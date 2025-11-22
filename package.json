@@ -15,6 +15,7 @@
     "demo": "cd demo && vite",
     "demo:build": "cd demo && vite build",
     "deploy": "node demo/deploy.js",
+    "deploy:api-config": "node backend/php/deploy-api-config.js",
     "prepublishOnly": "npm run build"
   },
   "keywords": [
