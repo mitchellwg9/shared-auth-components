@@ -8,4 +8,5 @@ demo/dist/
 demo/ftp-config.js
 src/utils/smtpConfig.js
 backend/php/config.php
+backend/php/temp-*/
 

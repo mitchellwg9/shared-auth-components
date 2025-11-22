@@ -163,13 +163,28 @@ ftp
     // Suppress verbose logs
   })
   .deploy(config)
-  .then(() => {
+  .then(async () => {
     console.log('');
     console.log('✅ API files deployed successfully!');
     console.log('');
     console.log('📋 Files uploaded:');
     console.log('   - api/config.php (with SMTP settings)');
     console.log('   - api/utils/email.php (with updated verification URL)');
+    console.log('');
+    
+    // Commit and push to Git
+    console.log('📝 Committing changes to Git...');
+    const { execSync } = await import('child_process');
+    try {
+      execSync('git add -A', { cwd: projectRoot, stdio: 'inherit' });
+      const timestamp = new Date().toISOString();
+      execSync(`git commit -m "Update API files: Fix SMTP authentication and routing - ${timestamp}"`, { cwd: projectRoot, stdio: 'inherit' });
+      execSync('git push', { cwd: projectRoot, stdio: 'inherit' });
+      console.log('✅ Changes committed and pushed to Git');
+    } catch (error) {
+      console.warn('⚠️  Git commit/push failed (this is OK if no changes to commit):', error.message);
+    }
+    
     console.log('');
     console.log('📋 Next steps:');
     console.log('   1. Test by creating a new account');
