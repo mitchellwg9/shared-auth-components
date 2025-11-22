@@ -398,7 +398,7 @@ export function LoginScreen({
             <button
               onClick={handleLogin}
               disabled={isLoading}
-              className="w-full px-6 py-3 text-white rounded-lg font-semibold transition-all duration-200 shadow-lg hover:shadow-xl disabled:opacity-50 disabled:cursor-not-allowed"
+              className="w-full px-6 py-3.5 text-white rounded-lg font-semibold transition-all duration-200 shadow-lg hover:shadow-xl disabled:opacity-50 disabled:cursor-not-allowed"
               style={{ 
                 background: `linear-gradient(to right, ${primaryColor}, ${primaryColor}dd)`,
                 fontWeight: 500
