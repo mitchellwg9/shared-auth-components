@@ -240,6 +240,65 @@ Your backend API should implement the following endpoints:
 - Success Response: `{ success: true, message?: string }`
 - Error Response: `{ error: string }`
 
+## Email Templates & SMTP
+
+The package includes email template generators and SMTP client utilities for sending authentication emails.
+
+### Email Templates
+
+Generate HTML email templates for verification, password reset, and welcome emails:
+
+```javascript
+import { generateVerificationEmail } from '@wayne/shared-auth';
+
+const html = generateVerificationEmail({
+  appName: 'My App',
+  userName: 'John Doe',
+  verificationUrl: 'https://myapp.com/verify?token=abc123',
+  primaryColor: '#6366f1',
+  logoUrl: 'https://myapp.com/logo.png' // optional
+});
+```
+
+Available templates:
+- `generateVerificationEmail()` - Email verification
+- `generatePasswordResetEmail()` - Password reset
+- `generateWelcomeEmail()` - Welcome email (after verification)
+
+### SMTP Client (Node.js Backend)
+
+For backend services, use the SMTP client to send emails:
+
+```javascript
+import { createSMTPClient, generateVerificationEmail } from '@wayne/shared-auth';
+
+// Create SMTP client (requires nodemailer: npm install nodemailer)
+const smtp = await createSMTPClient({
+  host: 'mail.example.com',
+  port: 465,
+  secure: true,
+  auth: {
+    user: 'noreply@example.com',
+    pass: 'password'
+  }
+});
+
+// Generate and send email
+const html = generateVerificationEmail({
+  appName: 'My App',
+  userName: 'John Doe',
+  verificationUrl: 'https://myapp.com/verify?token=abc123'
+});
+
+const result = await smtp.sendEmail({
+  to: 'user@example.com',
+  subject: 'Verify Your Email',
+  html: html
+});
+```
+
+See `src/utils/README.md` for detailed documentation.
+
 ## Customization
 
 All components support customization through props:
@@ -248,6 +307,7 @@ All components support customization through props:
 - **Styling**: `customStyles` object with CSS classes
 - **Behavior**: Custom validation functions, callbacks
 - **API**: Configurable API base URL
+- **Email**: Customizable email templates with branding
 
 ## License
 
