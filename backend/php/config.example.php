@@ -18,11 +18,11 @@ define('SMTP_PORT', 465);
 
 // Email sender information
 define('EMAIL_FROM', 'noreply@data-q.org');
-define('EMAIL_FROM_NAME', 'Your App Name'); // Optional: Name to display as sender
+define('EMAIL_FROM_NAME', 'Shared Auth Demo'); // Optional: Name to display as sender
 
 // Application settings
 define('APP_URL', 'https://data-q.org'); // Base URL of your application
-define('APP_NAME', 'Your App Name'); // Name of your application
+define('APP_NAME', 'Shared Auth Demo'); // Name of your application
 
 // Database settings (example - adjust to your needs)
 define('DB_HOST', 'localhost');
