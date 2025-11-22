@@ -201,7 +201,7 @@ export function SignupModal({
                 name="name"
                 value={formData.name}
                 onChange={handleChange}
-                className={`w-full pl-12 pr-4 py-3 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent ${
+                className={`w-full pl-12 pr-4 py-3.5 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent ${
                   errors.name ? 'border-red-300' : 'border-gray-300'
                 }`}
                 placeholder="Enter your full name"
@@ -226,7 +226,7 @@ export function SignupModal({
                 name="email"
                 value={formData.email}
                 onChange={handleChange}
-                className={`w-full pl-12 pr-4 py-3 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent ${
+                className={`w-full pl-12 pr-4 py-3.5 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent ${
                   errors.email ? 'border-red-300' : 'border-gray-300'
                 }`}
                 placeholder="Enter your email"
@@ -251,7 +251,7 @@ export function SignupModal({
                 name="password"
                 value={formData.password}
                 onChange={handleChange}
-                className={`w-full pl-12 pr-10 py-3 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent ${
+                className={`w-full pl-12 pr-10 py-3.5 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent ${
                   errors.password ? 'border-red-300' : 'border-gray-300'
                 }`}
                 placeholder="Create a password"
@@ -283,7 +283,7 @@ export function SignupModal({
                 name="confirmPassword"
                 value={formData.confirmPassword}
                 onChange={handleChange}
-                className={`w-full pl-12 pr-10 py-3 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent ${
+                className={`w-full pl-12 pr-10 py-3.5 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent ${
                   errors.confirmPassword ? 'border-red-300' : 'border-gray-300'
                 }`}
                 placeholder="Confirm your password"
