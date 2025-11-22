@@ -5,3 +5,6 @@ export { EmailVerificationPage } from './components/EmailVerificationPage';
 export { createAuthAPI } from './utils/authAPI';
 export { useAuth } from './hooks/useAuth';
 
+// Export theme for programmatic use
+export { theme, stylePaths } from './styles';
+
