@@ -14,6 +14,9 @@ function App() {
   const [user, setUser] = useState(null);
   const [toasts, setToasts] = useState([]);
 
+  // Debug: Log current state
+  console.log('App state:', { showLogin, showSignup, showVerification, hasUser: !!user });
+
   // Check for verification token in URL
   useEffect(() => {
     const urlParams = new URLSearchParams(window.location.search);
