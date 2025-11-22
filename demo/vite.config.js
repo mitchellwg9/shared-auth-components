@@ -17,6 +17,12 @@ export default defineConfig({
   },
   optimizeDeps: {
     include: ['react', 'react-dom', 'lucide-react'],
+    exclude: ['nodemailer'], // Exclude nodemailer (Node.js only, not for browser)
+  },
+  build: {
+    rollupOptions: {
+      external: ['nodemailer'], // Don't bundle nodemailer
+    },
   },
 })
 

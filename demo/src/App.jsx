@@ -57,7 +57,7 @@ function App() {
   const handleSignup = (userData) => {
     showToast('Account created! Please check your email to verify your account.', 'success');
     setShowSignup(false);
-    setShowLogin(true);
+    setShowLogin(false); // Close modals, show landing page
   };
 
   const handleLogout = () => {
@@ -70,7 +70,7 @@ function App() {
 
   const handleVerificationComplete = () => {
     setShowVerification(false);
-    setShowLogin(true);
+    setShowLogin(false); // Don't auto-show login, let user click the button
     // Clear token from URL
     window.history.replaceState({}, document.title, window.location.pathname);
   };
