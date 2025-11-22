@@ -22,7 +22,7 @@ try {
       host: process.env.FTP_HOST || 'ftp.data-q.org',
       port: parseInt(process.env.FTP_PORT || '21'),
       remoteRoot: process.env.FTP_REMOTE_ROOT || 'app/demo',
-      include: ["*", "**/*", ".htaccess"],
+      include: ["*", "**/*", ".htaccess", ".htaccess"],
       exclude: [".git", ".gitignore", "node_modules", ".DS_Store"],
       deleteRemote: false,
       forcePasv: true,
