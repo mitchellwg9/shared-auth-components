@@ -131,7 +131,7 @@ function App() {
                       key={toast.id}
                       className={`px-4 py-3 rounded-lg shadow-xl backdrop-blur-sm font-medium ${
                         toast.type === 'success' ? 'bg-green-500/90 text-white' :
-                        toast.type === 'error' ? 'bg-red-600/90 text-white border-2 border-red-700/50' :
+                        toast.type === 'error' ? 'bg-white text-red-600 border-2 border-red-300' :
                         'bg-blue-500/90 text-white'
                       }`}
                     >
@@ -201,7 +201,7 @@ function App() {
                   key={toast.id}
                   className={`px-4 py-3 rounded-lg shadow-lg font-medium ${
                     toast.type === 'success' ? 'bg-green-500 text-white' :
-                    toast.type === 'error' ? 'bg-red-600 text-white border-2 border-red-700' :
+                    toast.type === 'error' ? 'bg-white text-red-600 border-2 border-red-300' :
                     'bg-blue-500 text-white'
                   }`}
                 >
