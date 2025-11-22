@@ -1,7 +1,9 @@
 node_modules/
 dist/
+demo/dist/
 .DS_Store
 *.log
 .env
 .env.local
+demo/ftp-config.js
 

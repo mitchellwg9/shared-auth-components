@@ -11,6 +11,9 @@
   "scripts": {
     "build": "vite build",
     "dev": "vite",
+    "demo": "cd demo && vite",
+    "demo:build": "cd demo && vite build",
+    "deploy": "node demo/deploy.js",
     "prepublishOnly": "npm run build"
   },
   "keywords": [
@@ -23,12 +26,18 @@
   "author": "",
   "license": "MIT",
   "peerDependencies": {
-    "lucide-react": "^0.263.0",
     "react": "^18.0.0",
-    "react-dom": "^18.0.0"
+    "react-dom": "^18.0.0",
+    "lucide-react": "^0.263.0"
   },
   "devDependencies": {
+    "@tailwindcss/postcss": "^4.1.17",
     "@vitejs/plugin-react": "^5.1.1",
+    "autoprefixer": "^10.4.22",
+    "ftp-deploy": "^2.4.3",
+    "postcss": "^8.5.6",
+    "tailwindcss": "^4.1.17",
     "vite": "^7.2.4"
   }
 }
+

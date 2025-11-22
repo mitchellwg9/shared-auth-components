@@ -8,6 +8,29 @@ Reusable authentication components with email verification for React application
 npm install @wayne/shared-auth
 ```
 
+## Demo
+
+A demo application is included in the `demo` folder to test the components.
+
+### Running the Demo
+
+1. Install dependencies:
+```bash
+npm install
+```
+
+2. Start the demo development server:
+```bash
+npm run demo
+```
+
+3. Build the demo for production:
+```bash
+npm run demo:build
+```
+
+The demo connects to `https://data-q.org/api` and demonstrates all authentication features including login, signup, and email verification.
+
 ## Quick Start
 
 ```javascript
