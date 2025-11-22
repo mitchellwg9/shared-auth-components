@@ -35,20 +35,9 @@ try {
 
 const ftp = new FtpDeploy();
 
-// First, build the demo
-console.log('🔨 Building demo for production...');
-try {
-  execSync('npm run demo:build', { 
-    encoding: 'utf-8', 
-    cwd: projectRoot, 
-    stdio: 'inherit' 
-  });
-  console.log('✅ Demo build completed!\n');
-} catch (buildError) {
-  console.error('❌ Build failed:');
-  console.error(buildError.message || buildError);
-  process.exit(1);
-}
+// Skip build - using simple HTML file
+console.log('📄 Using simple HTML file (skipping build)...');
+console.log('✅ Ready to deploy!\n');
 
 // Validate FTP config
 if (!ftpConfig.user || !ftpConfig.password || ftpConfig.user.includes('your-ftp')) {
