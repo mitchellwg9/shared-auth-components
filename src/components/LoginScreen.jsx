@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { Mail, Lock, Eye, EyeOff, X } from 'lucide-react';
 import { createAuthAPI } from '../utils/authAPI';
 
 /**
@@ -30,6 +31,7 @@ export function LoginScreen({
 }) {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const [showPassword, setShowPassword] = useState(false);
   const [error, setError] = useState('');
   const [errorType, setErrorType] = useState('');
   const [isLoading, setIsLoading] = useState(false);
@@ -182,7 +184,7 @@ export function LoginScreen({
     return (
       <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
         <div className={`bg-white rounded-2xl w-full max-w-md shadow-2xl ${customStyles.container || ''}`}>
-          <div className="p-6 border-b border-gray-200 flex items-center justify-between">
+          <div className="flex items-center justify-between p-6 border-b border-gray-200">
             <div>
               <h2 className="text-2xl font-bold text-gray-900">Sign In</h2>
               <p className="text-sm text-gray-500 mt-1">Welcome back to {appName}</p>
@@ -192,9 +194,7 @@ export function LoginScreen({
                 onClick={onClose}
                 className="p-2 text-gray-400 hover:text-gray-600 hover:bg-gray-100 rounded-lg transition-colors"
               >
-                <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-                </svg>
+                <X className="w-5 h-5" />
               </button>
             )}
           </div>
@@ -202,43 +202,58 @@ export function LoginScreen({
             <div className="space-y-4">
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-2">Email Address</label>
-                <input
-                  type="email"
-                  value={email}
-                  onChange={(e) => {
-                    setEmail(e.target.value);
-                    if (error) {
-                      setError('');
-                      setErrorType('');
-                      setVerificationEmail('');
-                    }
-                  }}
-                  onKeyDown={handleKeyPress}
-                  className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                  style={{ '--tw-ring-color': primaryColor }}
-                  placeholder="Enter your email"
-                  disabled={isLoading}
-                />
+                <div className="relative">
+                  <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                    <Mail className="h-5 w-5 text-gray-400" />
+                  </div>
+                  <input
+                    type="email"
+                    value={email}
+                    onChange={(e) => {
+                      setEmail(e.target.value);
+                      if (error) {
+                        setError('');
+                        setErrorType('');
+                        setVerificationEmail('');
+                      }
+                    }}
+                    onKeyDown={handleKeyPress}
+                    className="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                    placeholder="Enter your email"
+                    disabled={isLoading}
+                  />
+                </div>
               </div>
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-2">Password</label>
-                <input
-                  type="password"
-                  value={password}
-                  onChange={(e) => {
-                    setPassword(e.target.value);
-                    if (error) {
-                      setError('');
-                      setErrorType('');
-                      setVerificationEmail('');
-                    }
-                  }}
-                  onKeyDown={handleKeyPress}
-                  className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                  style={{ '--tw-ring-color': primaryColor }}
-                  placeholder="Enter your password"
-                  disabled={isLoading}
-                />
+                <div className="relative">
+                  <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                    <Lock className="h-5 w-5 text-gray-400" />
+                  </div>
+                  <input
+                    type={showPassword ? 'text' : 'password'}
+                    value={password}
+                    onChange={(e) => {
+                      setPassword(e.target.value);
+                      if (error) {
+                        setError('');
+                        setErrorType('');
+                        setVerificationEmail('');
+                      }
+                    }}
+                    onKeyDown={handleKeyPress}
+                    className="w-full pl-10 pr-10 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                    placeholder="Enter your password"
+                    disabled={isLoading}
+                  />
+                  <button
+                    type="button"
+                    onClick={() => setShowPassword(!showPassword)}
+                    className="absolute inset-y-0 right-0 pr-3 flex items-center text-gray-400 hover:text-gray-600"
+                  >
+                    {showPassword ? <EyeOff className="h-5 w-5" /> : <Eye className="h-5 w-5" />}
+                  </button>
+                </div>
               </div>
               {error && error.trim() !== '' && (
                 <div className="bg-red-50 border-2 border-red-300 rounded-lg p-4" role="alert">
@@ -264,17 +279,15 @@ export function LoginScreen({
                   </div>
                 </div>
               )}
-              <button
-                onClick={handleLogin}
-                disabled={isLoading}
-                className="w-full px-6 py-3 text-white rounded-lg font-semibold transition-all duration-200 shadow-lg hover:shadow-xl disabled:opacity-50 disabled:cursor-not-allowed"
-                style={{ 
-                  background: `linear-gradient(to right, ${primaryColor}, ${primaryColor}dd)`,
-                  fontWeight: 500
-                }}
-              >
-                {isLoading ? 'Signing in...' : 'Sign In'}
-              </button>
+              <div className="pt-4">
+                <button
+                  onClick={handleLogin}
+                  disabled={isLoading}
+                  className="w-full px-6 py-3 bg-gradient-to-r from-blue-600 to-purple-600 text-white rounded-lg font-semibold hover:from-blue-700 hover:to-purple-700 transition-all duration-200 shadow-lg hover:shadow-xl disabled:opacity-50 disabled:cursor-not-allowed"
+                >
+                  {isLoading ? 'Signing in...' : 'Sign In'}
+                </button>
+              </div>
               {onSwitchToSignup && (
                 <div className="text-center pt-2">
                   <p className="text-sm text-gray-600">

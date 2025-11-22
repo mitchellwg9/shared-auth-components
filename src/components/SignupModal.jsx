@@ -201,10 +201,9 @@ export function SignupModal({
                 name="name"
                 value={formData.name}
                 onChange={handleChange}
-                className={`w-full pl-10 pr-4 py-3 border rounded-lg focus:ring-2 focus:border-transparent ${
+                className={`w-full pl-10 pr-4 py-3 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent ${
                   errors.name ? 'border-red-300' : 'border-gray-300'
                 }`}
-                style={{ '--tw-ring-color': primaryColor }}
                 placeholder="Enter your full name"
               />
             </div>
@@ -227,10 +226,9 @@ export function SignupModal({
                 name="email"
                 value={formData.email}
                 onChange={handleChange}
-                className={`w-full pl-10 pr-4 py-3 border rounded-lg focus:ring-2 focus:border-transparent ${
+                className={`w-full pl-10 pr-4 py-3 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent ${
                   errors.email ? 'border-red-300' : 'border-gray-300'
                 }`}
-                style={{ '--tw-ring-color': primaryColor }}
                 placeholder="Enter your email"
               />
             </div>
@@ -253,10 +251,9 @@ export function SignupModal({
                 name="password"
                 value={formData.password}
                 onChange={handleChange}
-                className={`w-full pl-10 pr-10 py-3 border rounded-lg focus:ring-2 focus:border-transparent ${
+                className={`w-full pl-10 pr-10 py-3 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent ${
                   errors.password ? 'border-red-300' : 'border-gray-300'
                 }`}
-                style={{ '--tw-ring-color': primaryColor }}
                 placeholder="Create a password"
               />
               <button
@@ -286,10 +283,9 @@ export function SignupModal({
                 name="confirmPassword"
                 value={formData.confirmPassword}
                 onChange={handleChange}
-                className={`w-full pl-10 pr-10 py-3 border rounded-lg focus:ring-2 focus:border-transparent ${
+                className={`w-full pl-10 pr-10 py-3 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent ${
                   errors.confirmPassword ? 'border-red-300' : 'border-gray-300'
                 }`}
-                style={{ '--tw-ring-color': primaryColor }}
                 placeholder="Confirm your password"
               />
               <button
@@ -322,11 +318,7 @@ export function SignupModal({
             <button
               type="submit"
               disabled={isLoading}
-              className="w-full px-6 py-3 text-white rounded-lg font-semibold transition-all duration-200 shadow-lg hover:shadow-xl disabled:opacity-50 disabled:cursor-not-allowed"
-              style={{ 
-                background: `linear-gradient(to right, ${primaryColor}, ${primaryColor}dd)`,
-                fontWeight: 500
-              }}
+              className="w-full px-6 py-3 bg-gradient-to-r from-blue-600 to-purple-600 text-white rounded-lg font-semibold hover:from-blue-700 hover:to-purple-700 transition-all duration-200 shadow-lg hover:shadow-xl disabled:opacity-50 disabled:cursor-not-allowed"
             >
               {isLoading ? 'Creating Account...' : 'Create Account'}
             </button>
@@ -343,8 +335,7 @@ export function SignupModal({
                     onClose();
                     onSwitchToLogin();
                   }}
-                  className="font-medium"
-                  style={{ color: primaryColor }}
+                  className="text-blue-600 hover:text-blue-700 font-medium"
                 >
                   Sign in
                 </button>
