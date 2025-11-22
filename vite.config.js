@@ -12,7 +12,7 @@ export default defineConfig({
       fileName: (format) => `index.${format === 'es' ? 'esm' : format}.js`
     },
     rollupOptions: {
-      external: ['react', 'react-dom'],
+      external: ['react', 'react-dom', 'lucide-react'],
       output: {
         globals: {
           react: 'React',
