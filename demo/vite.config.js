@@ -21,7 +21,18 @@ export default defineConfig({
   },
   build: {
     rollupOptions: {
-      external: ['nodemailer'], // Don't bundle nodemailer
+      external: [
+        'nodemailer', // Don't bundle nodemailer (Node.js only)
+        'fs', // Node.js file system
+        'path', // Node.js path module
+        'crypto', // Node.js crypto module
+      ],
+      output: {
+        // Ensure we don't try to bundle Node.js modules
+        globals: {
+          'nodemailer': 'nodemailer'
+        }
+      }
     },
   },
 })

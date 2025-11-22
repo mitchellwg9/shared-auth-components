@@ -5,9 +5,11 @@
 // Example: import '@wayne/shared-auth/styles/base.css'
 
 // Export paths for programmatic access
+// Style paths for importing CSS files
+// Note: In browser environments, use relative imports instead
 export const stylePaths = {
-  designSystem: require.resolve('./design-system.css'),
-  base: require.resolve('./base.css')
+  designSystem: './design-system.css',
+  base: './base.css'
 };
 
 // Export theme tokens as JavaScript object for programmatic use
