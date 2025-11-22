@@ -1,12 +1,13 @@
 import { useState, useEffect } from 'react';
 import { LoginScreen, SignupModal, EmailVerificationPage } from '../../src/index.js';
+import { LandingPage } from './LandingPage.jsx';
 import './App.css';
 
 // API Base URL - pointing to data-q.org API
 const API_BASE_URL = 'https://data-q.org/api';
 
 function App() {
-  const [showLogin, setShowLogin] = useState(true);
+  const [showLogin, setShowLogin] = useState(false);
   const [showSignup, setShowSignup] = useState(false);
   const [showVerification, setShowVerification] = useState(false);
   const [verificationToken, setVerificationToken] = useState(null);
@@ -62,7 +63,8 @@ function App() {
   const handleLogout = () => {
     localStorage.removeItem('currentUser');
     setUser(null);
-    setShowLogin(true);
+    setShowLogin(false);
+    setShowSignup(false);
     showToast('Logged out successfully', 'info');
   };
 
@@ -245,41 +247,43 @@ function App() {
     );
   }
 
-  // Show login or signup
+  // Show landing page with modals
   return (
-    <div className="min-h-screen">
-      {showLogin && (
-        <LoginScreen
-          apiBaseUrl={API_BASE_URL}
-          appName="Shared Auth Demo"
-          primaryColor="#6366f1"
-          onLogin={handleLogin}
-          showToast={showToast}
-          onSwitchToSignup={() => {
-            setShowLogin(false);
-            setShowSignup(true);
-          }}
-        />
-      )}
+    <>
+      <LandingPage
+        onLoginClick={() => setShowLogin(true)}
+        onSignupClick={() => setShowSignup(true)}
+      />
 
-      {showSignup && (
-        <SignupModal
-          isOpen={showSignup}
-          onClose={() => {
-            setShowSignup(false);
-            setShowLogin(true);
-          }}
-          apiBaseUrl={API_BASE_URL}
-          appName="Shared Auth Demo"
-          primaryColor="#6366f1"
-          onSignup={handleSignup}
-          showToast={showToast}
-          onSwitchToLogin={() => {
-            setShowSignup(false);
-            setShowLogin(true);
-          }}
-        />
-      )}
+      {/* Login Modal */}
+      <LoginScreen
+        isOpen={showLogin}
+        onClose={() => setShowLogin(false)}
+        apiBaseUrl={API_BASE_URL}
+        appName="Shared Auth Demo"
+        primaryColor="#6366f1"
+        onLogin={handleLogin}
+        showToast={showToast}
+        onSwitchToSignup={() => {
+          setShowLogin(false);
+          setShowSignup(true);
+        }}
+      />
+
+      {/* Signup Modal */}
+      <SignupModal
+        isOpen={showSignup}
+        onClose={() => setShowSignup(false)}
+        apiBaseUrl={API_BASE_URL}
+        appName="Shared Auth Demo"
+        primaryColor="#6366f1"
+        onSignup={handleSignup}
+        showToast={showToast}
+        onSwitchToLogin={() => {
+          setShowSignup(false);
+          setShowLogin(true);
+        }}
+      />
 
       {/* Toast Container */}
       <div className="fixed bottom-4 right-4 space-y-2 z-50">
@@ -296,7 +300,7 @@ function App() {
           </div>
         ))}
       </div>
-    </div>
+    </>
   );
 }
 
