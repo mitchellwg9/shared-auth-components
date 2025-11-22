@@ -105,9 +105,22 @@ ftp
     res.forEach(file => {
       console.log(`   - ${file}`);
     });
+    console.log('');
+    console.log('🔍 FTP Connection Details:');
+    console.log(`   Host: ${config.host}`);
+    console.log(`   Port: ${config.port}`);
+    console.log(`   User: ${config.user}`);
+    console.log(`   Remote Root: ${config.remoteRoot}`);
+    console.log(`   Local Root: ${config.localRoot}`);
+    console.log('');
     console.log(`🌐 Your demo should be live at: https://data-q.org/app/demo/`);
-    console.log(`🔍 Verify the remote path: ${config.remoteRoot} on ${config.host}`);
-    console.log(`🔍 Full URL should be: https://data-q.org/${config.remoteRoot}/index.html`);
+    console.log(`🔍 Verify in file manager: Look for folder "${config.remoteRoot}" on ${config.host}`);
+    console.log(`🔍 Files should be at: ${config.remoteRoot}/index.html`);
+    console.log('');
+    console.log('⚠️  If files are not visible in file manager:');
+    console.log('   1. Check if the remote path is correct');
+    console.log('   2. Try changing remoteRoot to just "demo" or "public_html/app/demo"');
+    console.log('   3. Verify FTP user has write permissions to that directory');
     console.log('');
     
     // Deploy to GitHub
