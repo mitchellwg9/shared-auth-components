@@ -44,7 +44,7 @@ if (isset($_GET['path'])) {
 }
 
 // Check if path is a direct file access that should bypass router
-$directAccessFiles = ['direct-show-logs.php', 'test-email.php', 'show-logs.php', 'test-smtp-config.php', 'check-email-verification.php', 'test-wayne.php'];
+$directAccessFiles = ['direct-show-logs.php', 'test-email.php', 'show-logs.php', 'test-smtp-config.php', 'check-email-verification.php', 'test-wayne.php', 'debug-routing.php'];
 foreach ($directAccessFiles as $fileName) {
     if ($path === $fileName || strpos($path, $fileName) !== false) {
         $filePath = __DIR__ . '/' . $fileName;
@@ -154,6 +154,11 @@ if (empty($resource)) {
             case 'test-wayne.php':
                 // Simple test endpoint
                 require_once __DIR__ . '/test-wayne.php';
+                exit;
+            case 'debug-routing':
+            case 'debug-routing.php':
+                // Debug routing endpoint
+                require_once __DIR__ . '/debug-routing.php';
                 exit;
             case 'show-logs':
             case 'show-logs.php':

@@ -141,6 +141,14 @@ if (existsSync(testWaynePath)) {
   console.log('✅ Prepared test-wayne.php');
 }
 
+// Copy debug-routing.php from backend/php
+const debugRoutingPath = resolve(__dirname, 'debug-routing.php');
+if (existsSync(debugRoutingPath)) {
+  const debugRoutingContent = readFileSync(debugRoutingPath, 'utf-8');
+  writeFileSync(resolve(tempDir, 'debug-routing.php'), debugRoutingContent);
+  console.log('✅ Prepared debug-routing.php');
+}
+
 const ftp = new FtpDeploy();
 
 // Deploy to api directory
