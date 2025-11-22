@@ -125,20 +125,20 @@ function App() {
           </div>
         </div>
 
-        <div className="fixed bottom-4 right-4 space-y-2 z-50">
-          {toasts.map(toast => (
-            <div
-              key={toast.id}
-              className={`px-4 py-3 rounded-lg shadow-xl backdrop-blur-sm ${
-                toast.type === 'success' ? 'bg-green-500/90 text-white' :
-                toast.type === 'error' ? 'bg-red-500/90 text-white' :
-                'bg-blue-500/90 text-white'
-              }`}
-            >
-              {toast.message}
-            </div>
-          ))}
-        </div>
+                <div className="fixed bottom-4 right-4 space-y-2 z-50">
+                  {toasts.map(toast => (
+                    <div
+                      key={toast.id}
+                      className={`px-4 py-3 rounded-lg shadow-xl backdrop-blur-sm font-medium ${
+                        toast.type === 'success' ? 'bg-green-500/90 text-white' :
+                        toast.type === 'error' ? 'bg-red-600/90 text-white border-2 border-red-700/50' :
+                        'bg-blue-500/90 text-white'
+                      }`}
+                    >
+                      {toast.message}
+                    </div>
+                  ))}
+                </div>
       </div>
     );
   }
@@ -195,20 +195,20 @@ function App() {
       )}
 
       {/* Toast Container */}
-      <div className="fixed bottom-4 right-4 space-y-2 z-50">
-        {toasts.map(toast => (
-          <div
-            key={toast.id}
-            className={`px-4 py-3 rounded-lg shadow-lg ${
-              toast.type === 'success' ? 'bg-green-500 text-white' :
-              toast.type === 'error' ? 'bg-red-500 text-white' :
-              'bg-blue-500 text-white'
-            }`}
-          >
-            {toast.message}
-          </div>
-        ))}
-      </div>
+            <div className="fixed bottom-4 right-4 space-y-2 z-50">
+              {toasts.map(toast => (
+                <div
+                  key={toast.id}
+                  className={`px-4 py-3 rounded-lg shadow-lg font-medium ${
+                    toast.type === 'success' ? 'bg-green-500 text-white' :
+                    toast.type === 'error' ? 'bg-red-600 text-white border-2 border-red-700' :
+                    'bg-blue-500 text-white'
+                  }`}
+                >
+                  {toast.message}
+                </div>
+              ))}
+            </div>
     </>
   );
 }
