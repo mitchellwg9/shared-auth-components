@@ -175,8 +175,10 @@ export function LoginScreen({
 
   // If used as a modal
   if (isOpen !== undefined) {
+    // If modal is closed, don't render anything
     if (!isOpen) return null;
     
+    // Render modal
     return (
       <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
         <div className={`bg-white rounded-2xl w-full max-w-md shadow-2xl ${customStyles.container || ''}`}>
