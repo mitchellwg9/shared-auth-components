@@ -240,11 +240,57 @@ Your backend API should implement the following endpoints:
 - Success Response: `{ success: true, message?: string }`
 - Error Response: `{ error: string }`
 
+## Backend Support
+
+This package includes both **frontend React components** and **backend utilities** for complete authentication functionality.
+
+### PHP Backend (Recommended for PHP APIs)
+
+If your backend API is PHP, use the shared PHP backend package:
+
+1. Copy the PHP files from `backend/php/` to your API directory
+2. Include them in your auth routes
+3. Configure SMTP settings
+4. Use `handleAuthRoute()` to handle all authentication endpoints
+
+See `backend/php/README.md` for detailed PHP backend documentation.
+
+**Quick PHP Example:**
+```php
+require_once __DIR__ . '/utils/emailTemplates.php';
+require_once __DIR__ . '/utils/smtpClient.php';
+require_once __DIR__ . '/utils/authRoutes.php';
+
+// Configure SMTP
+$smtpConfig = [
+    'host' => 'mail.data-q.org',
+    'port' => 465,
+    'secure' => 'ssl',
+    'auth' => [
+        'user' => 'noreply@data-q.org',
+        'pass' => 'your-password'
+    ],
+    'from' => 'noreply@data-q.org',
+    'fromName' => 'My App'
+];
+
+// Handle auth routes
+handleAuthRoute($conn, $method, $pathParts, $data, [
+    'appUrl' => 'https://data-q.org',
+    'appName' => 'My App',
+    'smtp' => $smtpConfig
+]);
+```
+
+### Node.js Backend
+
+For Node.js backend services, use the JavaScript email templates and SMTP client:
+
 ## Email Templates & SMTP
 
 The package includes email template generators and SMTP client utilities for sending authentication emails.
 
-### Email Templates
+### Email Templates (JavaScript/Node.js)
 
 Generate HTML email templates for verification, password reset, and welcome emails:
 
@@ -267,7 +313,7 @@ Available templates:
 
 ### SMTP Client (Node.js Backend)
 
-For backend services, use the SMTP client to send emails:
+For Node.js backend services, use the SMTP client to send emails:
 
 ```javascript
 import { createSMTPClient, generateVerificationEmail } from '@wayne/shared-auth';
