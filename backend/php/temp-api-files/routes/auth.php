@@ -374,11 +374,19 @@ switch ($method) {
                 error_log("=== TEST EMAIL SEND ===");
                 error_log("To: $testEmail");
                 error_log("Using SMTP: " . (defined('SMTP_ENABLED') && SMTP_ENABLED ? 'Yes' : 'No'));
+                error_log("SMTP_HOST: " . (defined('SMTP_HOST') ? SMTP_HOST : 'not defined'));
+                error_log("SMTP_USER: " . (defined('SMTP_USER') ? SMTP_USER : 'not defined'));
+                error_log("SMTP_PORT: " . (defined('SMTP_PORT') ? SMTP_PORT : 'not defined'));
+                error_log("SMTP_SECURE: " . (defined('SMTP_SECURE') ? SMTP_SECURE : 'not defined'));
                 
+                // Capture any output/errors
+                ob_start();
                 $emailSent = sendVerificationEmail($testEmail, $testName, $testToken);
+                $output = ob_get_clean();
                 
                 $result['email_sent'] = $emailSent;
                 $result['success'] = $emailSent;
+                $result['output_captured'] = $output;
                 
                 if ($emailSent) {
                     $result['message'] = 'Test email sent successfully! Check your inbox (and spam folder).';
@@ -386,13 +394,20 @@ switch ($method) {
                 } else {
                     $result['message'] = 'Email sending returned false. Check server error logs for details.';
                     error_log("❌ Test email send returned false for: $testEmail");
+                    // Get last error if available
+                    $lastError = error_get_last();
+                    if ($lastError) {
+                        $result['last_error'] = $lastError;
+                    }
                 }
             } catch (Exception $e) {
                 $result['email_sent'] = false;
                 $result['success'] = false;
                 $result['error'] = $e->getMessage();
+                $result['error_trace'] = $e->getTraceAsString();
                 $result['message'] = 'Exception occurred while sending email: ' . $e->getMessage();
                 error_log("❌ Exception sending test email: " . $e->getMessage());
+                error_log("Stack trace: " . $e->getTraceAsString());
             }
             
             error_log("=== END TEST EMAIL SEND ===");
