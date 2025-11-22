@@ -111,6 +111,38 @@ SMTP_FROM=noreply@example.com
 SMTP_FROM_NAME=My App
 ```
 
+### Example: data-q.org Configuration
+
+For Afrihost hosting with data-q.org:
+
+```javascript
+import { createSMTPClient } from '@wayne/shared-auth/utils/smtpClient';
+
+const smtp = await createSMTPClient({
+  host: 'mail.data-q.org',
+  port: 465,
+  secure: true, // SSL
+  auth: {
+    user: 'noreply@data-q.org',
+    pass: 'your-password'
+  },
+  from: 'noreply@data-q.org',
+  fromName: 'Data-Q App'
+});
+```
+
+Or using environment variables:
+
+```env
+SMTP_HOST=mail.data-q.org
+SMTP_PORT=465
+SMTP_SECURE=true
+SMTP_USER=noreply@data-q.org
+SMTP_PASS=your-password
+SMTP_FROM=noreply@data-q.org
+SMTP_FROM_NAME=Data-Q App
+```
+
 ## Integration Example
 
 ### Backend API Route (Node.js/Express)

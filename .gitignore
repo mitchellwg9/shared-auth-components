@@ -6,4 +6,5 @@ demo/dist/
 .env
 .env.local
 demo/ftp-config.js
+src/utils/smtpConfig.js
 
