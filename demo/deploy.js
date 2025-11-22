@@ -63,17 +63,38 @@ console.log(`🌐 Remote: ${config.remoteRoot} on ${config.host}`);
 console.log(`👤 User: ${config.user}`);
 console.log('');
 
+// Debug: List files that will be uploaded
+try {
+  const files = readdirSync(config.localRoot, { recursive: true });
+  console.log('📋 Files to upload:');
+  files.forEach(file => {
+    const fullPath = join(config.localRoot, file);
+    const stats = statSync(fullPath);
+    if (stats.isFile()) {
+      console.log(`   - ${file} (${stats.size} bytes)`);
+      // Show first few lines of index.html for debugging
+      if (file === 'index.html') {
+        const content = readFileSync(fullPath, 'utf-8');
+        const preview = content.substring(0, 200).replace(/\n/g, ' ');
+        console.log(`     Preview: ${preview}...`);
+      }
+    }
+  });
+  console.log('');
+} catch (err) {
+  console.log(`⚠️  Could not list files: ${err.message}`);
+  console.log('');
+}
+
 ftp
   .on('uploading', (data) => {
-    console.log(`📤 Uploading: ${data.filename}`);
+    console.log(`📤 Uploading: ${data.filename} (${data.totalFiles} total files)`);
   })
   .on('uploaded', (data) => {
     console.log(`✅ Uploaded: ${data.filename}`);
   })
   .on('log', (data) => {
-    if (data.type === 'log') {
-      console.log(`ℹ️  ${data.message}`);
-    }
+    console.log(`ℹ️  [FTP] ${data.type}: ${data.message}`);
   })
   .deploy(config)
   .then((res) => {
