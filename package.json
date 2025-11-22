@@ -16,6 +16,8 @@
     "demo:build": "cd demo && vite build",
     "deploy": "node demo/deploy.js",
     "deploy:api-config": "node backend/php/deploy-api-config.js",
+    "deploy:api-files": "node backend/php/deploy-api-files.js",
+    "deploy:test-email": "node backend/php/deploy-test-email.js",
     "prepublishOnly": "npm run build"
   },
   "keywords": [
