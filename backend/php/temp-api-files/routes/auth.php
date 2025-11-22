@@ -4,14 +4,28 @@ require_once __DIR__ . '/../utils/email.php';
 
 $method = $_SERVER['REQUEST_METHOD'];
 $data = getRequestData();
-$path = parse_url($_SERVER['REQUEST_URI'], PHP_URL_PATH);
-$path = str_replace('/api', '', $path);
+
+// Get path from query parameter (set by .htaccess rewrite) or from URI
+$path = '';
+if (isset($_GET['path'])) {
+    $path = $_GET['path'];
+} else {
+    // Extract path after /api/
+    $requestUri = $_SERVER['REQUEST_URI'] ?? '';
+    $requestUri = strtok($requestUri, '?'); // Remove query string
+    if (strpos($requestUri, '/api/') !== false) {
+        $path = substr($requestUri, strpos($requestUri, '/api/') + 5); // +5 for '/api/'
+    } elseif (strpos($requestUri, '/api') !== false && strlen($requestUri) > 4) {
+        $path = substr($requestUri, strpos($requestUri, '/api') + 4);
+    }
+}
+
 $path = trim($path, '/');
-$pathParts = explode('/', $path);
+$pathParts = !empty($path) ? explode('/', $path) : [];
 
 // Debug logging for routing
-error_log("Auth route - Method: $method, REQUEST_URI: " . $_SERVER['REQUEST_URI']);
-error_log("Auth route - Path after processing: $path, PathParts: " . json_encode($pathParts));
+error_log("Auth route - Method: $method, REQUEST_URI: " . ($_SERVER['REQUEST_URI'] ?? 'not set'));
+error_log("Auth route - Path after processing: '$path', PathParts: " . json_encode($pathParts));
 error_log("Auth route - PathParts[0]: " . ($pathParts[0] ?? 'empty') . ", PathParts[1]: " . ($pathParts[1] ?? 'empty'));
 
 switch ($method) {
