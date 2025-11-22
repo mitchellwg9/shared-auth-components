@@ -101,7 +101,13 @@ ftp
     console.log('');
     console.log('✅ FTP deployment completed successfully!');
     console.log(`📊 Total files processed: ${res.length}`);
+    console.log(`📁 Files uploaded:`);
+    res.forEach(file => {
+      console.log(`   - ${file}`);
+    });
     console.log(`🌐 Your demo should be live at: https://data-q.org/app/demo/`);
+    console.log(`🔍 Verify the remote path: ${config.remoteRoot} on ${config.host}`);
+    console.log(`🔍 Full URL should be: https://data-q.org/${config.remoteRoot}/index.html`);
     console.log('');
     
     // Deploy to GitHub
