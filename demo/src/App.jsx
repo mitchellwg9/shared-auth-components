@@ -144,11 +144,20 @@ function App() {
   }
 
   // Show landing page with modals
+  // Debug: Log to verify this code is running
+  console.log('✅ App.jsx: Rendering LandingPage component');
+  
   return (
     <>
       <LandingPage
-        onLoginClick={() => setShowLogin(true)}
-        onSignupClick={() => setShowSignup(true)}
+        onLoginClick={() => {
+          console.log('Login button clicked');
+          setShowLogin(true);
+        }}
+        onSignupClick={() => {
+          console.log('Signup button clicked');
+          setShowSignup(true);
+        }}
       />
 
       {/* Login Modal - only render when showLogin is true */}
