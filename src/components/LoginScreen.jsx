@@ -204,7 +204,7 @@ export function LoginScreen({
                 <label className="block text-sm font-medium text-gray-700 mb-2">Email Address</label>
                 <div className="relative">
                   <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                    <Mail className="h-5 w-5 text-gray-400" />
+                    <Mail className="h-5 w-5 text-gray-300" />
                   </div>
                   <input
                     type="email"
@@ -218,7 +218,7 @@ export function LoginScreen({
                       }
                     }}
                     onKeyDown={handleKeyPress}
-                    className="w-full pl-10 pr-4 py-3.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                    className="w-full pl-10 pr-4 py-3.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent text-gray-500 placeholder:text-gray-300"
                     placeholder="Enter your email"
                     disabled={isLoading}
                   />
@@ -228,7 +228,7 @@ export function LoginScreen({
                 <label className="block text-sm font-medium text-gray-700 mb-2">Password</label>
                 <div className="relative">
                   <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                    <Lock className="h-5 w-5 text-gray-400" />
+                    <Lock className="h-5 w-5 text-gray-300" />
                   </div>
                   <input
                     type={showPassword ? 'text' : 'password'}
@@ -242,14 +242,14 @@ export function LoginScreen({
                       }
                     }}
                     onKeyDown={handleKeyPress}
-                    className="w-full pl-10 pr-10 py-3.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                    className="w-full pl-10 pr-10 py-3.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent text-gray-500 placeholder:text-gray-300"
                     placeholder="Enter your password"
                     disabled={isLoading}
                   />
                   <button
                     type="button"
                     onClick={() => setShowPassword(!showPassword)}
-                    className="absolute inset-y-0 right-0 pr-3 flex items-center text-gray-400 hover:text-gray-600"
+                    className="absolute inset-y-0 right-0 pr-3 flex items-center text-gray-300 hover:text-gray-500"
                   >
                     {showPassword ? <EyeOff className="h-5 w-5" /> : <Eye className="h-5 w-5" />}
                   </button>
