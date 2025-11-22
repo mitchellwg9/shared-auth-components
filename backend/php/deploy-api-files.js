@@ -133,6 +133,14 @@ if (existsSync(directShowLogsPath)) {
   console.log('✅ Prepared direct-show-logs.php');
 }
 
+// Copy test-wayne.php from backend/php (simple test endpoint)
+const testWaynePath = resolve(__dirname, 'test-wayne.php');
+if (existsSync(testWaynePath)) {
+  const testWayneContent = readFileSync(testWaynePath, 'utf-8');
+  writeFileSync(resolve(tempDir, 'test-wayne.php'), testWayneContent);
+  console.log('✅ Prepared test-wayne.php');
+}
+
 const ftp = new FtpDeploy();
 
 // Deploy to api directory
