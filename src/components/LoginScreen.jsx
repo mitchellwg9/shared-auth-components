@@ -173,12 +173,12 @@ export function LoginScreen({
     if (e.key === 'Enter' && !isLoading) handleLogin();
   };
 
-  // If used as a modal
+  // If used as a modal (isOpen prop is provided)
   if (isOpen !== undefined) {
     // If modal is closed, don't render anything
     if (!isOpen) return null;
     
-    // Render modal
+    // Render modal when open
     return (
       <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
         <div className={`bg-white rounded-2xl w-full max-w-md shadow-2xl ${customStyles.container || ''}`}>
@@ -300,8 +300,11 @@ export function LoginScreen({
     );
   }
 
-  // If used as a full page (not modal)
-  return (
+  // If used as a full page (isOpen prop is NOT provided)
+  // Only render full page if isOpen is explicitly undefined (not provided)
+  // This allows the component to be used as a standalone login page
+  if (isOpen === undefined) {
+    return (
     <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 flex items-center justify-center p-4">
       <div className={`bg-white rounded-2xl w-full max-w-md shadow-2xl ${customStyles.container || ''}`}>
         <div className="p-8">
@@ -409,6 +412,11 @@ export function LoginScreen({
         </div>
       </div>
     </div>
-  );
+    );
+  }
+
+  // If isOpen was provided but we got here, something went wrong
+  // Don't render anything (this shouldn't happen, but safety check)
+  return null;
 }
 
