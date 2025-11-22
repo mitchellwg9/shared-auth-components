@@ -482,6 +482,7 @@ body {
 
 .space-y-2 > * + * { margin-top: var(--space-2); }
 .space-y-3 > * + * { margin-top: var(--space-3); }
+.space-y-4 > * + * { margin-top: var(--space-4); }
 
 .relative { position: relative; }
 .absolute { position: absolute; }
