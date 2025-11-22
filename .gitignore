@@ -7,4 +7,5 @@ demo/dist/
 .env.local
 demo/ftp-config.js
 src/utils/smtpConfig.js
+backend/php/config.php
 
