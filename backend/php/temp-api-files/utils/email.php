@@ -40,10 +40,25 @@ function sendEmailSMTP($to, $subject, $message, $html = true) {
     
     error_log("✅ SMTP socket connected successfully");
     
-    // Read server greeting
-    $response = fgets($socket, 515);
-    if (substr($response, 0, 3) !== '220') {
-        error_log("SMTP server error: $response");
+    // Read server greeting (220 response)
+    $greeting = '';
+    while ($line = fgets($socket, 515)) {
+        $greeting .= $line;
+        // Server greeting ends with a line starting with "220 " (space, not hyphen)
+        if (substr($line, 0, 4) === '220 ') {
+            break;
+        }
+        // Some servers send multi-line greeting ending with just "220"
+        if (substr(trim($line), 0, 3) === '220' && substr($line, 3, 1) === ' ') {
+            break;
+        }
+    }
+    
+    error_log("Server greeting: " . trim($greeting));
+    
+    // Check if greeting is valid (should start with 220)
+    if (substr($greeting, 0, 3) !== '220') {
+        error_log("❌ SMTP server error in greeting: " . trim($greeting));
         fclose($socket);
         return false;
     }
@@ -59,7 +74,10 @@ function sendEmailSMTP($to, $subject, $message, $html = true) {
         $response = '';
         while ($line = fgets($socket, 515)) {
             $response .= $line;
-            if (substr($line, 3, 1) === ' ') break;
+            // EHLO response ends with "250 " (space, not hyphen)
+            if (substr($line, 0, 4) === '250 ') {
+                break;
+            }
         }
         
         // Start TLS
@@ -77,7 +95,10 @@ function sendEmailSMTP($to, $subject, $message, $html = true) {
         $ehloResponse = '';
         while ($line = fgets($socket, 515)) {
             $ehloResponse .= $line;
-            if (substr($line, 3, 1) === ' ') break;
+            // EHLO response ends with "250 " (space, not hyphen)
+            if (substr($line, 0, 4) === '250 ') {
+                break;
+            }
         }
     } else {
         // For SSL, connection is already encrypted, send EHLO directly
@@ -89,12 +110,19 @@ function sendEmailSMTP($to, $subject, $message, $html = true) {
             // Last line of EHLO response starts with "250 " (space after code, not hyphen)
             // Multi-line responses have "250-" for continuation and "250 " for final line
             if (substr($line, 0, 4) === '250 ') {
+                error_log("✅ Got final EHLO line (250 with space)");
                 break;
             }
-            // Safety: if we get a non-250 response, something is wrong
+            // Continuation lines start with "250-"
+            if (substr($line, 0, 4) === '250-') {
+                // Continue reading
+                continue;
+            }
+            // If we get something that's not 250, something is wrong
             if (substr($line, 0, 3) !== '250') {
                 error_log("⚠️ Unexpected EHLO response line: " . trim($line));
-                break;
+                // Don't break - might be multi-line with different format
+                // But log it for debugging
             }
         }
     }
