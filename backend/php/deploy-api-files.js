@@ -151,14 +151,14 @@ if (existsSync(debugRoutingPath)) {
 
 const ftp = new FtpDeploy();
 
-// Deploy to api directory
+// Deploy to public_html/api directory (web-accessible API location)
 const config = {
   user: ftpConfig.user,
   password: ftpConfig.password,
   host: ftpConfig.host,
   port: ftpConfig.port || 21,
   localRoot: tempDir,
-  remoteRoot: 'api',
+  remoteRoot: 'public_html/api',
   include: ['**/*'],
   exclude: [],
   deleteRemote: false,
@@ -166,7 +166,7 @@ const config = {
 };
 
 console.log('');
-console.log('🔄 Uploading files to api/ directory...');
+console.log('🔄 Uploading files to public_html/api/ directory...');
 
 ftp
   .on('uploading', (data) => {
