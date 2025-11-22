@@ -460,6 +460,8 @@ body {
 .text-blue-600 { color: var(--primary-600); }
 .text-blue-800 { color: var(--primary-800); }
 .text-green-800 { color: var(--success-600); }
+.text-red-600 { color: var(--error-500); }
+.text-red-700 { color: var(--error-600); }
 .text-red-800 { color: var(--error-600); }
 .text-purple-800 { color: var(--accent-purple); }
 .text-yellow-800 { color: var(--warning-600); }
