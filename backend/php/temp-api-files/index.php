@@ -166,7 +166,27 @@ if (empty($resource)) {
                 require_once __DIR__ . '/show-logs.php';
                 exit;
             default:
-                sendJSON(['error' => 'Resource not found'], 404);
+                // Before returning error, check if it's a direct file access
+                $possibleFile = __DIR__ . '/' . $resource;
+                if (file_exists($possibleFile) && is_file($possibleFile)) {
+                    require_once $possibleFile;
+                    exit;
+                }
+                sendJSON([
+                    'error' => 'Resource not found',
+                    'debug' => [
+                        'resource' => $resource,
+                        'path' => $path,
+                        'pathParts' => $pathParts,
+                        'request_uri' => $_SERVER['REQUEST_URI'] ?? 'not set',
+                        'query_path' => $_GET['path'] ?? 'not set',
+                        'files_checked' => [
+                            'test-wayne.php' => file_exists(__DIR__ . '/test-wayne.php'),
+                            'debug-routing.php' => file_exists(__DIR__ . '/debug-routing.php'),
+                            'test-smtp-config.php' => file_exists(__DIR__ . '/test-smtp-config.php'),
+                        ]
+                    ]
+                ], 404);
                 break;
         }
 
