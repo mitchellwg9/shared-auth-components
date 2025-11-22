@@ -55,7 +55,7 @@ function App() {
   };
 
   const handleSignup = (userData) => {
-    showToast('Account created! Please check your email to verify your account.', 'success');
+    // Toast is already shown by SignupModal component, no need to show it again
     setShowSignup(false);
     setShowLogin(false);
   };
