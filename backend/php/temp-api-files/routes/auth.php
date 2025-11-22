@@ -517,12 +517,17 @@ switch ($method) {
                 'action' => $action, 
                 'pathParts' => $pathParts, 
                 'request_uri' => $_SERVER['REQUEST_URI'] ?? 'not set',
+                'query_string' => $_SERVER['QUERY_STRING'] ?? 'not set',
+                'get_path' => $_GET['path'] ?? 'not set',
+                'script_name' => $_SERVER['SCRIPT_NAME'] ?? 'not set',
                 'available_actions' => ['verify-email', 'test-smtp-config', 'test-send-email', 'check-email-verification'],
                 'debug' => [
                     'method' => $method,
                     'path' => $path ?? 'not set',
                     'pathParts_count' => count($pathParts),
-                    'pathParts' => $pathParts
+                    'pathParts' => $pathParts,
+                    'pathParts[0]' => $pathParts[0] ?? 'empty',
+                    'pathParts[1]' => $pathParts[1] ?? 'empty',
                 ]
             ], 404);
         }
