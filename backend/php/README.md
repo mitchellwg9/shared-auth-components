@@ -20,9 +20,31 @@ your-api/
   │   └── authRoutes.php (from shared-auth/backend/php/)
 ```
 
-## Usage
+## Setup
 
-### 1. Include the utilities in your auth routes
+### 1. Copy the configuration file
+
+Copy `config.example.php` to `config.php` and update with your settings:
+
+```php
+<?php
+// Email configuration
+define('SMTP_ENABLED', true);
+define('SMTP_HOST', 'mail.data-q.org');
+define('SMTP_USER', 'noreply@data-q.org');
+define('SMTP_PASS', '!Q@W#E4r5t6y');
+define('SMTP_SECURE', 'ssl');
+define('SMTP_PORT', 465);
+define('EMAIL_FROM', 'noreply@data-q.org');
+define('EMAIL_FROM_NAME', 'Your App Name');
+
+// Application settings
+define('APP_URL', 'https://data-q.org');
+define('APP_NAME', 'Your App Name');
+?>
+```
+
+### 2. Include the utilities in your auth routes
 
 ```php
 <?php
@@ -30,6 +52,7 @@ require_once __DIR__ . '/../config.php';
 require_once __DIR__ . '/../utils/emailTemplates.php';
 require_once __DIR__ . '/../utils/smtpClient.php';
 require_once __DIR__ . '/../utils/authRoutes.php';
+require_once __DIR__ . '/../utils/getSMTPConfig.php'; // Helper to read config
 
 $method = $_SERVER['REQUEST_METHOD'];
 $data = getRequestData();
@@ -37,66 +60,48 @@ $path = parse_url($_SERVER['REQUEST_URI'], PHP_URL_PATH);
 $path = str_replace('/api', '', $path);
 $pathParts = explode('/', trim($path, '/'));
 
-// Configure SMTP
-$smtpConfig = [
-    'host' => 'mail.data-q.org',
-    'port' => 465,
-    'secure' => 'ssl',
-    'auth' => [
-        'user' => 'noreply@data-q.org',
-        'pass' => '!Q@W#E4r5t6y'
-    ],
-    'from' => 'noreply@data-q.org',
-    'fromName' => 'Your App Name'
-];
-
-// Handle auth routes
+// Handle auth routes (automatically reads SMTP config from constants)
 if ($pathParts[0] === 'auth') {
     $conn = getDBConnection();
-    handleAuthRoute($conn, $method, $pathParts, $data, [
-        'appUrl' => 'https://data-q.org',
-        'appName' => 'Your App Name',
-        'smtp' => $smtpConfig
-    ]);
+    handleAuthRoute($conn, $method, $pathParts, $data, getAppConfig());
 }
 ```
 
-### 2. Or use the email templates and SMTP client directly
+### 3. Or use the email templates and SMTP client directly
 
 ```php
 <?php
+require_once __DIR__ . '/config.php';
 require_once __DIR__ . '/utils/emailTemplates.php';
 require_once __DIR__ . '/utils/smtpClient.php';
+require_once __DIR__ . '/utils/getSMTPConfig.php';
+
+// Get SMTP config from constants
+$smtpConfig = getSMTPConfig();
 
 // Generate verification email
 $emailHtml = generateVerificationEmail([
-    'appName' => 'My App',
+    'appName' => defined('APP_NAME') ? APP_NAME : 'My App',
     'userName' => 'John Doe',
     'verificationUrl' => 'https://myapp.com/verify?token=abc123',
     'primaryColor' => '#6366f1'
 ]);
 
 // Send email
-$result = sendEmailViaSMTP([
-    'host' => 'mail.data-q.org',
-    'port' => 465,
-    'secure' => 'ssl',
-    'auth' => [
-        'user' => 'noreply@data-q.org',
-        'pass' => '!Q@W#E4r5t6y'
-    ],
-    'from' => 'noreply@data-q.org',
-    'fromName' => 'My App'
-], [
-    'to' => 'user@example.com',
-    'subject' => 'Verify Your Email',
-    'html' => $emailHtml
-]);
-
-if ($result['success']) {
-    echo "Email sent: " . $result['messageId'];
+if ($smtpConfig) {
+    $result = sendEmailViaSMTP($smtpConfig, [
+        'to' => 'user@example.com',
+        'subject' => 'Verify Your Email',
+        'html' => $emailHtml
+    ]);
+    
+    if ($result['success']) {
+        echo "Email sent: " . $result['messageId'];
+    } else {
+        echo "Error: " . $result['error'];
+    }
 } else {
-    echo "Error: " . $result['error'];
+    echo "SMTP not configured";
 }
 ```
 

@@ -97,7 +97,10 @@ function handleAuthRoute($conn, $method, $pathParts, $data, $config) {
                     // Send verification email if enabled and SMTP is configured
                     if ($hasEmailVerification && $verificationToken && $smtpConfig) {
                         try {
-                            $verificationUrl = $appUrl . '/app/demo/?token=' . urlencode($verificationToken);
+                            // Build verification URL - adjust path based on your app structure
+                            $verificationPath = '/app/demo/?token=' . urlencode($verificationToken);
+                            $verificationUrl = $appUrl . $verificationPath;
+                            
                             $emailHtml = generateVerificationEmail([
                                 'appName' => $appName,
                                 'userName' => $name,
@@ -107,15 +110,17 @@ function handleAuthRoute($conn, $method, $pathParts, $data, $config) {
                             
                             $emailResult = sendEmailViaSMTP($smtpConfig, [
                                 'to' => $email,
-                                'subject' => 'Verify Your Email Address',
+                                'subject' => 'Verify Your Email Address - ' . $appName,
                                 'html' => $emailHtml
                             ]);
                             
                             if (!$emailResult['success']) {
-                                error_log("Failed to send verification email: " . ($emailResult['error'] ?? 'Unknown error'));
+                                error_log("Failed to send verification email to {$email}: " . ($emailResult['error'] ?? 'Unknown error'));
+                            } else {
+                                error_log("Verification email sent successfully to {$email}");
                             }
                         } catch (Exception $e) {
-                            error_log("Failed to send verification email: " . $e->getMessage());
+                            error_log("Failed to send verification email to {$email}: " . $e->getMessage());
                         }
                     }
                     
