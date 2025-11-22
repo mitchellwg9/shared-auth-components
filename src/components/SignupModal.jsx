@@ -115,6 +115,11 @@ export function SignupModal({
     
     if (!validate()) {
       console.log('SignupModal: Validation failed', errors);
+      // Show first validation error to user
+      const firstError = Object.values(errors)[0];
+      if (firstError && showToast) {
+        showToast(firstError, 'error');
+      }
       return;
     }
 
