@@ -251,11 +251,20 @@ function App() {
   }
 
   // Show landing page with modals
+  // IMPORTANT: LoginScreen should NOT render here unless showLogin is true
+  console.log('Rendering landing page. showLogin:', showLogin, 'showSignup:', showSignup);
+  
   return (
     <>
       <LandingPage
-        onLoginClick={() => setShowLogin(true)}
-        onSignupClick={() => setShowSignup(true)}
+        onLoginClick={() => {
+          console.log('Login button clicked');
+          setShowLogin(true);
+        }}
+        onSignupClick={() => {
+          console.log('Signup button clicked');
+          setShowSignup(true);
+        }}
       />
 
       {/* Login Modal - only render when showLogin is true */}
