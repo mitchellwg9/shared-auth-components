@@ -38,14 +38,14 @@ if (!existsSync(tempDir)) {
   mkdirSync(tempDir, { recursive: true });
 }
 
-// Copy config.php
-const configPath = resolve(tymtrackrApiPath, 'config.php');
+// Copy config.php from backend/php (data-q.org specific config)
+const configPath = resolve(__dirname, 'config-data-q.php');
 if (existsSync(configPath)) {
   const configContent = readFileSync(configPath, 'utf-8');
   writeFileSync(resolve(tempDir, 'config.php'), configContent);
-  console.log('✅ Prepared config.php');
+  console.log('✅ Prepared config.php (data-q.org database credentials)');
 } else {
-  console.error('❌ config.php not found at TymTrackr/api/config.php');
+  console.error('❌ config-data-q.php not found at backend/php/config-data-q.php');
   process.exit(1);
 }
 
