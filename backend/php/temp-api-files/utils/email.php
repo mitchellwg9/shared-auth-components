@@ -40,16 +40,26 @@ function sendEmailSMTP($to, $subject, $message, $html = true) {
     
     error_log("✅ SMTP socket connected successfully");
     
-    // Read server greeting (220 response)
+    // Read server greeting (220 response) - can be multi-line
     $greeting = '';
-    while ($line = fgets($socket, 515)) {
+    $greetingComplete = false;
+    while (!$greetingComplete && $line = fgets($socket, 515)) {
         $greeting .= $line;
-        // Server greeting ends with a line starting with "220 " (space, not hyphen)
-        if (substr($line, 0, 4) === '220 ') {
+        // Server greeting can be multi-line:
+        // "220-We do not authorize..." (continuation with hyphen)
+        // "220 and/or bulk e-mail." (final line with space)
+        // Or single line: "220 server.example.com ESMTP"
+        $lineCode = substr($line, 0, 3);
+        $lineChar = substr($line, 3, 1);
+        
+        // Greeting is complete when we get a line starting with "220 " (space, not hyphen)
+        if ($lineCode === '220' && $lineChar === ' ') {
+            $greetingComplete = true;
             break;
         }
-        // Some servers send multi-line greeting ending with just "220"
-        if (substr(trim($line), 0, 3) === '220' && substr($line, 3, 1) === ' ') {
+        // If we get a non-220 line, something is wrong
+        if ($lineCode !== '220') {
+            error_log("⚠️ Unexpected line in greeting: " . trim($line));
             break;
         }
     }
