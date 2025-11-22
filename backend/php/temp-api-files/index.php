@@ -5,7 +5,7 @@
 $requestUri = $_SERVER['REQUEST_URI'] ?? '';
 $requestUri = strtok($requestUri, '?'); // Remove query string
 
-$directAccessFiles = ['direct-show-logs.php', 'test-email.php', 'show-logs.php', 'test-smtp-config.php', 'check-email-verification.php', 'test-wayne.php'];
+$directAccessFiles = ['direct-show-logs.php', 'test-email.php', 'show-logs.php', 'test-smtp-config.php', 'check-email-verification.php', 'test-wayne.php', 'debug-routing.php'];
 
 foreach ($directAccessFiles as $fileName) {
     if (strpos($requestUri, '/' . $fileName) !== false || strpos($requestUri, $fileName) !== false) {
