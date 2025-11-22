@@ -183,7 +183,7 @@ export function LoginScreen({
     // Render modal when open
     return (
       <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
-        <div className={`bg-white rounded-2xl w-full max-w-md shadow-2xl ${customStyles.container || ''}`}>
+        <div className={`bg-white rounded-2xl w-full max-w-md mx-auto shadow-2xl ${customStyles.container || ''}`}>
           <div className="flex items-center justify-between p-6 border-b border-gray-200">
             <div>
               <h2 className="text-2xl font-bold text-gray-900">Sign In</h2>
@@ -319,7 +319,7 @@ export function LoginScreen({
   if (isOpen === undefined) {
     return (
     <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 flex items-center justify-center p-4">
-      <div className={`bg-white rounded-2xl w-full max-w-md shadow-2xl ${customStyles.container || ''}`}>
+      <div className={`bg-white rounded-2xl w-full max-w-md mx-auto shadow-2xl ${customStyles.container || ''}`}>
         <div className="p-8">
           {logo && (
             <div className="text-center mb-6">
