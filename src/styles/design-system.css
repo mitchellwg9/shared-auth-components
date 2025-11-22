@@ -480,12 +480,18 @@ body {
 .space-y-2 > * + * { margin-top: var(--space-2); }
 .space-y-3 > * + * { margin-top: var(--space-3); }
 
+.relative { position: relative; }
+.absolute { position: absolute; }
 .fixed { position: fixed; }
 .inset-0 { top: 0; right: 0; bottom: 0; left: 0; }
+.inset-y-0 { top: 0; bottom: 0; }
+.left-0 { left: 0; }
+.right-0 { right: 0; }
 .top-4 { top: var(--space-4); }
 .right-4 { right: var(--space-4); }
 .bottom-4 { bottom: var(--space-4); }
 .z-50 { z-index: 50; }
+.pointer-events-none { pointer-events: none; }
 
 /* Responsive Design */
 @media (min-width: 768px) {
