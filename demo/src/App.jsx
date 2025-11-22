@@ -255,35 +255,39 @@ function App() {
         onSignupClick={() => setShowSignup(true)}
       />
 
-      {/* Login Modal */}
-      <LoginScreen
-        isOpen={showLogin}
-        onClose={() => setShowLogin(false)}
-        apiBaseUrl={API_BASE_URL}
-        appName="Shared Auth Demo"
-        primaryColor="#6366f1"
-        onLogin={handleLogin}
-        showToast={showToast}
-        onSwitchToSignup={() => {
-          setShowLogin(false);
-          setShowSignup(true);
-        }}
-      />
+      {/* Login Modal - only render when showLogin is true */}
+      {showLogin && (
+        <LoginScreen
+          isOpen={showLogin}
+          onClose={() => setShowLogin(false)}
+          apiBaseUrl={API_BASE_URL}
+          appName="Shared Auth Demo"
+          primaryColor="#6366f1"
+          onLogin={handleLogin}
+          showToast={showToast}
+          onSwitchToSignup={() => {
+            setShowLogin(false);
+            setShowSignup(true);
+          }}
+        />
+      )}
 
-      {/* Signup Modal */}
-      <SignupModal
-        isOpen={showSignup}
-        onClose={() => setShowSignup(false)}
-        apiBaseUrl={API_BASE_URL}
-        appName="Shared Auth Demo"
-        primaryColor="#6366f1"
-        onSignup={handleSignup}
-        showToast={showToast}
-        onSwitchToLogin={() => {
-          setShowSignup(false);
-          setShowLogin(true);
-        }}
-      />
+      {/* Signup Modal - only render when showSignup is true */}
+      {showSignup && (
+        <SignupModal
+          isOpen={showSignup}
+          onClose={() => setShowSignup(false)}
+          apiBaseUrl={API_BASE_URL}
+          appName="Shared Auth Demo"
+          primaryColor="#6366f1"
+          onSignup={handleSignup}
+          showToast={showToast}
+          onSwitchToLogin={() => {
+            setShowSignup(false);
+            setShowLogin(true);
+          }}
+        />
+      )}
 
       {/* Toast Container */}
       <div className="fixed bottom-4 right-4 space-y-2 z-50">
