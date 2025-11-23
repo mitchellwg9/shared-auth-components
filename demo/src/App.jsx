@@ -334,9 +334,9 @@ function App() {
       </div>
 
       {/* Profile Modal */}
-      {user && (
-        <>
-          {console.log('Rendering UserProfileModal, isOpen:', showProfileModal)}
+      {user && (() => {
+        console.log('Rendering UserProfileModal, isOpen:', showProfileModal);
+        return (
           <UserProfileModal
             isOpen={showProfileModal}
             onClose={() => {
@@ -349,13 +349,13 @@ function App() {
             authAPI={authAPI}
             primaryColor="#6366f1"
           />
-        </>
-      )}
+        );
+      })()}
 
       {/* Settings Modal */}
-      {user && (
-        <>
-          {console.log('Rendering UserSettingsModal, isOpen:', showSettingsModal)}
+      {user && (() => {
+        console.log('Rendering UserSettingsModal, isOpen:', showSettingsModal);
+        return (
           <UserSettingsModal
             isOpen={showSettingsModal}
             onClose={() => {
@@ -368,8 +368,8 @@ function App() {
             authAPI={authAPI}
             primaryColor="#6366f1"
           />
-        </>
-      )}
+        );
+      })()}
     </>
   );
 }
