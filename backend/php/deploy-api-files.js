@@ -159,7 +159,7 @@ const config = {
   port: ftpConfig.port || 21,
   localRoot: tempDir,
   remoteRoot: 'public_html/api',
-  include: ['**/*'],
+        include: ['**/*', 'twoFactorHelper.php', 'twoFactorRoutes.php'],
   exclude: [],
   deleteRemote: false,
   forcePasv: true,
