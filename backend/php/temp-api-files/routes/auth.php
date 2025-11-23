@@ -247,9 +247,14 @@ switch ($method) {
             $checkOrgAdminCol = $conn->query("SHOW COLUMNS FROM users LIKE 'is_organization_admin'");
             $hasOrgAdminColumn = $checkOrgAdminCol->num_rows > 0;
             
+            // Check if system owner column exists
+            $checkSystemOwner = $conn->query("SHOW COLUMNS FROM users LIKE 'is_system_owner'");
+            $hasSystemOwner = $checkSystemOwner->num_rows > 0;
+            
             // Get organization fields from request (optional)
             $organizationId = null;
             $isOrganizationAdmin = false;
+            $isSystemOwner = false;
             
             if ($hasOrgIdColumn && isset($data['organization_id']) && !empty($data['organization_id'])) {
                 $organizationId = $conn->real_escape_string($data['organization_id']);
@@ -257,6 +262,11 @@ switch ($method) {
             
             if ($hasOrgAdminColumn && isset($data['is_organization_admin'])) {
                 $isOrganizationAdmin = (bool)$data['is_organization_admin'];
+            }
+            
+            // Get system owner field from request (optional, but should be restricted in production)
+            if ($hasSystemOwner && isset($data['is_system_owner'])) {
+                $isSystemOwner = (bool)$data['is_system_owner'];
             }
             
             // Generate a unique ID for the user
@@ -300,6 +310,13 @@ switch ($method) {
                 $insertValues[] = '?';
                 $bindParams[0] .= 'i'; // integer (boolean)
                 $bindValues[] = $isOrganizationAdmin ? 1 : 0;
+            }
+            
+            if ($hasSystemOwner) {
+                $insertFields[] = 'is_system_owner';
+                $insertValues[] = '?';
+                $bindParams[0] .= 'i'; // integer (boolean)
+                $bindValues[] = $isSystemOwner ? 1 : 0;
             }
             
             // Build and execute INSERT query
