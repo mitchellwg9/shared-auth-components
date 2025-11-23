@@ -99,30 +99,83 @@ function handle2FARoute($conn, $method, $pathParts, $data, $userId = null) {
  */
 function handle2FASetup($conn, $method, $userId, $data) {
     if ($method === 'GET') {
-        // Generate new secret for setup
-        $secret = generate2FASecret(16);
+        if (!$userId) {
+            error_log("2FA Setup GET - No user ID provided");
+            sendJSON(['error' => 'Authentication required'], 401);
+            return;
+        }
         
-        // Get user email for QR code label
-        $stmt = $conn->prepare("SELECT email FROM users WHERE id = ?");
-        $stmt->bind_param("i", $userId);
-        $stmt->execute();
-        $result = $stmt->get_result();
-        $user = $result->fetch_assoc();
-        $email = $user['email'] ?? 'user';
+        // Ensure generate2FASecret function exists
+        if (!function_exists('generate2FASecret')) {
+            error_log("2FA Setup GET - generate2FASecret function not found");
+            sendJSON(['error' => '2FA helper functions not available'], 500);
+            return;
+        }
         
-        // Get app name from config
-        $appName = defined('APP_NAME') ? APP_NAME : 'App';
-        
-        // Generate QR code URL (otpauth:// URL)
-        $issuer = $appName;
-        $label = urlencode($issuer . ':' . $email);
-        $qrUrl = "otpauth://totp/{$label}?secret={$secret}&issuer=" . urlencode($issuer);
-        
-        sendJSON([
-            'secret' => $secret,
-            'qrUrl' => $qrUrl,
-            'manualEntryKey' => chunk_split($secret, 4, ' ')
-        ]);
+        try {
+            // Generate new secret for setup
+            $secret = generate2FASecret(16);
+            
+            if (!$secret || strlen($secret) < 16) {
+                error_log("2FA Setup GET - Failed to generate secret (length: " . strlen($secret ?? '') . ")");
+                sendJSON(['error' => 'Failed to generate 2FA secret'], 500);
+                return;
+            }
+            
+            error_log("2FA Setup GET - User ID: $userId, Generated secret: " . substr($secret, 0, 8) . "...");
+            
+            // Get user email for QR code label
+            $stmt = $conn->prepare("SELECT email FROM users WHERE id = ?");
+            if (!$stmt) {
+                error_log("2FA Setup GET - Prepare failed: " . $conn->error);
+                sendJSON(['error' => 'Database error'], 500);
+                return;
+            }
+            
+            $stmt->bind_param("s", $userId); // Use "s" for string as user IDs might be strings
+            if (!$stmt->execute()) {
+                error_log("2FA Setup GET - Execute failed: " . $stmt->error);
+                $stmt->close();
+                sendJSON(['error' => 'Database error'], 500);
+                return;
+            }
+            
+            $result = $stmt->get_result();
+            $user = $result->fetch_assoc();
+            $stmt->close();
+            
+            if (!$user) {
+                error_log("2FA Setup GET - User not found: $userId");
+                sendJSON(['error' => 'User not found'], 404);
+                return;
+            }
+            
+            $email = $user['email'] ?? 'user';
+            
+            // Get app name from config
+            $appName = defined('APP_NAME') ? APP_NAME : 'App';
+            
+            // Generate QR code URL (otpauth:// URL)
+            $issuer = $appName;
+            $label = urlencode($issuer . ':' . $email);
+            $qrUrl = "otpauth://totp/{$label}?secret={$secret}&issuer=" . urlencode($issuer);
+            
+            error_log("2FA Setup GET - Success, returning secret and QR URL");
+            
+            sendJSON([
+                'secret' => $secret,
+                'qrUrl' => $qrUrl,
+                'manualEntryKey' => chunk_split($secret, 4, ' ')
+            ]);
+        } catch (Exception $e) {
+            error_log("2FA Setup GET - Exception: " . $e->getMessage());
+            error_log("2FA Setup GET - Stack trace: " . $e->getTraceAsString());
+            sendJSON(['error' => 'Failed to generate 2FA secret: ' . $e->getMessage()], 500);
+        } catch (Error $e) {
+            error_log("2FA Setup GET - Fatal error: " . $e->getMessage());
+            error_log("2FA Setup GET - Stack trace: " . $e->getTraceAsString());
+            sendJSON(['error' => 'Failed to generate 2FA secret'], 500);
+        }
         
     } else if ($method === 'POST') {
         // Verify code and enable 2FA
