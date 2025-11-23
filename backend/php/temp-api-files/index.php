@@ -20,6 +20,12 @@ foreach ($directAccessFiles as $fileName) {
 
 require_once 'config.php';
 
+// Helper function to get request data
+function getRequestData() {
+    $data = file_get_contents('php://input');
+    return json_decode($data, true) ?: [];
+}
+
 // Get request method and path
 $method = $_SERVER['REQUEST_METHOD'];
 

@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { Mail, Lock, Eye, EyeOff, X } from 'lucide-react';
 import { createAuthAPI } from '../utils/authAPI';
+import { TwoFactorVerify } from './TwoFactorVerify';
 
 /**
  * LoginScreen - Configurable login component with email verification support
@@ -37,6 +38,8 @@ export function LoginScreen({
   const [isLoading, setIsLoading] = useState(false);
   const [isResendingVerification, setIsResendingVerification] = useState(false);
   const [verificationEmail, setVerificationEmail] = useState('');
+  const [requires2FA, setRequires2FA] = useState(false);
+  const [twoFactorEmail, setTwoFactorEmail] = useState('');
   const [requires2FA, setRequires2FA] = useState(false);
   const [twoFactorEmail, setTwoFactorEmail] = useState('');
 
@@ -188,6 +191,40 @@ export function LoginScreen({
   const handleKeyPress = (e) => {
     if (e.key === 'Enter' && !isLoading) handleLogin();
   };
+
+  // Handle 2FA verification
+  const handle2FAVerify = async (user) => {
+    setRequires2FA(false);
+    setTwoFactorEmail('');
+    setEmail('');
+    setPassword('');
+    setError('');
+    setErrorType('');
+    
+    if (onLogin) {
+      await onLogin(user);
+    }
+  };
+
+  const handle2FACancel = () => {
+    setRequires2FA(false);
+    setTwoFactorEmail('');
+    // Keep email/password filled in case user wants to try again
+  };
+
+  // Show 2FA verification if required
+  if (requires2FA) {
+    return (
+      <TwoFactorVerify
+        email={twoFactorEmail}
+        onVerify={handle2FAVerify}
+        onCancel={handle2FACancel}
+        showToast={showToast}
+        apiBaseUrl={apiBaseUrl}
+        appName={appName}
+      />
+    );
+  }
 
   // If used as a modal (isOpen prop is provided)
   if (isOpen !== undefined) {
