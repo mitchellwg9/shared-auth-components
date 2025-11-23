@@ -78,6 +78,26 @@ switch ($method) {
                 $selectFields[] = 'is_system_owner';
             }
             
+            // Check if subscription columns exist
+            $checkPlan = $conn->query("SHOW COLUMNS FROM users LIKE 'plan'");
+            $hasPlan = $checkPlan->num_rows > 0;
+            if ($hasPlan) {
+                $selectFields[] = 'plan';
+            }
+            
+            $checkSubscriptionStatus = $conn->query("SHOW COLUMNS FROM users LIKE 'subscription_status'");
+            $hasSubscriptionStatus = $checkSubscriptionStatus->num_rows > 0;
+            if ($hasSubscriptionStatus) {
+                $selectFields[] = 'subscription_status';
+            }
+            
+            // Check if 2FA columns exist
+            $check2FAEnabled = $conn->query("SHOW COLUMNS FROM users LIKE 'two_factor_enabled'");
+            $has2FAEnabled = $check2FAEnabled->num_rows > 0;
+            if ($has2FAEnabled) {
+                $selectFields[] = 'two_factor_enabled';
+            }
+            
             $selectQuery = "SELECT " . implode(', ', $selectFields) . " FROM users WHERE email = ?";
             $stmt = $conn->prepare($selectQuery);
             $stmt->bind_param("s", $email);
@@ -127,6 +147,18 @@ switch ($method) {
                     'error_type' => 'email_not_verified',
                     'email' => $user['email']
                 ], 403);
+            }
+            
+            // Check if 2FA is enabled
+            $twoFactorEnabled = false;
+            if ($has2FAEnabled && isset($user['two_factor_enabled']) && (int)$user['two_factor_enabled'] === 1) {
+                $twoFactorEnabled = true;
+                // Return requires2FA flag - frontend should call 2FA verify endpoint
+                sendJSON([
+                    'requires2FA' => true,
+                    'email' => $user['email'],
+                    'message' => 'Please enter your 2FA code'
+                ], 200);
             }
             
             unset($user['password']);
@@ -204,8 +236,25 @@ switch ($method) {
                 $user['isSystemOwner'] = false;
             }
             
+            // Add subscription fields if columns exist
+            if ($hasPlan) {
+                $user['plan'] = $user['plan'] ?? 'free';
+            } else {
+                $user['plan'] = 'free';
+            }
+            
+            if ($hasSubscriptionStatus) {
+                $user['subscription_status'] = $user['subscription_status'] ?? 'inactive';
+            } else {
+                $user['subscription_status'] = 'inactive';
+            }
+            
+            // Add 2FA status
+            $user['two_factor_enabled'] = $twoFactorEnabled;
+            $user['requires2FA'] = false;
+            
             // Log for debugging (remove in production)
-            error_log("Auth login - User: " . $user['email'] . ", is_organization_admin: " . ($user['is_organization_admin'] ? 'true' : 'false') . ", is_system_owner: " . ($user['is_system_owner'] ? 'true' : 'false') . ", org_id: " . ($user['organization_id'] ?? 'null'));
+            error_log("Auth login - User: " . $user['email'] . ", is_organization_admin: " . ($user['is_organization_admin'] ? 'true' : 'false') . ", is_system_owner: " . ($user['is_system_owner'] ? 'true' : 'false') . ", org_id: " . ($user['organization_id'] ?? 'null') . ", plan: " . ($user['plan'] ?? 'free'));
             
             sendJSON(['success' => true, 'user' => $user]);
         } elseif ($action === 'register') {
@@ -269,6 +318,31 @@ switch ($method) {
                 $isSystemOwner = (bool)$data['is_system_owner'];
             }
             
+            // Check if subscription columns exist
+            $checkPlan = $conn->query("SHOW COLUMNS FROM users LIKE 'plan'");
+            $hasPlan = $checkPlan->num_rows > 0;
+            
+            $checkSubscriptionStatus = $conn->query("SHOW COLUMNS FROM users LIKE 'subscription_status'");
+            $hasSubscriptionStatus = $checkSubscriptionStatus->num_rows > 0;
+            
+            // Get subscription fields from request (optional)
+            $plan = 'free';
+            $subscriptionStatus = 'inactive';
+            
+            if ($hasPlan && isset($data['plan']) && !empty($data['plan'])) {
+                $validPlans = ['free', 'family', 'pro', 'enterprise'];
+                if (in_array($data['plan'], $validPlans)) {
+                    $plan = $conn->real_escape_string($data['plan']);
+                }
+            }
+            
+            if ($hasSubscriptionStatus && isset($data['subscription_status']) && !empty($data['subscription_status'])) {
+                $validStatuses = ['active', 'inactive', 'canceled', 'past_due', 'trialing'];
+                if (in_array($data['subscription_status'], $validStatuses)) {
+                    $subscriptionStatus = $conn->real_escape_string($data['subscription_status']);
+                }
+            }
+            
             // Generate a unique ID for the user
             $userId = 'u' . time() . rand(1000, 9999);
             
@@ -317,6 +391,20 @@ switch ($method) {
                 $insertValues[] = '?';
                 $bindParams[0] .= 'i'; // integer (boolean)
                 $bindValues[] = $isSystemOwner ? 1 : 0;
+            }
+            
+            if ($hasPlan) {
+                $insertFields[] = 'plan';
+                $insertValues[] = '?';
+                $bindParams[0] .= 's';
+                $bindValues[] = $plan;
+            }
+            
+            if ($hasSubscriptionStatus) {
+                $insertFields[] = 'subscription_status';
+                $insertValues[] = '?';
+                $bindParams[0] .= 's';
+                $bindValues[] = $subscriptionStatus;
             }
             
             // Build and execute INSERT query
