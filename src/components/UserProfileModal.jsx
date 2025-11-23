@@ -75,9 +75,11 @@ export function UserProfileModal({
       const issuer = 'Shared Auth';
       const accountName = currentUser.email || currentUser.name;
       // Use proper TOTP URL format that Google Authenticator can scan
-      const otpAuthUrl = `otpauth://totp/${encodeURIComponent(issuer)}:${encodeURIComponent(accountName)}?secret=${setup.secret}&issuer=${encodeURIComponent(issuer)}&algorithm=SHA1&digits=6&period=30`;
-      // Use a more reliable QR code service with proper error correction
-      const qrUrl = `https://api.qrserver.com/v1/create-qr-code/?size=300x300&data=${encodeURIComponent(otpAuthUrl)}&ecc=M`;
+      // Format: otpauth://totp/ISSUER:ACCOUNT?secret=SECRET&issuer=ISSUER
+      // Don't include algorithm/digits/period as they're defaults and can cause issues
+      const otpAuthUrl = `otpauth://totp/${encodeURIComponent(issuer)}:${encodeURIComponent(accountName)}?secret=${setup.secret}&issuer=${encodeURIComponent(issuer)}`;
+      // Use Google Charts API for more reliable QR codes
+      const qrUrl = `https://chart.googleapis.com/chart?chs=300x300&cht=qr&chl=${encodeURIComponent(otpAuthUrl)}&choe=UTF-8`;
       setQrCodeUrl(qrUrl);
       setShowQRCode(true);
     } catch (error) {
