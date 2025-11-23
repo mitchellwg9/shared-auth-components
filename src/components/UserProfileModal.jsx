@@ -264,8 +264,8 @@ export function UserProfileModal({
 
   return (
     <>
-      <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
-        <div className="bg-white rounded-lg max-w-2xl w-full mx-auto max-h-[85vh] overflow-y-auto shadow-xl" style={{ maxWidth: '42rem', width: 'calc(100% - 2rem)' }}>
+      <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50 overflow-y-auto">
+        <div className="bg-white rounded-lg max-w-2xl w-full mx-auto my-4 shadow-xl flex flex-col" style={{ maxWidth: '42rem', width: 'calc(100% - 2rem)', maxHeight: '90vh' }}>
           {/* Header */}
           <div className="sticky top-0 bg-white border-b border-gray-200 px-6 py-4 flex items-center justify-between">
             <div className="flex items-center gap-3">
@@ -503,8 +503,11 @@ export function UserProfileModal({
                 )}
               </div>
 
-              {/* Save Button */}
-              <div className="flex gap-2 pt-6 mt-6 border-t border-gray-200">
+          </div>
+          
+          {/* Footer - Fixed at bottom */}
+          <div className="flex-shrink-0 border-t border-gray-200 px-6 py-4 bg-white">
+            <div className="flex gap-2">
                 <button
                   onClick={async () => {
                     setLoading(true);
