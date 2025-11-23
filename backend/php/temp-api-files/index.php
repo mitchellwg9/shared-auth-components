@@ -147,7 +147,14 @@ if (empty($resource)) {
                 require_once __DIR__ . '/routes/organizations.php';
                 break;
             case 'owner':
-                require_once __DIR__ . '/routes/owner.php';
+                // Handle owner routes using shared handler
+                require_once __DIR__ . '/../../shared-auth-components/backend/php/ownerRoutes.php';
+                
+                // Get current user ID from request
+                $currentUserId = $_GET['current_user_id'] ?? $data['current_user_id'] ?? null;
+                
+                handleOwnerRoute($conn, $method, $pathParts, $data, $currentUserId);
+                exit;
                 break;
             case 'leave-requests':
                 require_once __DIR__ . '/routes/leave_requests.php';
