@@ -167,8 +167,14 @@ function App() {
               </div>
               <UserProfileDropdown
                 currentUser={user}
-                onProfileClick={() => setShowProfileModal(true)}
-                onSettingsClick={() => setShowSettingsModal(true)}
+                onProfileClick={() => {
+                  console.log('Profile clicked, setting showProfileModal to true');
+                  setShowProfileModal(true);
+                }}
+                onSettingsClick={() => {
+                  console.log('Settings clicked, setting showSettingsModal to true');
+                  setShowSettingsModal(true);
+                }}
                 onSubscriptionClick={() => {
                   showToast('Subscription management coming soon!', 'info');
                 }}
@@ -329,28 +335,40 @@ function App() {
 
       {/* Profile Modal */}
       {user && (
-        <UserProfileModal
-          isOpen={showProfileModal}
-          onClose={() => setShowProfileModal(false)}
-          currentUser={user}
-          onUserUpdate={handleUserUpdate}
-          showToast={showToast}
-          authAPI={authAPI}
-          primaryColor="#6366f1"
-        />
+        <>
+          {console.log('Rendering UserProfileModal, isOpen:', showProfileModal)}
+          <UserProfileModal
+            isOpen={showProfileModal}
+            onClose={() => {
+              console.log('Closing profile modal');
+              setShowProfileModal(false);
+            }}
+            currentUser={user}
+            onUserUpdate={handleUserUpdate}
+            showToast={showToast}
+            authAPI={authAPI}
+            primaryColor="#6366f1"
+          />
+        </>
       )}
 
       {/* Settings Modal */}
       {user && (
-        <UserSettingsModal
-          isOpen={showSettingsModal}
-          onClose={() => setShowSettingsModal(false)}
-          currentUser={user}
-          onUserUpdate={handleUserUpdate}
-          showToast={showToast}
-          authAPI={authAPI}
-          primaryColor="#6366f1"
-        />
+        <>
+          {console.log('Rendering UserSettingsModal, isOpen:', showSettingsModal)}
+          <UserSettingsModal
+            isOpen={showSettingsModal}
+            onClose={() => {
+              console.log('Closing settings modal');
+              setShowSettingsModal(false);
+            }}
+            currentUser={user}
+            onUserUpdate={handleUserUpdate}
+            showToast={showToast}
+            authAPI={authAPI}
+            primaryColor="#6366f1"
+          />
+        </>
       )}
     </>
   );
