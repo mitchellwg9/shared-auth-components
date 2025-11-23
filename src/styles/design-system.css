@@ -705,6 +705,14 @@ body {
 .z-50 { z-index: 50; }
 .pointer-events-none { pointer-events: none; }
 
+/* Overflow utilities */
+.overflow-auto { overflow: auto; }
+.overflow-y-auto { 
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
+}
+.overflow-hidden { overflow: hidden; }
+
 /* Icon positioning utilities */
 .inset-y-0 { top: 0; bottom: 0; }
 .inset-x-0 { left: 0; right: 0; }
