@@ -445,7 +445,7 @@ export function UserProfileModal({
               </div>
 
               {/* Save Button */}
-              <div className="flex gap-2 pt-4 border-t border-gray-200">
+              <div className="flex gap-2 pt-6 mt-6 border-t border-gray-200">
                 <button
                   onClick={async () => {
                     // Save profile first

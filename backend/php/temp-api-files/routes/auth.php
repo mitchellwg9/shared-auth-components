@@ -303,9 +303,9 @@ try {
             
             sendJSON(['success' => true, 'user' => $user]);
         } elseif ($action === 'change-password') {
-            // Version: 2025-11-23-13:25
-            // Change password
-            $missing = validateRequired($data, ['currentPassword', 'newPassword']);
+            // Version: 2025-11-23-13:47
+            // Change password (currentPassword is optional)
+            $missing = validateRequired($data, ['newPassword']);
             if (!empty($missing)) {
                 sendJSON(['error' => 'Missing required fields', 'fields' => $missing], 400);
             }
@@ -318,7 +318,7 @@ try {
             }
             
             $conn = getDBConnection();
-            $currentPassword = $data['currentPassword'];
+            $currentPassword = $data['currentPassword'] ?? '';
             $newPassword = $data['newPassword'];
             
             // Validate new password length
@@ -348,24 +348,27 @@ try {
             $user = $result->fetch_assoc();
             $stmt->close();
             
-            // Verify current password
-            $passwordValid = false;
-            try {
-                // Check if password is hashed (starts with $2y$ or $2a$ or $2b$ for bcrypt)
-                if (preg_match('/^\$2[ayb]\$/', $user['password'])) {
-                    // Password is hashed, use password_verify
-                    $passwordValid = password_verify($currentPassword, $user['password']);
-                } else {
-                    // Password is plain text (legacy), compare directly
-                    $passwordValid = ($user['password'] === $currentPassword);
-                }
-            } catch (Exception $e) {
-                error_log("Password verification error: " . $e->getMessage());
+            // Verify current password only if provided
+            $passwordValid = true; // Default to true if no current password provided
+            if (!empty($currentPassword)) {
                 $passwordValid = false;
-            }
-            
-            if (!$passwordValid) {
-                sendJSON(['error' => 'Current password is incorrect'], 401);
+                try {
+                    // Check if password is hashed (starts with $2y$ or $2a$ or $2b$ for bcrypt)
+                    if (preg_match('/^\$2[ayb]\$/', $user['password'])) {
+                        // Password is hashed, use password_verify
+                        $passwordValid = password_verify($currentPassword, $user['password']);
+                    } else {
+                        // Password is plain text (legacy), compare directly
+                        $passwordValid = ($user['password'] === $currentPassword);
+                    }
+                } catch (Exception $e) {
+                    error_log("Password verification error: " . $e->getMessage());
+                    $passwordValid = false;
+                }
+                
+                if (!$passwordValid) {
+                    sendJSON(['error' => 'Current password is incorrect'], 401);
+                }
             }
             
             // Hash new password
