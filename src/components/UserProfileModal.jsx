@@ -71,11 +71,13 @@ export function UserProfileModal({
       const setup = await authAPI.get2FASetup();
       setTwoFactorSecret(setup.secret);
       
-      // Generate QR code URL
+      // Generate QR code URL with proper encoding for Google Authenticator
       const issuer = 'Shared Auth';
       const accountName = currentUser.email || currentUser.name;
-      const otpAuthUrl = `otpauth://totp/${encodeURIComponent(issuer)}:${encodeURIComponent(accountName)}?secret=${setup.secret}&issuer=${encodeURIComponent(issuer)}`;
-      const qrUrl = `https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=${encodeURIComponent(otpAuthUrl)}`;
+      // Use proper TOTP URL format that Google Authenticator can scan
+      const otpAuthUrl = `otpauth://totp/${encodeURIComponent(issuer)}:${encodeURIComponent(accountName)}?secret=${setup.secret}&issuer=${encodeURIComponent(issuer)}&algorithm=SHA1&digits=6&period=30`;
+      // Use a more reliable QR code service with proper error correction
+      const qrUrl = `https://api.qrserver.com/v1/create-qr-code/?size=300x300&data=${encodeURIComponent(otpAuthUrl)}&ecc=M`;
       setQrCodeUrl(qrUrl);
       setShowQRCode(true);
     } catch (error) {
@@ -195,7 +197,7 @@ export function UserProfileModal({
     try {
       const response = await authAPI.changePassword('', formData.newPassword);
       if (response && response.success) {
-        showToast?.('Password changed successfully!', 'success');
+        // Don't show toast here - will be shown by save handler
         setFormData({ ...formData, newPassword: '', confirmPassword: '' });
         setPasswordErrors({});
         return true;
@@ -224,7 +226,7 @@ export function UserProfileModal({
           email: formData.email.trim() || currentUser.email
         });
       }
-      showToast?.('Profile updated successfully!', 'success');
+      // Don't show toast here - will be shown by save handler
       return;
     }
 
@@ -238,7 +240,7 @@ export function UserProfileModal({
           email: formData.email.trim() || currentUser.email
         });
       }
-      showToast?.('Profile updated successfully!', 'success');
+      // Don't show toast here - will be shown by save handler
     } catch (error) {
       showToast?.(error.message || 'Failed to update profile', 'error');
       throw error;
@@ -511,12 +513,14 @@ export function UserProfileModal({
                       await handleSaveProfile();
                       // Then change password if new password is provided
                       let passwordSuccess = true;
-                      if (formData.newPassword) {
+                      const hasPasswordChange = formData.newPassword && formData.newPassword.trim();
+                      if (hasPasswordChange) {
                         passwordSuccess = await handleChangePassword();
                       }
                       
-                      // Only close if both operations succeeded
+                      // Only show one success message and close if both operations succeeded
                       if (passwordSuccess) {
+                        showToast?.('Changes saved successfully!', 'success');
                         // Small delay to show success message
                         setTimeout(() => {
                           onClose();
