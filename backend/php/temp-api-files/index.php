@@ -112,17 +112,20 @@ if (empty($resource)) {
                     // Handle 2FA routes
                     require_once __DIR__ . '/twoFactorRoutes.php';
                     
-                    // Get user ID from session or token (adjust based on your auth method)
-                    // For now, we'll get it from the request or session
+                    // Get request data first
+                    $data = getRequestData();
+                    
+                    // Get user ID from session, query string, or request body
                     $userId = null;
                     if (isset($_SESSION['user_id'])) {
                         $userId = $_SESSION['user_id'];
+                    } elseif (isset($_GET['current_user_id'])) {
+                        $userId = $_GET['current_user_id'];
+                    } elseif (isset($data['current_user_id'])) {
+                        $userId = $data['current_user_id'];
                     } elseif (isset($data['user_id'])) {
                         $userId = $data['user_id'];
                     }
-                    
-                    // Get request data
-                    $data = getRequestData();
                     
                     handle2FARoute($conn, $method, $pathParts, $data, $userId);
                     exit;
