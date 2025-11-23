@@ -141,12 +141,28 @@ function handle2FASetup($conn, $method, $userId, $data) {
         
         error_log("2FA Enable attempt - User ID: $userId, Code: $code, Secret: " . substr($secret, 0, 4) . "...");
         
-        // Verify code
-        if (!verifyTOTP($secret, $code)) {
-            error_log("2FA Enable failed: Invalid TOTP code");
-            sendJSON(['error' => 'Invalid code. Please try again.'], 400);
+        // Verify code with time window tolerance (allow codes from previous/next time step)
+        $verified = false;
+        $currentCode = generateTOTP($secret);
+        $previousCode = generateTOTP($secret, 30, -1); // Previous time step
+        $nextCode = generateTOTP($secret, 30, 1); // Next time step
+        
+        error_log("2FA Code verification - Entered: $code, Current: $currentCode, Previous: $previousCode, Next: $nextCode");
+        
+        if ($code === $currentCode || $code === $previousCode || $code === $nextCode) {
+            $verified = true;
+        } else {
+            // Also try the verifyTOTP function with window
+            $verified = verifyTOTP($secret, $code, 1); // Window of 1 (current, previous, next)
+        }
+        
+        if (!$verified) {
+            error_log("2FA Enable failed: Invalid TOTP code. Entered: $code");
+            sendJSON(['error' => 'Invalid code. Please enter the current 6-digit code from your authenticator app.'], 400);
             return;
         }
+        
+        error_log("2FA Code verified successfully");
         
         // Generate backup codes
         $backupCodes = generateBackupCodes(10);

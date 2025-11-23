@@ -43,10 +43,13 @@ function base32Decode($input) {
 
 /**
  * Generate TOTP code from secret
+ * @param string $secret Base32-encoded secret
+ * @param int $timeStep Time step in seconds (default 30)
+ * @param int $timeOffset Offset in time steps (0 = current, -1 = previous, 1 = next)
  */
-function generateTOTP($secret, $timeStep = 30) {
+function generateTOTP($secret, $timeStep = 30, $timeOffset = 0) {
     $key = base32Decode($secret);
-    $time = floor(time() / $timeStep);
+    $time = floor(time() / $timeStep) + $timeOffset;
     
     // Convert time to 8-byte binary string (big-endian)
     $timeBytes = '';
