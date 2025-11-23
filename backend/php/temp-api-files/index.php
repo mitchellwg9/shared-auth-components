@@ -109,8 +109,10 @@ if (empty($resource)) {
             case 'auth':
                 // Check if this is a 2FA route
                 if (isset($pathParts[1]) && $pathParts[1] === 'two-factor') {
-                    // Handle 2FA routes
-                    require_once __DIR__ . '/twoFactorRoutes.php';
+                    // Ensure output buffering is active
+                    if (!ob_get_level()) {
+                        ob_start();
+                    }
                     
                     // Get request data first
                     $data = getRequestData();
@@ -127,7 +129,19 @@ if (empty($resource)) {
                         $userId = $data['user_id'];
                     }
                     
-                    handle2FARoute($conn, $method, $pathParts, $data, $userId);
+                    // Handle 2FA routes - include after getting data to avoid output issues
+                    try {
+                        require_once __DIR__ . '/twoFactorRoutes.php';
+                        handle2FARoute($conn, $method, $pathParts, $data, $userId);
+                    } catch (Exception $e) {
+                        ob_clean();
+                        error_log("2FA route exception in index.php: " . $e->getMessage());
+                        sendJSON(['error' => 'Server error', 'message' => 'An error occurred processing the 2FA request'], 500);
+                    } catch (Error $e) {
+                        ob_clean();
+                        error_log("2FA route fatal error in index.php: " . $e->getMessage());
+                        sendJSON(['error' => 'Server error', 'message' => 'An error occurred processing the 2FA request'], 500);
+                    }
                     exit;
                 } else {
                     // Regular auth routes
