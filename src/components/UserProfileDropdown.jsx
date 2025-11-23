@@ -214,12 +214,12 @@ export function UserProfileDropdown({
                   }`}
                   style={{ minWidth: 0 }}
                 >
-                  <Icon className={`w-5 h-5 flex-shrink-0 ${item.isDanger ? 'text-red-600' : 'text-gray-600'}`} />
-                  <div className="flex-1 text-left" style={{ minWidth: 0, overflow: 'hidden' }}>
-                    <p className={`text-sm font-medium whitespace-nowrap ${item.isDanger ? 'text-red-600' : 'text-gray-900'}`}>
+                  <Icon className={`w-5 h-5 flex-shrink-0 ${item.isDanger ? 'text-red-600' : 'text-gray-600'}`} style={{ flexShrink: 0 }} />
+                  <div className="flex-1 text-left" style={{ minWidth: 0, overflow: 'hidden', flex: '1 1 0%' }}>
+                    <p className={`text-sm font-medium ${item.isDanger ? 'text-red-600' : 'text-gray-900'}`} style={{ whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
                       {item.label}
                     </p>
-                    <p className="text-xs text-gray-500 truncate">{item.description}</p>
+                    <p className="text-xs text-gray-500" style={{ whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{item.description}</p>
                   </div>
                 </button>
               );
