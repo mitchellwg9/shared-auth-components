@@ -84,12 +84,48 @@ export function UserProfileModal({
       return;
     }
 
+    // Check if user is logged in
+    if (!currentUser || !currentUser.id) {
+      console.error('2FA Setup - No current user or user ID:', currentUser);
+      showToast?.('You must be logged in to enable 2FA', 'error');
+      return;
+    }
+
+    // Check localStorage for user ID
+    try {
+      const userStr = localStorage.getItem('currentUser');
+      if (userStr) {
+        const user = JSON.parse(userStr);
+        console.log('2FA Setup - Current user from localStorage:', { id: user.id, user_id: user.user_id, email: user.email });
+      } else {
+        console.warn('2FA Setup - No user in localStorage');
+      }
+    } catch (e) {
+      console.error('2FA Setup - Failed to read localStorage:', e);
+    }
+
     try {
       setLoading(true);
+      console.log('2FA Setup - Calling get2FASetup API...');
       const setup = await authAPI.get2FASetup();
       
-      if (!setup || !setup.secret) {
-        showToast?.('Failed to generate 2FA secret', 'error');
+      console.log('2FA Setup - API response:', setup);
+      
+      if (!setup) {
+        console.error('2FA Setup - No response from API');
+        showToast?.('Failed to generate 2FA secret: No response from server', 'error');
+        return;
+      }
+      
+      if (setup.error) {
+        console.error('2FA Setup - API error:', setup.error);
+        showToast?.(setup.error || 'Failed to generate 2FA secret', 'error');
+        return;
+      }
+      
+      if (!setup.secret) {
+        console.error('2FA Setup - No secret in response:', setup);
+        showToast?.('Failed to generate 2FA secret: Invalid response', 'error');
         return;
       }
       
@@ -113,6 +149,11 @@ export function UserProfileModal({
       console.log('2FA Setup state - Secret set:', !!setup.secret, 'QR Code shown:', true);
     } catch (error) {
       console.error('2FA Secret generation error:', error);
+      console.error('2FA Secret generation error details:', {
+        message: error.message,
+        stack: error.stack,
+        name: error.name
+      });
       showToast?.(error.message || 'Failed to generate 2FA secret', 'error');
     } finally {
       setLoading(false);
