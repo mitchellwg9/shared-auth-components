@@ -181,6 +181,7 @@ export function UserProfileDropdown({
       {isOpen && (
         <div 
           className={`absolute ${position === 'right' ? 'right-0' : 'left-0'} mt-2 w-80 bg-white rounded-xl shadow-xl border border-gray-200 py-2 z-50`}
+          style={{ minWidth: '20rem' }}
         >
           {/* User Info Header */}
           <div className="px-4 py-3 border-b border-gray-100">
@@ -211,10 +212,11 @@ export function UserProfileDropdown({
                   className={`w-full px-4 py-2.5 flex items-center gap-3 hover:bg-gray-50 transition-colors ${
                     item.isDanger ? 'hover:bg-red-50' : ''
                   }`}
+                  style={{ minWidth: 0 }}
                 >
                   <Icon className={`w-5 h-5 flex-shrink-0 ${item.isDanger ? 'text-red-600' : 'text-gray-600'}`} />
-                  <div className="flex-1 text-left min-w-0">
-                    <p className={`text-sm font-medium ${item.isDanger ? 'text-red-600' : 'text-gray-900'}`}>
+                  <div className="flex-1 text-left" style={{ minWidth: 0, overflow: 'hidden' }}>
+                    <p className={`text-sm font-medium whitespace-nowrap ${item.isDanger ? 'text-red-600' : 'text-gray-900'}`}>
                       {item.label}
                     </p>
                     <p className="text-xs text-gray-500 truncate">{item.description}</p>
