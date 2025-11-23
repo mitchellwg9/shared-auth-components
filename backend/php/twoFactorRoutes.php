@@ -4,6 +4,8 @@
  * Handles 2FA setup, verification, and status
  * 
  * Usage: Include this file in your API router and route /auth/two-factor/* to this handler
+ * 
+ * Version: 2025-11-23-13:25 (with error handling and output buffering)
  */
 
 // Suppress any output before JSON response

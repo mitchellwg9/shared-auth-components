@@ -303,6 +303,7 @@ try {
             
             sendJSON(['success' => true, 'user' => $user]);
         } elseif ($action === 'change-password') {
+            // Version: 2025-11-23-13:25
             // Change password
             $missing = validateRequired($data, ['currentPassword', 'newPassword']);
             if (!empty($missing)) {
