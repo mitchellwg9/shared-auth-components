@@ -410,6 +410,10 @@ body {
 .p-6 { padding: var(--space-6); }
 .p-8 { padding: var(--space-8); }
 .px-2 { padding-left: var(--space-2); padding-right: var(--space-2); }
+.px-3 { padding-left: var(--space-3); padding-right: var(--space-3); }
+.px-4 { padding-left: var(--space-4); padding-right: var(--space-4); }
+.pl-3 { padding-left: var(--space-3); }
+.border-l { border-left: 1px solid var(--gray-200); }
 .px-4 { padding-left: var(--space-4); padding-right: var(--space-4); }
 .py-3\.5 { padding-top: 0.875rem; padding-bottom: 0.875rem; }
 .px-4 { padding-left: var(--space-4); padding-right: var(--space-4); }
