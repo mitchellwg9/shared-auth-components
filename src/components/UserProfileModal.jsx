@@ -268,8 +268,8 @@ export function UserProfileModal({
     <>
       <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50 overflow-y-auto">
         <div className="bg-white rounded-lg max-w-2xl w-full mx-auto my-4 shadow-xl flex flex-col" style={{ maxWidth: '42rem', width: 'calc(100% - 2rem)', maxHeight: '90vh' }}>
-          {/* Header */}
-          <div className="sticky top-0 bg-white border-b border-gray-200 px-6 py-4 flex items-center justify-between">
+          {/* Header - Fixed at top */}
+          <div className="flex-shrink-0 bg-white border-b border-gray-200 px-6 py-4 flex items-center justify-between rounded-t-lg">
             <div className="flex items-center gap-3">
               <div 
                 className="w-10 h-10 rounded-lg flex items-center justify-center"
@@ -290,8 +290,8 @@ export function UserProfileModal({
             </button>
           </div>
 
-          {/* Content */}
-          <div className="p-6">
+          {/* Scrollable Content */}
+          <div className="flex-1 overflow-y-auto px-6 py-6 min-h-0">
             <div className="space-y-6">
               {/* Personal Information */}
               <div>
