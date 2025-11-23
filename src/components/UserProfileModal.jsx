@@ -418,10 +418,8 @@ export function UserProfileModal({
         isOpen={showPasswordModal}
         onClose={() => setShowPasswordModal(false)}
         currentUser={currentUser}
-        onSave={(updatedUser) => {
-          if (onUserUpdate) {
-            onUserUpdate(updatedUser);
-          }
+        onSave={async (oldPassword, newPassword) => {
+          await handleChangePassword(oldPassword, newPassword);
         }}
         showToast={showToast}
         authAPI={authAPI}
