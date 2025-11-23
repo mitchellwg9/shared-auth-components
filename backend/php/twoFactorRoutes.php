@@ -6,10 +6,25 @@
  * Usage: Include this file in your API router and route /auth/two-factor/* to this handler
  */
 
+// Suppress any output before JSON response
+ob_start();
+
 require_once __DIR__ . '/twoFactorHelper.php';
 require_once __DIR__ . '/../config.php'; // Adjust path as needed
 
+// Clear any output buffer
+ob_clean();
+
+// Set error handler to ensure JSON responses
+set_error_handler(function($severity, $message, $file, $line) {
+    // Log the error but don't output it
+    error_log("PHP Error in twoFactorRoutes.php: $message in $file:$line");
+    // Return false to let PHP handle it normally, but we'll catch it in try-catch
+    return false;
+}, E_ALL);
+
 function handle2FARoute($conn, $method, $pathParts, $data, $userId = null) {
+    try {
     // Get action from path (e.g., /auth/two-factor/setup -> 'setup')
     $action = $pathParts[2] ?? '';
     
@@ -29,6 +44,23 @@ function handle2FARoute($conn, $method, $pathParts, $data, $userId = null) {
             return handle2FADisable($conn, $method, $userId, $data);
         default:
             sendJSON(['error' => 'Action not found'], 404);
+    }
+    } catch (Exception $e) {
+        error_log("2FA route exception: " . $e->getMessage());
+        error_log("Stack trace: " . $e->getTraceAsString());
+        sendJSON([
+            'error' => 'Server error',
+            'error_type' => 'server_error',
+            'message' => 'An error occurred while processing your request'
+        ], 500);
+    } catch (Error $e) {
+        error_log("2FA route fatal error: " . $e->getMessage());
+        error_log("Stack trace: " . $e->getTraceAsString());
+        sendJSON([
+            'error' => 'Server error',
+            'error_type' => 'server_error',
+            'message' => 'An error occurred while processing your request'
+        ], 500);
     }
 }
 
@@ -235,22 +267,55 @@ function handle2FAVerify($conn, $method, $data) {
  * GET: Check if 2FA is enabled for the user
  */
 function handle2FAStatus($conn, $userId) {
-    $check2FAEnabled = $conn->query("SHOW COLUMNS FROM users LIKE 'two_factor_enabled'");
-    $has2FAEnabled = $check2FAEnabled->num_rows > 0;
-    
-    if (!$has2FAEnabled) {
-        sendJSON(['enabled' => false, 'supported' => false]);
+    try {
+        $check2FAEnabled = $conn->query("SHOW COLUMNS FROM users LIKE 'two_factor_enabled'");
+        if (!$check2FAEnabled) {
+            error_log("2FA Status error: Query failed: " . $conn->error);
+            sendJSON(['enabled' => false, 'supported' => false, 'error' => 'Database query failed']);
+            return;
+        }
+        
+        $has2FAEnabled = $check2FAEnabled->num_rows > 0;
+        
+        if (!$has2FAEnabled) {
+            sendJSON(['enabled' => false, 'supported' => false]);
+            return;
+        }
+        
+        $stmt = $conn->prepare("SELECT two_factor_enabled FROM users WHERE id = ?");
+        if (!$stmt) {
+            error_log("2FA Status error: Prepare failed: " . $conn->error);
+            sendJSON(['enabled' => false, 'supported' => true, 'error' => 'Database error']);
+            return;
+        }
+        
+        $stmt->bind_param("s", $userId); // Use "s" for string, as user IDs might be strings
+        if (!$stmt->execute()) {
+            error_log("2FA Status error: Execute failed: " . $stmt->error);
+            sendJSON(['enabled' => false, 'supported' => true, 'error' => 'Database error']);
+            $stmt->close();
+            return;
+        }
+        
+        $result = $stmt->get_result();
+        $user = $result->fetch_assoc();
+        $stmt->close();
+        
+        if (!$user) {
+            sendJSON(['enabled' => false, 'supported' => true, 'error' => 'User not found']);
+            return;
+        }
+        
+        $enabled = isset($user['two_factor_enabled']) && (int)$user['two_factor_enabled'] === 1;
+        
+        sendJSON(['enabled' => $enabled, 'supported' => true]);
+    } catch (Exception $e) {
+        error_log("2FA Status exception: " . $e->getMessage());
+        sendJSON(['enabled' => false, 'supported' => false, 'error' => 'Server error']);
+    } catch (Error $e) {
+        error_log("2FA Status fatal error: " . $e->getMessage());
+        sendJSON(['enabled' => false, 'supported' => false, 'error' => 'Server error']);
     }
-    
-    $stmt = $conn->prepare("SELECT two_factor_enabled FROM users WHERE id = ?");
-    $stmt->bind_param("i", $userId);
-    $stmt->execute();
-    $result = $stmt->get_result();
-    $user = $result->fetch_assoc();
-    
-    $enabled = isset($user['two_factor_enabled']) && (int)$user['two_factor_enabled'] === 1;
-    
-    sendJSON(['enabled' => $enabled, 'supported' => true]);
 }
 
 /**
