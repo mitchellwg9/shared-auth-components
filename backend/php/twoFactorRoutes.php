@@ -11,8 +11,34 @@
 // Suppress any output before JSON response
 ob_start();
 
-require_once __DIR__ . '/twoFactorHelper.php';
-require_once __DIR__ . '/../config.php'; // Adjust path as needed
+// Suppress errors during require
+$oldErrorReporting = error_reporting(0);
+$oldDisplayErrors = ini_get('display_errors');
+ini_set('display_errors', '0');
+
+try {
+    require_once __DIR__ . '/twoFactorHelper.php';
+} catch (Exception $e) {
+    error_log("Failed to require twoFactorHelper.php: " . $e->getMessage());
+    ob_clean();
+    header('Content-Type: application/json');
+    echo json_encode(['error' => '2FA helper not available', 'details' => $e->getMessage()], JSON_PRETTY_PRINT);
+    exit;
+}
+
+try {
+    require_once __DIR__ . '/../config.php';
+} catch (Exception $e) {
+    error_log("Failed to require config.php: " . $e->getMessage());
+    ob_clean();
+    header('Content-Type: application/json');
+    echo json_encode(['error' => 'Configuration not available', 'details' => $e->getMessage()], JSON_PRETTY_PRINT);
+    exit;
+}
+
+// Restore error settings
+error_reporting($oldErrorReporting);
+ini_set('display_errors', $oldDisplayErrors);
 
 // Clear any output buffer
 ob_clean();
