@@ -4,6 +4,7 @@ export { SignupModal } from './components/SignupModal';
 export { EmailVerificationPage } from './components/EmailVerificationPage';
 export { TwoFactorVerify } from './components/TwoFactorVerify';
 export { SystemOwnerPanel } from './components/SystemOwnerPanel';
+export { UserProfileDropdown } from './components/UserProfileDropdown';
 export { createAuthAPI } from './utils/authAPI';
 export { createOwnerAPI } from './utils/ownerAPI';
 export { useAuth } from './hooks/useAuth';
