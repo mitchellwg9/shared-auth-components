@@ -27,9 +27,35 @@ try {
 }
 
 try {
-    require_once __DIR__ . '/../config.php';
+    // Try config.php in the same directory first (api/config.php)
+    if (file_exists(__DIR__ . '/config.php')) {
+        require_once __DIR__ . '/config.php';
+    } elseif (file_exists(__DIR__ . '/../config.php')) {
+        // Fallback to parent directory
+        require_once __DIR__ . '/../config.php';
+    } else {
+        // Try absolute path based on common structure
+        $possiblePaths = [
+            __DIR__ . '/config.php',
+            __DIR__ . '/../config.php',
+            dirname(__DIR__) . '/config.php'
+        ];
+        $found = false;
+        foreach ($possiblePaths as $path) {
+            if (file_exists($path)) {
+                require_once $path;
+                $found = true;
+                break;
+            }
+        }
+        if (!$found) {
+            throw new Exception("config.php not found in any expected location");
+        }
+    }
 } catch (Exception $e) {
     error_log("Failed to require config.php: " . $e->getMessage());
+    error_log("Current directory: " . __DIR__);
+    error_log("Tried paths: " . __DIR__ . '/config.php, ' . __DIR__ . '/../config.php');
     ob_clean();
     header('Content-Type: application/json');
     echo json_encode(['error' => 'Configuration not available', 'details' => $e->getMessage()], JSON_PRETTY_PRINT);
