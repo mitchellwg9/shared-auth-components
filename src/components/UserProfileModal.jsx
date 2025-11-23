@@ -39,9 +39,19 @@ export function UserProfileModal({
         confirmPassword: ''
       });
       setTwoFactorEnabled(currentUser.two_factor_enabled || currentUser.twoFactorEnabled || false);
-      setTwoFactorSecret(currentUser.two_factor_secret || currentUser.twoFactorSecret || null);
-      setShowQRCode(false);
-      setVerificationCode('');
+      
+      // Only reset secret if 2FA is already enabled (don't reset during setup)
+      // If showQRCode is true, we're in the middle of setup, so preserve the secret
+      if (!showQRCode) {
+        setTwoFactorSecret(currentUser.two_factor_secret || currentUser.twoFactorSecret || null);
+        setVerificationCode('');
+      }
+      
+      // Only reset QR code display if 2FA is already enabled
+      if (currentUser.two_factor_enabled || currentUser.twoFactorEnabled) {
+        setShowQRCode(false);
+      }
+      
       setPasswordErrors({});
       
       // Load 2FA status if API is available
@@ -104,7 +114,11 @@ export function UserProfileModal({
     }
     
     if (!twoFactorSecret) {
-      showToast?.('2FA secret is missing. Please try enabling 2FA again.', 'error');
+      showToast?.('2FA secret is missing. Please click "Enable 2FA" again to generate a new secret.', 'error');
+      // Reset to allow user to start over
+      setShowQRCode(false);
+      setTwoFactorSecret(null);
+      setQrCodeUrl('');
       return;
     }
 
