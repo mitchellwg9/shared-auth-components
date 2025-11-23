@@ -240,6 +240,25 @@ switch ($method) {
             $checkEmailVerification = $conn->query("SHOW COLUMNS FROM users LIKE 'email_verified'");
             $hasEmailVerification = $checkEmailVerification->num_rows > 0;
             
+            // Check if organization columns exist
+            $checkOrgIdCol = $conn->query("SHOW COLUMNS FROM users LIKE 'organization_id'");
+            $hasOrgIdColumn = $checkOrgIdCol->num_rows > 0;
+            
+            $checkOrgAdminCol = $conn->query("SHOW COLUMNS FROM users LIKE 'is_organization_admin'");
+            $hasOrgAdminColumn = $checkOrgAdminCol->num_rows > 0;
+            
+            // Get organization fields from request (optional)
+            $organizationId = null;
+            $isOrganizationAdmin = false;
+            
+            if ($hasOrgIdColumn && isset($data['organization_id']) && !empty($data['organization_id'])) {
+                $organizationId = $conn->real_escape_string($data['organization_id']);
+            }
+            
+            if ($hasOrgAdminColumn && isset($data['is_organization_admin'])) {
+                $isOrganizationAdmin = (bool)$data['is_organization_admin'];
+            }
+            
             // Generate a unique ID for the user
             $userId = 'u' . time() . rand(1000, 9999);
             
@@ -251,14 +270,44 @@ switch ($method) {
                 $tokenExpires = date('Y-m-d H:i:s', strtotime('+24 hours'));
             }
             
-            // Insert user
+            // Build INSERT query based on available columns
+            $insertFields = ['id', 'email', 'password', 'name', 'role'];
+            $insertValues = ['?', '?', '?', '?', '?'];
+            $bindParams = ['sssss'];
+            $bindValues = [$userId, $email, $password, $name, $role];
+            
             if ($hasEmailVerification) {
-                $stmt = $conn->prepare("INSERT INTO users (id, email, password, name, role, email_verified, email_verification_token, email_verification_token_expires) VALUES (?, ?, ?, ?, ?, FALSE, ?, ?)");
-                $stmt->bind_param("sssssss", $userId, $email, $password, $name, $role, $verificationToken, $tokenExpires);
-            } else {
-                $stmt = $conn->prepare("INSERT INTO users (id, email, password, name, role) VALUES (?, ?, ?, ?, ?)");
-                $stmt->bind_param("sssss", $userId, $email, $password, $name, $role);
+                $insertFields[] = 'email_verified';
+                $insertFields[] = 'email_verification_token';
+                $insertFields[] = 'email_verification_token_expires';
+                $insertValues[] = 'FALSE';
+                $insertValues[] = '?';
+                $insertValues[] = '?';
+                $bindParams[0] .= 'sss';
+                $bindValues[] = $verificationToken;
+                $bindValues[] = $tokenExpires;
             }
+            
+            if ($hasOrgIdColumn) {
+                $insertFields[] = 'organization_id';
+                $insertValues[] = '?';
+                $bindParams[0] .= 's';
+                $bindValues[] = $organizationId;
+            }
+            
+            if ($hasOrgAdminColumn) {
+                $insertFields[] = 'is_organization_admin';
+                $insertValues[] = '?';
+                $bindParams[0] .= 'i'; // integer (boolean)
+                $bindValues[] = $isOrganizationAdmin ? 1 : 0;
+            }
+            
+            // Build and execute INSERT query
+            $insertQuery = "INSERT INTO users (" . implode(', ', $insertFields) . ") VALUES (" . implode(', ', $insertValues) . ")";
+            $stmt = $conn->prepare($insertQuery);
+            
+            // Dynamically bind parameters
+            $stmt->bind_param($bindParams[0], ...$bindValues);
             
             if ($stmt->execute()) {
                 // Send verification email if email verification is enabled
