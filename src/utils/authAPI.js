@@ -123,6 +123,40 @@ export function createAuthAPI(apiBaseUrl) {
         method: 'GET',
       });
     },
+
+    // 2FA methods
+    verify2FA: async (email, code) => {
+      return apiRequest('/auth/two-factor/verify', {
+        method: 'POST',
+        body: { email, code },
+      });
+    },
+
+    get2FASetup: async () => {
+      return apiRequest('/auth/two-factor/setup', {
+        method: 'GET',
+      });
+    },
+
+    enable2FA: async (secret, code) => {
+      return apiRequest('/auth/two-factor/setup', {
+        method: 'POST',
+        body: { secret, code },
+      });
+    },
+
+    get2FAStatus: async () => {
+      return apiRequest('/auth/two-factor/status', {
+        method: 'GET',
+      });
+    },
+
+    disable2FA: async (password) => {
+      return apiRequest('/auth/two-factor/disable', {
+        method: 'POST',
+        body: { password },
+      });
+    },
   };
 }
 

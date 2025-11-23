@@ -107,7 +107,29 @@ if (empty($resource)) {
                 require_once __DIR__ . '/routes/time_entries.php';
                 break;
             case 'auth':
-                require_once __DIR__ . '/routes/auth.php';
+                // Check if this is a 2FA route
+                if (isset($pathParts[1]) && $pathParts[1] === 'two-factor') {
+                    // Handle 2FA routes
+                    require_once __DIR__ . '/twoFactorRoutes.php';
+                    
+                    // Get user ID from session or token (adjust based on your auth method)
+                    // For now, we'll get it from the request or session
+                    $userId = null;
+                    if (isset($_SESSION['user_id'])) {
+                        $userId = $_SESSION['user_id'];
+                    } elseif (isset($data['user_id'])) {
+                        $userId = $data['user_id'];
+                    }
+                    
+                    // Get request data
+                    $data = getRequestData();
+                    
+                    handle2FARoute($conn, $method, $pathParts, $data, $userId);
+                    exit;
+                } else {
+                    // Regular auth routes
+                    require_once __DIR__ . '/routes/auth.php';
+                }
                 break;
             case 'settings':
                 require_once __DIR__ . '/routes/settings.php';

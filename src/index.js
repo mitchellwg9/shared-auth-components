@@ -2,6 +2,7 @@
 export { LoginScreen } from './components/LoginScreen';
 export { SignupModal } from './components/SignupModal';
 export { EmailVerificationPage } from './components/EmailVerificationPage';
+export { TwoFactorVerify } from './components/TwoFactorVerify';
 export { createAuthAPI } from './utils/authAPI';
 export { useAuth } from './hooks/useAuth';
 

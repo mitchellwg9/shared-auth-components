@@ -37,6 +37,8 @@ export function LoginScreen({
   const [isLoading, setIsLoading] = useState(false);
   const [isResendingVerification, setIsResendingVerification] = useState(false);
   const [verificationEmail, setVerificationEmail] = useState('');
+  const [requires2FA, setRequires2FA] = useState(false);
+  const [twoFactorEmail, setTwoFactorEmail] = useState('');
 
   // Create API client
   const authAPI = React.useMemo(() => {
@@ -113,6 +115,16 @@ export function LoginScreen({
     try {
       const response = await authAPI.login(email, password);
       
+      // Check if 2FA is required
+      if (response.requires2FA) {
+        setRequires2FA(true);
+        setTwoFactorEmail(response.email || email);
+        setError('');
+        setErrorType('');
+        // Don't clear email/password yet - user might cancel 2FA
+        return;
+      }
+      
       if (response.success && response.user) {
         const user = response.user;
         // Store user in localStorage
@@ -130,6 +142,8 @@ export function LoginScreen({
         setEmail('');
         setPassword('');
         setVerificationEmail('');
+        setRequires2FA(false);
+        setTwoFactorEmail('');
       } else {
         const errorMsg = response.error || 'Invalid credentials';
         setError(errorMsg);
