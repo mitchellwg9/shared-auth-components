@@ -302,6 +302,90 @@ try {
             error_log("Auth login - User: " . $user['email'] . ", is_organization_admin: " . ($user['is_organization_admin'] ? 'true' : 'false') . ", is_system_owner: " . ($user['is_system_owner'] ? 'true' : 'false') . ", org_id: " . ($user['organization_id'] ?? 'null') . ", plan: " . ($user['plan'] ?? 'free'));
             
             sendJSON(['success' => true, 'user' => $user]);
+        } elseif ($action === 'change-password') {
+            // Change password
+            $missing = validateRequired($data, ['currentPassword', 'newPassword']);
+            if (!empty($missing)) {
+                sendJSON(['error' => 'Missing required fields', 'fields' => $missing], 400);
+            }
+            
+            // Get current user ID from query string or request body
+            $currentUserId = $_GET['current_user_id'] ?? $data['current_user_id'] ?? null;
+            
+            if (!$currentUserId) {
+                sendJSON(['error' => 'Authentication required'], 401);
+            }
+            
+            $conn = getDBConnection();
+            $currentPassword = $data['currentPassword'];
+            $newPassword = $data['newPassword'];
+            
+            // Validate new password length
+            if (strlen($newPassword) < 6) {
+                sendJSON(['error' => 'New password must be at least 6 characters'], 400);
+            }
+            
+            // Get user's current password hash
+            $stmt = $conn->prepare("SELECT password FROM users WHERE id = ?");
+            if (!$stmt) {
+                error_log("Change password error: Prepare failed: " . $conn->error);
+                sendJSON(['error' => 'Database error'], 500);
+            }
+            
+            $stmt->bind_param("s", $currentUserId);
+            if (!$stmt->execute()) {
+                error_log("Change password error: Execute failed: " . $stmt->error);
+                sendJSON(['error' => 'Database error'], 500);
+            }
+            
+            $result = $stmt->get_result();
+            if ($result->num_rows === 0) {
+                $stmt->close();
+                sendJSON(['error' => 'User not found'], 404);
+            }
+            
+            $user = $result->fetch_assoc();
+            $stmt->close();
+            
+            // Verify current password
+            $passwordValid = false;
+            try {
+                // Check if password is hashed (starts with $2y$ or $2a$ or $2b$ for bcrypt)
+                if (preg_match('/^\$2[ayb]\$/', $user['password'])) {
+                    // Password is hashed, use password_verify
+                    $passwordValid = password_verify($currentPassword, $user['password']);
+                } else {
+                    // Password is plain text (legacy), compare directly
+                    $passwordValid = ($user['password'] === $currentPassword);
+                }
+            } catch (Exception $e) {
+                error_log("Password verification error: " . $e->getMessage());
+                $passwordValid = false;
+            }
+            
+            if (!$passwordValid) {
+                sendJSON(['error' => 'Current password is incorrect'], 401);
+            }
+            
+            // Hash new password
+            $hashedPassword = password_hash($newPassword, PASSWORD_DEFAULT);
+            
+            // Update password
+            $updateStmt = $conn->prepare("UPDATE users SET password = ? WHERE id = ?");
+            if (!$updateStmt) {
+                error_log("Change password error: Prepare failed: " . $conn->error);
+                sendJSON(['error' => 'Database error'], 500);
+            }
+            
+            $updateStmt->bind_param("ss", $hashedPassword, $currentUserId);
+            if (!$updateStmt->execute()) {
+                error_log("Change password error: Execute failed: " . $updateStmt->error);
+                sendJSON(['error' => 'Failed to update password'], 500);
+            }
+            
+            $updateStmt->close();
+            sendJSON(['success' => true, 'message' => 'Password changed successfully'], 200);
+            
         } elseif ($action === 'register') {
             // Register new user
             $missing = validateRequired($data, ['email', 'password', 'name']);
