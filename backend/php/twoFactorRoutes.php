@@ -126,16 +126,26 @@ function handle2FASetup($conn, $method, $userId, $data) {
         
     } else if ($method === 'POST') {
         // Verify code and enable 2FA
+        if (!$userId) {
+            sendJSON(['error' => 'Authentication required'], 401);
+            return;
+        }
+        
         if (empty($data['code']) || empty($data['secret'])) {
             sendJSON(['error' => 'Code and secret are required'], 400);
+            return;
         }
         
         $code = trim($data['code']);
         $secret = trim($data['secret']);
         
+        error_log("2FA Enable attempt - User ID: $userId, Code: $code, Secret: " . substr($secret, 0, 4) . "...");
+        
         // Verify code
         if (!verifyTOTP($secret, $code)) {
+            error_log("2FA Enable failed: Invalid TOTP code");
             sendJSON(['error' => 'Invalid code. Please try again.'], 400);
+            return;
         }
         
         // Generate backup codes
@@ -152,6 +162,10 @@ function handle2FASetup($conn, $method, $userId, $data) {
         
         // Enable 2FA in database
         $twoFactorEnabled = 1;
+        
+        // Log for debugging
+        error_log("Enabling 2FA for user ID: $userId, Secret: " . substr($secret, 0, 4) . "...");
+        
         $stmt = $conn->prepare("
             UPDATE users 
             SET two_factor_enabled = ?, 
@@ -159,17 +173,36 @@ function handle2FASetup($conn, $method, $userId, $data) {
                 two_factor_backup_codes = ?
             WHERE id = ?
         ");
-        $stmt->bind_param("issi", $twoFactorEnabled, $secret, $backupCodesJson, $userId);
+        
+        if (!$stmt) {
+            error_log("2FA Enable error: Prepare failed: " . $conn->error);
+            sendJSON(['error' => 'Database error: ' . $conn->error], 500);
+            return;
+        }
+        
+        // Use "s" for userId as it might be a string
+        $stmt->bind_param("isss", $twoFactorEnabled, $secret, $backupCodesJson, $userId);
         
         if ($stmt->execute()) {
-            sendJSON([
-                'success' => true,
-                'backupCodes' => $backupCodes,
-                'message' => '2FA enabled successfully'
-            ]);
+            $affectedRows = $stmt->affected_rows;
+            error_log("2FA enabled successfully. Affected rows: $affectedRows");
+            
+            if ($affectedRows === 0) {
+                error_log("Warning: No rows updated. User ID might not exist: $userId");
+                sendJSON(['error' => 'User not found or no changes made'], 404);
+            } else {
+                sendJSON([
+                    'success' => true,
+                    'backupCodes' => $backupCodes,
+                    'message' => '2FA enabled successfully'
+                ]);
+            }
         } else {
-            sendJSON(['error' => 'Failed to enable 2FA'], 500);
+            error_log("2FA Enable error: Execute failed: " . $stmt->error);
+            sendJSON(['error' => 'Failed to enable 2FA: ' . $stmt->error], 500);
         }
+        
+        $stmt->close();
     } else {
         sendJSON(['error' => 'Method not allowed'], 405);
     }
