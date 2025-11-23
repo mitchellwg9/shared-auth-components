@@ -393,6 +393,40 @@ function App() {
           showToast={showToast}
           authAPI={authAPI}
           primaryColor="#6366f1"
+          darkMode={darkMode}
+          onToggleDarkMode={() => {
+            const newDarkMode = !darkMode;
+            setDarkMode(newDarkMode);
+            // Apply dark mode to document
+            if (newDarkMode) {
+              document.documentElement.classList.add('dark');
+            } else {
+              document.documentElement.classList.remove('dark');
+            }
+            localStorage.setItem('darkMode', newDarkMode.toString());
+            showToast(`Dark mode ${newDarkMode ? 'enabled' : 'disabled'}`, 'success');
+          }}
+          theme={theme}
+          onThemeChange={(newTheme) => {
+            setTheme(newTheme);
+            // Apply theme colors to CSS variables
+            const themes = {
+              default: { primary: '#6366f1', background: '#ffffff', text: '#1f2937' },
+              blue: { primary: '#3b82f6', background: '#ffffff', text: '#1f2937' },
+              green: { primary: '#10b981', background: '#ffffff', text: '#1f2937' },
+              purple: { primary: '#8b5cf6', background: '#ffffff', text: '#1f2937' },
+            };
+            const selectedTheme = themes[newTheme] || themes.default;
+            document.documentElement.style.setProperty('--primary-color', selectedTheme.primary);
+            localStorage.setItem('theme', newTheme);
+            showToast(`Theme changed to ${newTheme}`, 'success');
+          }}
+          dateFormat={dateFormat}
+          onDateFormatChange={(newFormat) => {
+            setDateFormat(newFormat);
+            localStorage.setItem('dateFormat', newFormat);
+            showToast(`Date format changed to ${newFormat}`, 'success');
+          }}
         />
       )}
     </>
