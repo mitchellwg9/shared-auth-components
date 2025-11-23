@@ -1,5 +1,12 @@
-import { useState, useEffect } from 'react';
-import { LoginScreen, SignupModal, EmailVerificationPage } from '../../src/index.js';
+import { useState, useEffect, useMemo } from 'react';
+import { 
+  LoginScreen, 
+  SignupModal, 
+  EmailVerificationPage, 
+  UserProfileDropdown,
+  SystemOwnerPanel,
+  createOwnerAPI
+} from '../../src/index.js';
 import { LandingPage } from './LandingPage.jsx';
 import './App.css';
 
@@ -88,8 +95,50 @@ function App() {
     );
   }
 
+  // Create owner API client if user is system owner
+  const ownerAPI = useMemo(() => {
+    if (user?.is_system_owner || user?.isSystemOwner) {
+      return createOwnerAPI(API_BASE_URL);
+    }
+    return null;
+  }, [user]);
+
+  // Check if user is system owner
+  const isSystemOwner = user?.is_system_owner === true || user?.isSystemOwner === true;
+
   // If user is logged in, show dashboard
   if (user) {
+    // Show System Owner Panel if user is system owner
+    if (isSystemOwner && ownerAPI) {
+      return (
+        <>
+          <SystemOwnerPanel
+            currentUser={user}
+            showToast={showToast}
+            onLogout={handleLogout}
+            ownerAPI={ownerAPI}
+            appName="Shared Auth Demo"
+            primaryColor="#6366f1"
+          />
+          <div className="fixed bottom-4 right-4 space-y-2 z-50">
+            {toasts.map(toast => (
+              <div
+                key={toast.id}
+                className={`px-4 py-3 rounded-lg shadow-xl backdrop-blur-sm font-medium ${
+                  toast.type === 'success' ? 'bg-green-500/90 text-white' :
+                  toast.type === 'error' ? 'bg-white text-red-600 border-2 border-red-300' :
+                  'bg-blue-500/90 text-white'
+                }`}
+              >
+                {toast.message}
+              </div>
+            ))}
+          </div>
+        </>
+      );
+    }
+
+    // Regular user dashboard
     return (
       <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-50">
         <div className="bg-white border-b border-gray-200 shadow-sm">
@@ -101,12 +150,26 @@ function App() {
                 </h1>
                 <p className="text-sm text-gray-500 mt-1">Testing authentication components</p>
               </div>
-              <button
-                onClick={handleLogout}
-                className="px-4 py-2 bg-red-500 text-white rounded-lg hover:bg-red-600 transition-all duration-200 shadow-md hover:shadow-lg font-medium"
-              >
-                Logout
-              </button>
+              <UserProfileDropdown
+                currentUser={user}
+                onProfileClick={() => {
+                  showToast('Profile editing coming soon!', 'info');
+                }}
+                onSettingsClick={() => {
+                  showToast('Settings coming soon!', 'info');
+                }}
+                onSubscriptionClick={() => {
+                  showToast('Subscription management coming soon!', 'info');
+                }}
+                onTeamManagementClick={() => {
+                  showToast('Team management coming soon!', 'info');
+                }}
+                onHelpClick={() => {
+                  showToast('Help & Support coming soon!', 'info');
+                }}
+                onLogoutClick={handleLogout}
+                primaryColor="#6366f1"
+              />
             </div>
           </div>
         </div>
@@ -123,22 +186,62 @@ function App() {
               </div>
             </div>
           </div>
+
+          {/* Component Testing Section */}
+          <div className="bg-white rounded-xl shadow-lg p-6 mb-6">
+            <h3 className="text-xl font-bold text-gray-900 mb-4">Testing Shared Components</h3>
+            <div className="space-y-4">
+              <div className="p-4 bg-gray-50 rounded-lg">
+                <h4 className="font-semibold text-gray-900 mb-2">✅ UserProfileDropdown</h4>
+                <p className="text-sm text-gray-600">
+                  Click on your name in the top right corner to see the dropdown menu with:
+                  Edit Profile, Settings, Help & Support, and Logout.
+                  {user.is_organization_admin && (
+                    <span className="block mt-1 text-blue-600">
+                      As an organization admin, you'll also see "Manage Subscription" and "Manage Team" options.
+                    </span>
+                  )}
+                </p>
+              </div>
+              {isSystemOwner && (
+                <div className="p-4 bg-purple-50 rounded-lg border-2 border-purple-200">
+                  <h4 className="font-semibold text-purple-900 mb-2">👑 SystemOwnerPanel</h4>
+                  <p className="text-sm text-purple-700">
+                    You are a system owner! You should see the System Owner Panel with access to:
+                    Analytics, Organizations, Subscriptions, and All Users management.
+                  </p>
+                </div>
+              )}
+              <div className="p-4 bg-gray-50 rounded-lg">
+                <h4 className="font-semibold text-gray-900 mb-2">User Information</h4>
+                <div className="text-sm text-gray-600 space-y-1">
+                  <p><strong>Email:</strong> {user.email}</p>
+                  <p><strong>Name:</strong> {user.name || 'Not set'}</p>
+                  <p><strong>Role:</strong> {user.role || 'user'}</p>
+                  {user.plan && <p><strong>Plan:</strong> {user.plan}</p>}
+                  {user.subscription_status && <p><strong>Subscription Status:</strong> {user.subscription_status}</p>}
+                  {user.is_organization_admin && <p className="text-blue-600"><strong>Organization Admin:</strong> Yes</p>}
+                  {isSystemOwner && <p className="text-purple-600"><strong>System Owner:</strong> Yes</p>}
+                </div>
+              </div>
+            </div>
+          </div>
         </div>
 
-                <div className="fixed bottom-4 right-4 space-y-2 z-50">
-                  {toasts.map(toast => (
-                    <div
-                      key={toast.id}
-                      className={`px-4 py-3 rounded-lg shadow-xl backdrop-blur-sm font-medium ${
-                        toast.type === 'success' ? 'bg-green-500/90 text-white' :
-                        toast.type === 'error' ? 'bg-white text-red-600 border-2 border-red-300' :
-                        'bg-blue-500/90 text-white'
-                      }`}
-                    >
-                      {toast.message}
-                    </div>
-                  ))}
-                </div>
+        <div className="fixed bottom-4 right-4 space-y-2 z-50">
+          {toasts.map(toast => (
+            <div
+              key={toast.id}
+              className={`px-4 py-3 rounded-lg shadow-xl backdrop-blur-sm font-medium ${
+                toast.type === 'success' ? 'bg-green-500/90 text-white' :
+                toast.type === 'error' ? 'bg-white text-red-600 border-2 border-red-300' :
+                'bg-blue-500/90 text-white'
+              }`}
+            >
+              {toast.message}
+            </div>
+          ))}
+        </div>
       </div>
     );
   }
