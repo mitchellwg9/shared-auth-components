@@ -172,6 +172,14 @@ if (existsSync(ownerRoutesPath)) {
   console.log('✅ Prepared ownerRoutes.php');
 }
 
+// Copy test-api-version.php
+const testApiVersionPath = resolve(__dirname, 'test-api-version.php');
+if (existsSync(testApiVersionPath)) {
+  const testApiVersionContent = readFileSync(testApiVersionPath, 'utf-8');
+  writeFileSync(resolve(tempDir, 'test-api-version.php'), testApiVersionContent);
+  console.log('✅ Prepared test-api-version.php');
+}
+
 const ftp = new FtpDeploy();
 
 // Deploy to public_html/api directory (web-accessible API location)
