@@ -150,6 +150,65 @@ export function UserProfileModal({
     }
   };
 
+  const validatePassword = () => {
+    const errors = {};
+    
+    // Only validate if user is trying to change password (newPassword is filled)
+    if (!formData.newPassword && !formData.confirmPassword) {
+      // No password change attempted
+      return true;
+    }
+    
+    if (!formData.newPassword) {
+      errors.newPassword = 'New password is required';
+    } else if (formData.newPassword.length < 6) {
+      errors.newPassword = 'Password must be at least 6 characters';
+    }
+    
+    if (!formData.confirmPassword) {
+      errors.confirmPassword = 'Please confirm your password';
+    } else if (formData.newPassword !== formData.confirmPassword) {
+      errors.confirmPassword = 'Passwords do not match';
+    }
+    
+    setPasswordErrors(errors);
+    return Object.keys(errors).length === 0;
+  };
+
+  const handleChangePassword = async () => {
+    // Only change password if new password is provided
+    if (!formData.newPassword && !formData.confirmPassword) {
+      return true; // No password change requested, return success
+    }
+    
+    if (!validatePassword()) {
+      return false; // Validation failed
+    }
+
+    if (!authAPI || !authAPI.changePassword) {
+      showToast?.('Password change is not available', 'error');
+      return false;
+    }
+    
+    // Change password without requiring current password
+    // Use empty string for current password - API allows this
+    try {
+      const response = await authAPI.changePassword('', formData.newPassword);
+      if (response && response.success) {
+        showToast?.('Password changed successfully!', 'success');
+        setFormData({ ...formData, newPassword: '', confirmPassword: '' });
+        setPasswordErrors({});
+        return true;
+      } else {
+        showToast?.(response?.message || 'Failed to change password', 'error');
+        return false;
+      }
+    } catch (error) {
+      showToast?.(error.message || 'Failed to change password', 'error');
+      return false;
+    }
+  };
+
   const handleSaveProfile = async () => {
     if (!formData.name.trim()) {
       showToast?.('Name is required', 'error');
