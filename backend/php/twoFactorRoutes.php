@@ -139,26 +139,30 @@ function handle2FASetup($conn, $method, $userId, $data) {
         $code = trim($data['code']);
         $secret = trim($data['secret']);
         
-        error_log("2FA Enable attempt - User ID: $userId, Code: $code, Secret: " . substr($secret, 0, 4) . "...");
+        // Remove any spaces, dashes, or other non-digit characters
+        $code = preg_replace('/[^0-9]/', '', $code);
         
-        // Verify code with time window tolerance (allow codes from previous/next time step)
-        $verified = false;
-        $currentCode = generateTOTP($secret);
-        $previousCode = generateTOTP($secret, 30, -1); // Previous time step
-        $nextCode = generateTOTP($secret, 30, 1); // Next time step
+        error_log("2FA Enable attempt - User ID: $userId");
+        error_log("2FA Code received: '$code' (length: " . strlen($code) . ", is_numeric: " . (ctype_digit($code) ? 'yes' : 'no') . ")");
+        error_log("2FA Secret: " . substr($secret, 0, 8) . "... (length: " . strlen($secret) . ")");
+        error_log("2FA Server time: " . date('Y-m-d H:i:s') . " (Unix: " . time() . ")");
         
-        error_log("2FA Code verification - Entered: $code, Current: $currentCode, Previous: $previousCode, Next: $nextCode");
-        
-        if ($code === $currentCode || $code === $previousCode || $code === $nextCode) {
-            $verified = true;
-        } else {
-            // Also try the verifyTOTP function with window
-            $verified = verifyTOTP($secret, $code, 1); // Window of 1 (current, previous, next)
-        }
+        // Verify code with window of 1 (current, previous, next time step)
+        // This allows for clock skew between server and authenticator app
+        $verified = verifyTOTP($secret, $code, 1);
         
         if (!$verified) {
-            error_log("2FA Enable failed: Invalid TOTP code. Entered: $code");
-            sendJSON(['error' => 'Invalid code. Please enter the current 6-digit code from your authenticator app.'], 400);
+            // Generate what the codes should be for debugging
+            $currentCode = generateTOTP($secret, 30, 0);
+            $prevCode = generateTOTP($secret, 30, -1);
+            $nextCode = generateTOTP($secret, 30, 1);
+            error_log("2FA Enable failed: Invalid TOTP code");
+            error_log("2FA Expected codes - Current: $currentCode, Previous: $prevCode, Next: $nextCode");
+            error_log("2FA Code comparison - Entered: '$code', Current: '$currentCode', Previous: '$prevCode', Next: '$nextCode'");
+            sendJSON([
+                'error' => 'Invalid code. Please enter the current 6-digit code from your authenticator app. Make sure your device time is synchronized.',
+                'debug_info' => 'Check server logs for detailed verification info'
+            ], 400);
             return;
         }
         
