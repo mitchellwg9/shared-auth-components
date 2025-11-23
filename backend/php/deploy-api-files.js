@@ -164,6 +164,14 @@ if (existsSync(twoFactorRoutesPath)) {
   console.log('✅ Prepared twoFactorRoutes.php');
 }
 
+// Copy ownerRoutes.php
+const ownerRoutesPath = resolve(__dirname, 'ownerRoutes.php');
+if (existsSync(ownerRoutesPath)) {
+  const ownerRoutesContent = readFileSync(ownerRoutesPath, 'utf-8');
+  writeFileSync(resolve(tempDir, 'ownerRoutes.php'), ownerRoutesContent);
+  console.log('✅ Prepared ownerRoutes.php');
+}
+
 const ftp = new FtpDeploy();
 
 // Deploy to public_html/api directory (web-accessible API location)

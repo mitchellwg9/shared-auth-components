@@ -148,7 +148,7 @@ if (empty($resource)) {
                 break;
             case 'owner':
                 // Handle owner routes using shared handler
-                require_once __DIR__ . '/../../shared-auth-components/backend/php/ownerRoutes.php';
+                require_once __DIR__ . '/ownerRoutes.php';
                 
                 // Get current user ID from request
                 $currentUserId = $_GET['current_user_id'] ?? $data['current_user_id'] ?? null;
