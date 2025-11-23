@@ -224,162 +224,186 @@ export function UserProfileModal({
           </div>
 
           {/* Content */}
-          <div className="p-8">
-            <div className="space-y-8">
+          <div className="p-6">
+            <div className="space-y-6">
               {/* Personal Information */}
               <div>
-                <h4 className="text-base font-semibold text-gray-900 mb-5">Personal Information</h4>
-                <div className="space-y-5">
+                <h4 className="text-sm font-semibold text-gray-900 mb-4">Personal Information</h4>
+                <div className="space-y-4">
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-2.5">Full Name *</label>
+                    <label className="block text-sm font-medium text-gray-700 mb-2">Full Name *</label>
                     <input
                       type="text"
                       value={formData.name}
                       onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-                      className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-all"
+                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
                       style={{ '--tw-ring-color': primaryColor }}
                       placeholder="Enter your full name"
                     />
                   </div>
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-2.5">Email</label>
+                    <label className="block text-sm font-medium text-gray-700 mb-2">Email</label>
                     <input
                       type="email"
                       value={formData.email}
                       onChange={(e) => setFormData({ ...formData, email: e.target.value })}
-                      className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent bg-gray-50 transition-all"
+                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent bg-gray-50"
                       style={{ '--tw-ring-color': primaryColor }}
                       placeholder="Enter your email"
                       disabled
                     />
-                    <p className="text-xs text-gray-500 mt-1.5">Email cannot be changed</p>
+                    <p className="text-xs text-gray-500 mt-1">Email cannot be changed</p>
                   </div>
                 </div>
               </div>
 
               {/* Password Change */}
               <div className="border-t border-gray-200 pt-6">
-                <div className="flex items-center justify-between">
-                  <div className="flex-1">
-                    <h4 className="text-base font-semibold text-gray-900 mb-1 flex items-center gap-2">
-                      <Lock className="w-4 h-4" />
-                      Password
-                    </h4>
-                    <p className="text-xs text-gray-500">
-                      Change your password to keep your account secure
-                    </p>
-                  </div>
-                  <button
-                    onClick={() => setShowPasswordModal(true)}
-                    className="px-5 py-2.5 text-white rounded-lg hover:opacity-90 transition-colors font-medium text-sm"
-                    style={{ backgroundColor: primaryColor }}
-                  >
-                    Change Password
-                  </button>
-                </div>
+                <h4 className="text-sm font-semibold text-gray-900 mb-4 flex items-center gap-2">
+                  <Lock className="w-4 h-4" />
+                  Password
+                </h4>
+                <p className="text-sm text-gray-600 mb-4">
+                  Change your password to keep your account secure.
+                </p>
+                <button
+                  onClick={() => setShowPasswordModal(true)}
+                  className="px-4 py-2 text-white rounded-lg hover:opacity-90 transition-colors font-medium"
+                  style={{ backgroundColor: primaryColor }}
+                >
+                  Change Password
+                </button>
               </div>
 
               {/* 2FA Section */}
               <div className="border-t border-gray-200 pt-6">
-                <div className="flex items-center justify-between">
-                  <div className="flex-1">
-                    <h4 className="text-sm font-semibold text-gray-900 mb-1 flex items-center gap-2">
-                      <Shield className="w-4 h-4" />
-                      Two-Factor Authentication (2FA)
-                    </h4>
-                    <p className="text-xs text-gray-500">
-                      Require a verification code when logging in for added security
-                    </p>
-                  </div>
-                  <button
-                    onClick={async () => {
-                      if (twoFactorEnabled) {
-                        // Disable 2FA
-                        await disable2FA();
-                      } else {
-                        // Enable 2FA - show setup flow
-                        await generate2FASecret();
-                      }
-                    }}
-                    disabled={loading || !authAPI}
-                    className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors focus:outline-none focus:ring-2 focus:ring-offset-2 disabled:opacity-50 ${
-                      twoFactorEnabled ? 'bg-green-600 focus:ring-green-500' : 'bg-gray-300 focus:ring-gray-400'
-                    }`}
-                  >
-                    <span
-                      className={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform ${
-                        twoFactorEnabled ? 'translate-x-6' : 'translate-x-1'
-                      }`}
-                    />
-                  </button>
-                </div>
-                
-                {/* Show QR code setup when enabling */}
-                {showQRCode && !twoFactorEnabled && (
-                  <div className="mt-4 bg-gray-50 rounded-lg p-4 border border-gray-200">
-                    <p className="text-sm font-medium text-gray-900 mb-2">
-                      Scan this QR code with your authenticator app:
-                    </p>
-                    <div className="flex justify-center mb-4">
-                      {qrCodeUrl && (
-                        <img src={qrCodeUrl} alt="2FA QR Code" className="border border-gray-300 rounded" />
-                      )}
-                    </div>
-                    <p className="text-xs text-gray-600 mb-4">
-                      Use apps like Google Authenticator, Microsoft Authenticator, or Authy
-                    </p>
-                    <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-2">
-                        Enter verification code:
-                      </label>
-                      <div className="flex gap-2">
-                        <input
-                          type="text"
-                          value={verificationCode}
-                          onChange={(e) => setVerificationCode(e.target.value.replace(/\D/g, '').slice(0, 6))}
-                          placeholder="000000"
-                          className="flex-1 px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent text-center text-lg font-mono tracking-widest"
-                          style={{ '--tw-ring-color': primaryColor }}
-                          maxLength={6}
-                        />
+                <h4 className="text-sm font-semibold text-gray-900 mb-4 flex items-center gap-2">
+                  <Shield className="w-4 h-4" />
+                  Two-Factor Authentication (2FA)
+                </h4>
+                <p className="text-sm text-gray-600 mb-4">
+                  Add an extra layer of security to your account by requiring a verification code from your mobile device.
+                </p>
+
+                {!twoFactorEnabled ? (
+                  <div className="space-y-4">
+                    {!showQRCode ? (
+                      <div className="flex items-center justify-between">
+                        <span className="text-sm text-gray-700">2FA is currently disabled</span>
                         <button
-                          onClick={verifyAndEnable2FA}
-                          disabled={verificationCode.length !== 6 || loading}
-                          className="px-4 py-2 text-white rounded-lg hover:opacity-90 transition-colors font-medium disabled:opacity-50"
-                          style={{ backgroundColor: primaryColor }}
+                          onClick={generate2FASecret}
+                          disabled={loading || !authAPI}
+                          className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors focus:outline-none focus:ring-2 focus:ring-offset-2 disabled:opacity-50 ${
+                            twoFactorEnabled ? 'bg-green-600 focus:ring-green-500' : 'bg-gray-300 focus:ring-gray-400'
+                          }`}
                         >
-                          {loading ? 'Verifying...' : 'Verify'}
+                          <span
+                            className={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform ${
+                              twoFactorEnabled ? 'translate-x-6' : 'translate-x-1'
+                            }`}
+                          />
                         </button>
                       </div>
+                    ) : (
+                      <div className="space-y-4">
+                        <div className="bg-gray-50 rounded-lg p-4 border border-gray-200">
+                          <p className="text-sm font-medium text-gray-900 mb-2">
+                            Scan this QR code with your authenticator app:
+                          </p>
+                          <div className="flex justify-center mb-4">
+                            {qrCodeUrl && (
+                              <img src={qrCodeUrl} alt="2FA QR Code" className="border border-gray-300 rounded" />
+                            )}
+                          </div>
+                          <p className="text-xs text-gray-600 mb-4">
+                            Use apps like Google Authenticator, Microsoft Authenticator, or Authy
+                          </p>
+                          <div>
+                            <label className="block text-sm font-medium text-gray-700 mb-2">
+                              Enter verification code:
+                            </label>
+                            <div className="flex gap-2">
+                              <input
+                                type="text"
+                                value={verificationCode}
+                                onChange={(e) => setVerificationCode(e.target.value.replace(/\D/g, '').slice(0, 6))}
+                                placeholder="000000"
+                                className="flex-1 px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent text-center text-lg font-mono tracking-widest"
+                                style={{ '--tw-ring-color': primaryColor }}
+                                maxLength={6}
+                              />
+                              <button
+                                onClick={verifyAndEnable2FA}
+                                disabled={verificationCode.length !== 6 || loading}
+                                className="px-4 py-2 text-white rounded-lg hover:opacity-90 transition-colors font-medium disabled:opacity-50"
+                                style={{ backgroundColor: primaryColor }}
+                              >
+                                {loading ? 'Verifying...' : 'Verify'}
+                              </button>
+                            </div>
+                          </div>
+                          <button
+                            onClick={() => {
+                              setShowQRCode(false);
+                              setTwoFactorSecret(null);
+                              setQrCodeUrl('');
+                              setVerificationCode('');
+                            }}
+                            className="mt-2 text-sm text-gray-600 hover:text-gray-900"
+                          >
+                            Cancel
+                          </button>
+                        </div>
+                      </div>
+                    )}
+                  </div>
+                ) : (
+                  <div className="space-y-4">
+                    <div className="bg-green-50 border border-green-200 rounded-lg p-4">
+                      <div className="flex items-center justify-between">
+                        <div>
+                          <p className="text-sm font-medium text-green-900">2FA is enabled</p>
+                          <p className="text-xs text-green-700 mt-1">
+                            Your account is protected with two-factor authentication
+                          </p>
+                        </div>
+                        <div className="flex items-center gap-3">
+                          <span className="px-2 py-1 bg-green-100 text-green-800 text-xs font-medium rounded-full">
+                            Active
+                          </span>
+                          <button
+                            onClick={disable2FA}
+                            disabled={loading || !authAPI}
+                            className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors focus:outline-none focus:ring-2 focus:ring-offset-2 disabled:opacity-50 ${
+                              twoFactorEnabled ? 'bg-green-600 focus:ring-green-500' : 'bg-gray-300 focus:ring-gray-400'
+                            }`}
+                          >
+                            <span
+                              className={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform ${
+                                twoFactorEnabled ? 'translate-x-6' : 'translate-x-1'
+                              }`}
+                            />
+                          </button>
+                        </div>
+                      </div>
                     </div>
-                    <button
-                      onClick={() => {
-                        setShowQRCode(false);
-                        setTwoFactorSecret(null);
-                        setQrCodeUrl('');
-                        setVerificationCode('');
-                      }}
-                      className="mt-2 text-sm text-gray-600 hover:text-gray-900"
-                    >
-                      Cancel
-                    </button>
                   </div>
                 )}
               </div>
 
               {/* Save Button */}
-              <div className="flex gap-3 pt-6 border-t border-gray-200">
+              <div className="flex gap-2 pt-4 border-t border-gray-200">
                 <button
                   onClick={handleSaveProfile}
                   disabled={loading}
-                  className="px-6 py-2.5 text-white rounded-lg hover:opacity-90 transition-colors font-medium disabled:opacity-50 text-sm"
+                  className="px-4 py-2 text-white rounded-lg hover:opacity-90 transition-colors font-medium disabled:opacity-50"
                   style={{ backgroundColor: primaryColor }}
                 >
                   {loading ? 'Saving...' : 'Save Changes'}
                 </button>
                 <button
                   onClick={onClose}
-                  className="px-6 py-2.5 bg-gray-200 text-gray-700 rounded-lg hover:bg-gray-300 transition-colors font-medium text-sm"
+                  className="px-4 py-2 bg-gray-200 text-gray-700 rounded-lg hover:bg-gray-300 transition-colors"
                 >
                   Cancel
                 </button>
