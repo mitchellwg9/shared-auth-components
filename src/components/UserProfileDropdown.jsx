@@ -180,13 +180,13 @@ export function UserProfileDropdown({
 
       {isOpen && (
         <div 
-          className={`absolute ${position === 'right' ? 'right-0' : 'left-0'} mt-2 w-72 bg-white rounded-xl shadow-xl border border-gray-200 py-2 z-50`}
+          className={`absolute ${position === 'right' ? 'right-0' : 'left-0'} mt-2 w-80 bg-white rounded-xl shadow-xl border border-gray-200 py-2 z-50`}
         >
           {/* User Info Header */}
           <div className="px-4 py-3 border-b border-gray-100">
             <div className="flex items-center gap-3">
               <div 
-                className="w-10 h-10 rounded-full flex items-center justify-center text-white text-sm font-medium"
+                className="w-10 h-10 rounded-full flex items-center justify-center text-white text-sm font-medium flex-shrink-0"
                 style={{ 
                   background: `linear-gradient(to bottom right, ${primaryColor}, rgba(${primaryColorRgb}, 0.7))`
                 }}
@@ -212,12 +212,12 @@ export function UserProfileDropdown({
                     item.isDanger ? 'hover:bg-red-50' : ''
                   }`}
                 >
-                  <Icon className={`w-5 h-5 ${item.isDanger ? 'text-red-600' : 'text-gray-600'}`} />
-                  <div className="flex-1 text-left">
+                  <Icon className={`w-5 h-5 flex-shrink-0 ${item.isDanger ? 'text-red-600' : 'text-gray-600'}`} />
+                  <div className="flex-1 text-left min-w-0">
                     <p className={`text-sm font-medium ${item.isDanger ? 'text-red-600' : 'text-gray-900'}`}>
                       {item.label}
                     </p>
-                    <p className="text-xs text-gray-500">{item.description}</p>
+                    <p className="text-xs text-gray-500 truncate">{item.description}</p>
                   </div>
                 </button>
               );
