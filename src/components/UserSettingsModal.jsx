@@ -26,6 +26,11 @@ export function UserSettingsModal({
 }) {
   const [activeSection, setActiveSection] = useState('appearance');
 
+  // Default values if not provided
+  const currentDarkMode = darkMode !== undefined ? darkMode : false;
+  const currentTheme = theme || 'default';
+  const currentDateFormat = dateFormat || 'dd/mm/yyyy';
+
   if (!isOpen) return null;
 
   // Convert hex color to RGB for opacity
@@ -83,77 +88,79 @@ export function UserSettingsModal({
                   <h4 className="font-medium text-sm text-gray-900 mb-1">Dark Mode</h4>
                   <p className="text-xs text-gray-500">Switch between light and dark themes</p>
                 </div>
-                {onToggleDarkMode && (
-                  <button
-                    onClick={onToggleDarkMode}
-                    className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors focus:outline-none focus:ring-2 focus:ring-offset-2 ${
-                      darkMode ? 'bg-blue-600 focus:ring-blue-500' : 'bg-gray-300 focus:ring-gray-400'
+                <button
+                  onClick={onToggleDarkMode || (() => {})}
+                  className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors focus:outline-none focus:ring-2 focus:ring-offset-2 ${
+                    currentDarkMode ? 'bg-blue-600 focus:ring-blue-500' : 'bg-gray-300 focus:ring-gray-400'
+                  }`}
+                >
+                  <span
+                    className={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform ${
+                      currentDarkMode ? 'translate-x-6' : 'translate-x-1'
                     }`}
-                  >
-                    <span
-                      className={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform ${
-                        darkMode ? 'translate-x-6' : 'translate-x-1'
-                      }`}
-                    />
-                  </button>
-                )}
+                  />
+                </button>
               </div>
 
               {/* Color Theme */}
-              {onThemeChange && (
-                <div className="p-4 bg-gray-50 rounded-lg border border-gray-200">
-                  <h4 className="font-medium text-sm text-gray-900 mb-2">Color Theme</h4>
-                  <p className="text-xs text-gray-500 mb-4">Choose a color theme for your app</p>
-                  <div className="grid grid-cols-4 gap-3">
-                    {themes.map((themeOption) => {
-                      const isSelected = theme === themeOption.id;
-                      return (
-                        <button
-                          key={themeOption.id}
-                          onClick={() => onThemeChange(themeOption.id)}
-                          className={`p-4 rounded-lg border-2 transition-all text-center ${
-                            isSelected 
-                              ? 'border-blue-600 ring-2 ring-blue-600/50 shadow-md' 
-                              : 'border-gray-300 hover:border-gray-400 hover:shadow-sm'
-                          }`}
-                          style={{
-                            backgroundColor: themeOption.colors.background,
-                          }}
-                        >
-                          <div className="flex items-center justify-center mb-2">
-                            <div 
-                              className="w-8 h-8 rounded-full border-2 border-white shadow-sm"
-                              style={{ backgroundColor: themeOption.colors.primary }}
-                            />
-                          </div>
-                          <div className="text-xs font-medium text-gray-900">
-                            {themeOption.name}
-                          </div>
-                        </button>
-                      );
-                    })}
-                  </div>
+              <div className="p-4 bg-gray-50 rounded-lg border border-gray-200">
+                <h4 className="font-medium text-sm text-gray-900 mb-2">Color Theme</h4>
+                <p className="text-xs text-gray-500 mb-4">Choose a color theme for your app</p>
+                <div className="grid grid-cols-4 gap-3">
+                  {themes.map((themeOption) => {
+                    const isSelected = currentTheme === themeOption.id;
+                    return (
+                      <button
+                        key={themeOption.id}
+                        onClick={() => {
+                          if (onThemeChange) {
+                            onThemeChange(themeOption.id);
+                          }
+                        }}
+                        className={`p-4 rounded-lg border-2 transition-all text-center ${
+                          isSelected 
+                            ? 'border-blue-600 ring-2 ring-blue-600/50 shadow-md' 
+                            : 'border-gray-300 hover:border-gray-400 hover:shadow-sm'
+                        }`}
+                        style={{
+                          backgroundColor: themeOption.colors.background,
+                        }}
+                      >
+                        <div className="flex items-center justify-center mb-2">
+                          <div 
+                            className="w-8 h-8 rounded-full border-2 border-white shadow-sm"
+                            style={{ backgroundColor: themeOption.colors.primary }}
+                          />
+                        </div>
+                        <div className="text-xs font-medium text-gray-900">
+                          {themeOption.name}
+                        </div>
+                      </button>
+                    );
+                  })}
                 </div>
-              )}
+              </div>
 
               {/* Date Format */}
-              {onDateFormatChange && (
-                <div className="p-4 bg-gray-50 rounded-lg border border-gray-200">
-                  <h4 className="font-medium text-sm text-gray-900 mb-2">Date Format</h4>
-                  <p className="text-xs text-gray-500 mb-3">Choose how dates are displayed throughout the app</p>
-                  <select
-                    value={dateFormat}
-                    onChange={(e) => onDateFormatChange(e.target.value)}
-                    className="w-full px-4 py-2.5 border border-gray-300 rounded-lg text-sm bg-white text-gray-900 focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                    style={{ '--tw-ring-color': primaryColor }}
-                  >
-                    <option value="dd/mm/yyyy">DD/MM/YYYY (25/12/2024)</option>
-                    <option value="mm/dd/yyyy">MM/DD/YYYY (12/25/2024)</option>
-                    <option value="yyyy-mm-dd">YYYY-MM-DD (2024-12-25)</option>
-                    <option value="dd-mmm-yyyy">DD-MMM-YYYY (25-Dec-2024)</option>
-                  </select>
-                </div>
-              )}
+              <div className="p-4 bg-gray-50 rounded-lg border border-gray-200">
+                <h4 className="font-medium text-sm text-gray-900 mb-2">Date Format</h4>
+                <p className="text-xs text-gray-500 mb-3">Choose how dates are displayed throughout the app</p>
+                <select
+                  value={currentDateFormat}
+                  onChange={(e) => {
+                    if (onDateFormatChange) {
+                      onDateFormatChange(e.target.value);
+                    }
+                  }}
+                  className="w-full px-4 py-2.5 border border-gray-300 rounded-lg text-sm bg-white text-gray-900 focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                  style={{ '--tw-ring-color': primaryColor }}
+                >
+                  <option value="dd/mm/yyyy">DD/MM/YYYY (25/12/2024)</option>
+                  <option value="mm/dd/yyyy">MM/DD/YYYY (12/25/2024)</option>
+                  <option value="yyyy-mm-dd">YYYY-MM-DD (2024-12-25)</option>
+                  <option value="dd-mmm-yyyy">DD-MMM-YYYY (25-Dec-2024)</option>
+                </select>
+              </div>
 
               {/* Custom appearance options */}
               {customAppearanceOptions.length > 0 && (

@@ -25,6 +25,9 @@ function App() {
   const [toasts, setToasts] = useState([]);
   const [showProfileModal, setShowProfileModal] = useState(false);
   const [showSettingsModal, setShowSettingsModal] = useState(false);
+  const [darkMode, setDarkMode] = useState(false);
+  const [theme, setTheme] = useState('default');
+  const [dateFormat, setDateFormat] = useState('dd/mm/yyyy');
 
   // Create auth API client
   const authAPI = useMemo(() => createAuthAPI(API_BASE_URL), []);
