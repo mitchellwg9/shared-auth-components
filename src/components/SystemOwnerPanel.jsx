@@ -67,8 +67,8 @@ export function SystemOwnerPanel({
             <div className="flex items-center">
               <Settings className="w-8 h-8 mr-3" style={{ color: primaryColor }} />
               <div>
-                <h1 className="text-2xl font-bold text-gray-900">System Owner Panel</h1>
-                <p className="text-sm text-gray-500">Manage your {appName} application</p>
+                <h1 className="text-2xl font-bold text-gray-900">App Owner Panel</h1>
+                <p className="text-sm text-gray-500">Full access to manage {appName} - App Creator/Owner Only</p>
               </div>
             </div>
             <div className="flex items-center gap-3">
@@ -79,7 +79,7 @@ export function SystemOwnerPanel({
                   color: primaryColor
                 }}
               >
-                <span className="text-sm font-medium">System Owner</span>
+                <span className="text-sm font-medium">App Owner</span>
               </div>
               {currentUser && (
                 <div className="flex items-center gap-2">

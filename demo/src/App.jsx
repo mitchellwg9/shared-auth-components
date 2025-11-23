@@ -205,10 +205,13 @@ function App() {
               </div>
               {isSystemOwner && (
                 <div className="p-4 bg-purple-50 rounded-lg border-2 border-purple-200">
-                  <h4 className="font-semibold text-purple-900 mb-2">👑 SystemOwnerPanel</h4>
-                  <p className="text-sm text-purple-700">
-                    You are a system owner! You should see the System Owner Panel with access to:
+                  <h4 className="font-semibold text-purple-900 mb-2">👑 App Owner Panel</h4>
+                  <p className="text-sm text-purple-700 mb-2">
+                    You are the app owner/creator! You have full access to the App Owner Panel with:
                     Analytics, Organizations, Subscriptions, and All Users management.
+                  </p>
+                  <p className="text-xs text-purple-600 italic">
+                    ⚠️ This is the highest privilege level - only for app creators, never assign to customers.
                   </p>
                 </div>
               )}

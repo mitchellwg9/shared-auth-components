@@ -2,6 +2,15 @@
 
 The shared auth components include a complete system owner admin panel that you can use across all your apps.
 
+**⚠️ IMPORTANT: System Owner is for the app creator/owner only - never assign this to customers!**
+
+The System Owner role represents the highest level of privilege and should only be assigned to you as the app creator. System owners have:
+- Full access to all subscription tiers and features
+- Complete control over all organizations and users
+- Access to system-wide analytics and metrics
+- Ability to manage subscriptions and billing
+- This is NOT a customer role - it's your app owner/admin role
+
 ## Features
 
 The System Owner Panel provides:
@@ -88,7 +97,7 @@ The `ownerRoutes.php` file should be deployed to your API server. The deployment
 ### Required Tables
 
 1. **users** table with:
-   - `is_system_owner` (BOOLEAN) - Identifies system owners
+   - `is_system_owner` (BOOLEAN) - Identifies app owners/creators (YOU ONLY - never assign to customers!)
    - `organization_id` (VARCHAR, nullable) - Links users to organizations
    - `plan` (VARCHAR) - User's subscription plan
    - `subscription_status` (VARCHAR) - Subscription status
@@ -108,7 +117,8 @@ The `ownerRoutes.php` file should be deployed to your API server. The deployment
 -- Add system owner column if not exists
 ALTER TABLE users ADD COLUMN is_system_owner BOOLEAN DEFAULT FALSE;
 
--- Set yourself as system owner
+-- ⚠️ IMPORTANT: Only set YOUR email as system owner - this is for app creator/owner only!
+-- Never assign this to customers - it gives full access to everything
 UPDATE users SET is_system_owner = TRUE WHERE email = 'your-email@example.com';
 
 -- Create organizations table if not exists
@@ -137,13 +147,14 @@ The owner routes provide these endpoints:
 
 All endpoints require:
 - `current_user_id` in request (query param for GET, body for POST/PUT/DELETE)
-- User must have `is_system_owner = TRUE`
+- User must have `is_system_owner = TRUE` (app owner/creator only)
 
 ## Security
 
 - All endpoints verify system owner status before processing
 - Returns 403 if user is not a system owner
 - Returns 401 if no user ID is provided
+- **⚠️ WARNING: System owner has full access to everything - only assign to yourself as app creator!**
 
 ## Customization
 
