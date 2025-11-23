@@ -262,6 +262,34 @@ function App() {
             </div>
           ))}
         </div>
+
+        {/* Profile Modal */}
+        <UserProfileModal
+          isOpen={showProfileModal}
+          onClose={() => {
+            console.log('Closing profile modal');
+            setShowProfileModal(false);
+          }}
+          currentUser={user}
+          onUserUpdate={handleUserUpdate}
+          showToast={showToast}
+          authAPI={authAPI}
+          primaryColor="#6366f1"
+        />
+
+        {/* Settings Modal */}
+        <UserSettingsModal
+          isOpen={showSettingsModal}
+          onClose={() => {
+            console.log('Closing settings modal');
+            setShowSettingsModal(false);
+          }}
+          currentUser={user}
+          onUserUpdate={handleUserUpdate}
+          showToast={showToast}
+          authAPI={authAPI}
+          primaryColor="#6366f1"
+        />
       </div>
     );
   }
@@ -333,43 +361,37 @@ function App() {
         ))}
       </div>
 
-      {/* Profile Modal */}
-      {user && (() => {
-        console.log('Rendering UserProfileModal, isOpen:', showProfileModal);
-        return (
-          <UserProfileModal
-            isOpen={showProfileModal}
-            onClose={() => {
-              console.log('Closing profile modal');
-              setShowProfileModal(false);
-            }}
-            currentUser={user}
-            onUserUpdate={handleUserUpdate}
-            showToast={showToast}
-            authAPI={authAPI}
-            primaryColor="#6366f1"
-          />
-        );
-      })()}
+      {/* Profile Modal - Always render, modal handles visibility */}
+      {user && (
+        <UserProfileModal
+          isOpen={showProfileModal}
+          onClose={() => {
+            console.log('Closing profile modal');
+            setShowProfileModal(false);
+          }}
+          currentUser={user}
+          onUserUpdate={handleUserUpdate}
+          showToast={showToast}
+          authAPI={authAPI}
+          primaryColor="#6366f1"
+        />
+      )}
 
-      {/* Settings Modal */}
-      {user && (() => {
-        console.log('Rendering UserSettingsModal, isOpen:', showSettingsModal);
-        return (
-          <UserSettingsModal
-            isOpen={showSettingsModal}
-            onClose={() => {
-              console.log('Closing settings modal');
-              setShowSettingsModal(false);
-            }}
-            currentUser={user}
-            onUserUpdate={handleUserUpdate}
-            showToast={showToast}
-            authAPI={authAPI}
-            primaryColor="#6366f1"
-          />
-        );
-      })()}
+      {/* Settings Modal - Always render, modal handles visibility */}
+      {user && (
+        <UserSettingsModal
+          isOpen={showSettingsModal}
+          onClose={() => {
+            console.log('Closing settings modal');
+            setShowSettingsModal(false);
+          }}
+          currentUser={user}
+          onUserUpdate={handleUserUpdate}
+          showToast={showToast}
+          authAPI={authAPI}
+          primaryColor="#6366f1"
+        />
+      )}
     </>
   );
 }
