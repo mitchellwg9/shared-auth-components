@@ -398,6 +398,82 @@ export function UserProfileModal({
 
   return (
     <>
+      {/* Disable 2FA Modal */}
+      {showDisable2FAModal && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-[60]">
+          <div className="bg-white rounded-lg max-w-md w-full mx-auto shadow-xl">
+            <div className="px-6 py-4 border-b border-gray-200 flex items-center justify-between">
+              <h3 className="text-base font-semibold text-gray-900">Disable Two-Factor Authentication</h3>
+              <button
+                onClick={() => {
+                  setShowDisable2FAModal(false);
+                  setDisable2FAPassword('');
+                }}
+                className="text-gray-400 hover:text-gray-600"
+              >
+                <X className="w-5 h-5" />
+              </button>
+            </div>
+            
+            <div className="px-6 py-6">
+              <p className="text-sm text-gray-600 mb-4">
+                Are you sure you want to disable 2FA? This will reduce your account security. Please enter your password to confirm.
+              </p>
+              
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  Password
+                </label>
+                <div className="relative">
+                  <input
+                    type={showDisable2FAPassword ? 'text' : 'password'}
+                    value={disable2FAPassword}
+                    onChange={(e) => setDisable2FAPassword(e.target.value)}
+                    className="w-full px-3 py-2 pr-10 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
+                    style={{ '--tw-ring-color': primaryColor }}
+                    placeholder="Enter your password"
+                    autoFocus
+                    onKeyDown={(e) => {
+                      if (e.key === 'Enter' && disable2FAPassword && !loading) {
+                        handleDisable2FA();
+                      }
+                    }}
+                  />
+                  <button
+                    type="button"
+                    onClick={() => setShowDisable2FAPassword(!showDisable2FAPassword)}
+                    className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-gray-600"
+                  >
+                    {showDisable2FAPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+                  </button>
+                </div>
+              </div>
+            </div>
+            
+            <div className="px-6 py-4 border-t border-gray-200 flex gap-2 justify-end">
+              <button
+                onClick={() => {
+                  setShowDisable2FAModal(false);
+                  setDisable2FAPassword('');
+                }}
+                className="px-4 py-2 text-gray-700 bg-gray-100 rounded-lg hover:bg-gray-200 transition-colors font-medium"
+              >
+                Cancel
+              </button>
+              <button
+                onClick={handleDisable2FA}
+                disabled={!disable2FAPassword || loading}
+                className="px-4 py-2 text-white rounded-lg hover:opacity-90 transition-colors font-medium disabled:opacity-50"
+                style={{ backgroundColor: primaryColor }}
+              >
+                {loading ? 'Disabling...' : 'Disable 2FA'}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Main Profile Modal */}
       <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50 overflow-y-auto">
         <div className="bg-white rounded-lg max-w-2xl w-full mx-auto my-4 shadow-xl flex flex-col" style={{ maxWidth: '42rem', width: 'calc(100% - 2rem)', maxHeight: '90vh' }}>
           {/* Header - Fixed at top */}
