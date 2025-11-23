@@ -5,7 +5,10 @@ import {
   EmailVerificationPage, 
   UserProfileDropdown,
   SystemOwnerPanel,
-  createOwnerAPI
+  createOwnerAPI,
+  UserProfileModal,
+  UserSettingsModal,
+  createAuthAPI
 } from '../../src/index.js';
 import { LandingPage } from './LandingPage.jsx';
 import './App.css';
@@ -20,6 +23,11 @@ function App() {
   const [verificationToken, setVerificationToken] = useState(null);
   const [user, setUser] = useState(null);
   const [toasts, setToasts] = useState([]);
+  const [showProfileModal, setShowProfileModal] = useState(false);
+  const [showSettingsModal, setShowSettingsModal] = useState(false);
+
+  // Create auth API client
+  const authAPI = useMemo(() => createAuthAPI(API_BASE_URL), []);
 
   // Check for verification token in URL
   useEffect(() => {
@@ -72,7 +80,14 @@ function App() {
     setUser(null);
     setShowLogin(false);
     setShowSignup(false);
+    setShowProfileModal(false);
+    setShowSettingsModal(false);
     showToast('Logged out successfully', 'info');
+  };
+
+  const handleUserUpdate = (updatedUser) => {
+    setUser(updatedUser);
+    localStorage.setItem('currentUser', JSON.stringify(updatedUser));
   };
 
   const handleVerificationComplete = () => {
@@ -152,12 +167,8 @@ function App() {
               </div>
               <UserProfileDropdown
                 currentUser={user}
-                onProfileClick={() => {
-                  showToast('Profile editing coming soon!', 'info');
-                }}
-                onSettingsClick={() => {
-                  showToast('Settings coming soon!', 'info');
-                }}
+                onProfileClick={() => setShowProfileModal(true)}
+                onSettingsClick={() => setShowSettingsModal(true)}
                 onSubscriptionClick={() => {
                   showToast('Subscription management coming soon!', 'info');
                 }}
@@ -301,20 +312,46 @@ function App() {
       )}
 
       {/* Toast Container */}
-            <div className="fixed bottom-4 right-4 space-y-2 z-50">
-              {toasts.map(toast => (
-                <div
-                  key={toast.id}
-                  className={`px-4 py-3 rounded-lg shadow-lg font-medium ${
-                    toast.type === 'success' ? 'bg-green-500 text-white' :
-                    toast.type === 'error' ? 'bg-white text-red-600 border-2 border-red-300' :
-                    'bg-blue-500 text-white'
-                  }`}
-                >
-                  {toast.message}
-                </div>
-              ))}
-            </div>
+      <div className="fixed bottom-4 right-4 space-y-2 z-50">
+        {toasts.map(toast => (
+          <div
+            key={toast.id}
+            className={`px-4 py-3 rounded-lg shadow-lg font-medium ${
+              toast.type === 'success' ? 'bg-green-500 text-white' :
+              toast.type === 'error' ? 'bg-white text-red-600 border-2 border-red-300' :
+              'bg-blue-500 text-white'
+            }`}
+          >
+            {toast.message}
+          </div>
+        ))}
+      </div>
+
+      {/* Profile Modal */}
+      {user && (
+        <UserProfileModal
+          isOpen={showProfileModal}
+          onClose={() => setShowProfileModal(false)}
+          currentUser={user}
+          onUserUpdate={handleUserUpdate}
+          showToast={showToast}
+          authAPI={authAPI}
+          primaryColor="#6366f1"
+        />
+      )}
+
+      {/* Settings Modal */}
+      {user && (
+        <UserSettingsModal
+          isOpen={showSettingsModal}
+          onClose={() => setShowSettingsModal(false)}
+          currentUser={user}
+          onUserUpdate={handleUserUpdate}
+          showToast={showToast}
+          authAPI={authAPI}
+          primaryColor="#6366f1"
+        />
+      )}
     </>
   );
 }

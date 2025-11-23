@@ -157,6 +157,21 @@ export function createAuthAPI(apiBaseUrl) {
         body: { password },
       });
     },
+
+    // Profile management
+    updateProfile: async (name, email) => {
+      return apiRequest('/auth/profile', {
+        method: 'PUT',
+        body: { name, email },
+      });
+    },
+
+    changePassword: async (currentPassword, newPassword) => {
+      return apiRequest('/auth/change-password', {
+        method: 'POST',
+        body: { currentPassword, newPassword },
+      });
+    },
   };
 }
 
