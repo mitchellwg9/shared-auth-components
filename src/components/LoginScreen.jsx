@@ -235,8 +235,8 @@ export function LoginScreen({
         <div className={`bg-white rounded-2xl w-full max-w-md mx-auto shadow-2xl ${customStyles.container || ''}`}>
           <div className="flex items-center justify-between p-6 border-b border-gray-200">
             <div>
-              <h2 className="text-2xl font-bold text-gray-900">Sign In</h2>
-              <p className="text-sm text-gray-500 mt-1">Welcome back to {appName}</p>
+              <h2 className="text-lg font-semibold text-gray-900">Sign In</h2>
+              <p className="text-xs text-gray-500 mt-1">Welcome back to {appName}</p>
             </div>
             {onClose && (
               <button

@@ -278,8 +278,8 @@ export function UserProfileModal({
                 <User className="w-5 h-5" style={{ color: primaryColor }} />
               </div>
               <div>
-                <h3 className="text-lg font-bold text-gray-900">My Profile</h3>
-                <p className="text-sm text-gray-500">Manage your account settings</p>
+                <h3 className="text-base font-semibold text-gray-900">My Profile</h3>
+                <p className="text-xs text-gray-500">Manage your account settings</p>
               </div>
             </div>
             <button
