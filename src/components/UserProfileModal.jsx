@@ -291,7 +291,7 @@ export function UserProfileModal({
           </div>
 
           {/* Scrollable Content */}
-          <div className="flex-1 overflow-y-auto px-6 py-6 min-h-0">
+          <div className="flex-1 overflow-y-auto px-6 py-6" style={{ minHeight: 0, maxHeight: 'calc(90vh - 180px)', WebkitOverflowScrolling: 'touch' }}>
             <div className="space-y-6">
               {/* Personal Information */}
               <div>
