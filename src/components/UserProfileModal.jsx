@@ -78,7 +78,8 @@ export function UserProfileModal({
       // Format: otpauth://totp/ISSUER:ACCOUNT?secret=SECRET&issuer=ISSUER
       const otpAuthUrl = `otpauth://totp/${encodeURIComponent(issuer)}:${encodeURIComponent(accountName)}?secret=${setup.secret}&issuer=${encodeURIComponent(issuer)}`;
       // Use QR Server API (same as TymTrackr) - more reliable
-      const qrUrl = `https://api.qrserver.com/v1/create-qr-code/?size=300x300&data=${encodeURIComponent(otpAuthUrl)}&ecc=M`;
+      // Use 250x250 size to fit better in modal
+      const qrUrl = `https://api.qrserver.com/v1/create-qr-code/?size=250x250&data=${encodeURIComponent(otpAuthUrl)}&ecc=M`;
       setQrCodeUrl(qrUrl);
       setShowQRCode(true);
     } catch (error) {
@@ -431,14 +432,15 @@ export function UserProfileModal({
                               <img 
                                 src={qrCodeUrl} 
                                 alt="2FA QR Code" 
-                                className="border border-gray-300 rounded"
+                                className="border border-gray-300 rounded max-w-full h-auto"
+                                style={{ maxWidth: '250px', width: '100%' }}
                                 onError={(e) => {
                                   console.error('QR code image failed to load:', qrCodeUrl);
                                   e.target.style.display = 'none';
                                 }}
                               />
                             ) : (
-                              <div className="w-[300px] h-[300px] border border-gray-300 rounded flex items-center justify-center bg-gray-50">
+                              <div className="w-[250px] h-[250px] border border-gray-300 rounded flex items-center justify-center bg-gray-50">
                                 <p className="text-gray-500 text-sm">Loading QR code...</p>
                               </div>
                             )}
