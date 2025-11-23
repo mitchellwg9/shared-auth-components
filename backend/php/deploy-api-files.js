@@ -149,6 +149,21 @@ if (existsSync(debugRoutingPath)) {
   console.log('✅ Prepared debug-routing.php');
 }
 
+// Copy 2FA helper and routes
+const twoFactorHelperPath = resolve(__dirname, 'twoFactorHelper.php');
+if (existsSync(twoFactorHelperPath)) {
+  const twoFactorHelperContent = readFileSync(twoFactorHelperPath, 'utf-8');
+  writeFileSync(resolve(tempDir, 'twoFactorHelper.php'), twoFactorHelperContent);
+  console.log('✅ Prepared twoFactorHelper.php');
+}
+
+const twoFactorRoutesPath = resolve(__dirname, 'twoFactorRoutes.php');
+if (existsSync(twoFactorRoutesPath)) {
+  const twoFactorRoutesContent = readFileSync(twoFactorRoutesPath, 'utf-8');
+  writeFileSync(resolve(tempDir, 'twoFactorRoutes.php'), twoFactorRoutesContent);
+  console.log('✅ Prepared twoFactorRoutes.php');
+}
+
 const ftp = new FtpDeploy();
 
 // Deploy to public_html/api directory (web-accessible API location)
