@@ -17,11 +17,9 @@ export function UserProfileModal({
   const [formData, setFormData] = useState({
     name: '',
     email: '',
-    currentPassword: '',
     newPassword: '',
     confirmPassword: ''
   });
-  const [showCurrentPassword, setShowCurrentPassword] = useState(false);
   const [showNewPassword, setShowNewPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const [passwordErrors, setPasswordErrors] = useState({});
@@ -37,7 +35,6 @@ export function UserProfileModal({
       setFormData({
         name: currentUser.name || '',
         email: currentUser.email || '',
-        currentPassword: '',
         newPassword: '',
         confirmPassword: ''
       });
@@ -266,37 +263,6 @@ export function UserProfileModal({
                   
                   {/* Password Change - Inline */}
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-2">Current Password</label>
-                    <div className="relative">
-                      <input
-                        type={showCurrentPassword ? 'text' : 'password'}
-                        value={formData.currentPassword}
-                        onChange={(e) => {
-                          setFormData({ ...formData, currentPassword: e.target.value });
-                          if (passwordErrors.currentPassword) {
-                            setPasswordErrors({ ...passwordErrors, currentPassword: '' });
-                          }
-                        }}
-                        className={`w-full px-3 py-2 pr-10 border rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent ${
-                          passwordErrors.currentPassword ? 'border-red-300' : 'border-gray-300'
-                        }`}
-                        style={{ '--tw-ring-color': primaryColor }}
-                        placeholder="Enter current password"
-                      />
-                      <button
-                        type="button"
-                        onClick={() => setShowCurrentPassword(!showCurrentPassword)}
-                        className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-gray-600"
-                      >
-                        {showCurrentPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
-                      </button>
-                    </div>
-                    {passwordErrors.currentPassword && (
-                      <p className="mt-1 text-sm text-red-600">{passwordErrors.currentPassword}</p>
-                    )}
-                  </div>
-                  
-                  <div>
                     <label className="block text-sm font-medium text-gray-700 mb-2">New Password</label>
                     <div className="relative">
                       <input
@@ -365,14 +331,11 @@ export function UserProfileModal({
               </div>
 
               {/* 2FA Section */}
-              <div className="border-t border-gray-200 pt-6">
+              <div className="border-t border-gray-200 pt-6 mt-6">
                 <h4 className="text-sm font-semibold text-gray-900 mb-4 flex items-center gap-2">
                   <Shield className="w-4 h-4" />
                   Two-Factor Authentication (2FA)
                 </h4>
-                <p className="text-sm text-gray-600 mb-4">
-                  Add an extra layer of security to your account by requiring a verification code from your mobile device.
-                </p>
 
                 {!twoFactorEnabled ? (
                   <div className="space-y-4">
