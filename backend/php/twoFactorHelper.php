@@ -76,8 +76,12 @@ function generateTOTP($secret, $timeStep = 30, $timeOffset = 0) {
  * Verify TOTP code with time window tolerance
  */
 function verifyTOTP($secret, $code, $window = 1) {
-    $code = trim($code);
+    // Remove any spaces, dashes, or other non-digit characters
+    $code = preg_replace('/[^0-9]/', '', trim($code));
+    
+    // Validate code format
     if (strlen($code) !== 6 || !ctype_digit($code)) {
+        error_log("verifyTOTP: Invalid code format - length: " . strlen($code) . ", is_digit: " . (ctype_digit($code) ? 'yes' : 'no') . ", code: '$code'");
         return false;
     }
     
@@ -103,11 +107,14 @@ function verifyTOTP($secret, $code, $window = 1) {
         
         $calculated = str_pad($calculated, 6, '0', STR_PAD_LEFT);
         
+        // Use hash_equals for timing-safe comparison
         if (hash_equals($calculated, $code)) {
+            error_log("verifyTOTP: Code matched at time offset $i (calculated: $calculated, entered: $code)");
             return true;
         }
     }
     
+    error_log("verifyTOTP: Code did not match any time window. Entered: '$code', Secret length: " . strlen($secret));
     return false;
 }
 
