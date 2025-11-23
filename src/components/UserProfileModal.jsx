@@ -153,7 +153,7 @@ export function UserProfileModal({
   const handleSaveProfile = async () => {
     if (!formData.name.trim()) {
       showToast?.('Name is required', 'error');
-      return;
+      throw new Error('Name is required');
     }
 
     if (!authAPI || !authAPI.updateProfile) {
@@ -170,7 +170,6 @@ export function UserProfileModal({
     }
 
     try {
-      setLoading(true);
       await authAPI.updateProfile(formData.name.trim(), formData.email.trim() || currentUser.email);
       
       if (onUserUpdate) {
@@ -183,8 +182,7 @@ export function UserProfileModal({
       showToast?.('Profile updated successfully!', 'success');
     } catch (error) {
       showToast?.(error.message || 'Failed to update profile', 'error');
-    } finally {
-      setLoading(false);
+      throw error;
     }
   };
 
@@ -448,11 +446,28 @@ export function UserProfileModal({
               <div className="flex gap-2 pt-6 mt-6 border-t border-gray-200">
                 <button
                   onClick={async () => {
-                    // Save profile first
-                    await handleSaveProfile();
-                    // Then change password if new password is provided
-                    if (formData.newPassword) {
-                      await handleChangePassword();
+                    setLoading(true);
+                    try {
+                      // Save profile first
+                      await handleSaveProfile();
+                      // Then change password if new password is provided
+                      let passwordSuccess = true;
+                      if (formData.newPassword) {
+                        passwordSuccess = await handleChangePassword();
+                      }
+                      
+                      // Only close if both operations succeeded
+                      if (passwordSuccess) {
+                        // Small delay to show success message
+                        setTimeout(() => {
+                          onClose();
+                        }, 300);
+                      }
+                    } catch (error) {
+                      console.error('Save error:', error);
+                      showToast?.(error.message || 'Failed to save changes', 'error');
+                    } finally {
+                      setLoading(false);
                     }
                   }}
                   disabled={loading}
