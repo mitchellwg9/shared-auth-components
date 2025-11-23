@@ -412,17 +412,17 @@ try {
             // Build INSERT query based on available columns
             $insertFields = ['id', 'email', 'password', 'name', 'role'];
             $insertValues = ['?', '?', '?', '?', '?'];
-            $bindParams = ['sssss'];
+            $bindParamTypes = 'sssss';
             $bindValues = [$userId, $email, $password, $name, $role];
             
             if ($hasEmailVerification) {
                 $insertFields[] = 'email_verified';
                 $insertFields[] = 'email_verification_token';
                 $insertFields[] = 'email_verification_token_expires';
-                $insertValues[] = 'FALSE';
+                $insertValues[] = 'FALSE';  // Not bound, literal value
                 $insertValues[] = '?';
                 $insertValues[] = '?';
-                $bindParams[0] .= 'sss';
+                $bindParamTypes .= 'ss';  // Only 2 params for token and expires
                 $bindValues[] = $verificationToken;
                 $bindValues[] = $tokenExpires;
             }
@@ -430,37 +430,42 @@ try {
             if ($hasOrgIdColumn) {
                 $insertFields[] = 'organization_id';
                 $insertValues[] = '?';
-                $bindParams[0] .= 's';
+                $bindParamTypes .= 's';
                 $bindValues[] = $organizationId;
             }
             
             if ($hasOrgAdminColumn) {
                 $insertFields[] = 'is_organization_admin';
                 $insertValues[] = '?';
-                $bindParams[0] .= 'i'; // integer (boolean)
+                $bindParamTypes .= 'i'; // integer (boolean)
                 $bindValues[] = $isOrganizationAdmin ? 1 : 0;
             }
             
             if ($hasSystemOwner) {
                 $insertFields[] = 'is_system_owner';
                 $insertValues[] = '?';
-                $bindParams[0] .= 'i'; // integer (boolean)
+                $bindParamTypes .= 'i'; // integer (boolean)
                 $bindValues[] = $isSystemOwner ? 1 : 0;
             }
             
             if ($hasPlan) {
                 $insertFields[] = 'plan';
                 $insertValues[] = '?';
-                $bindParams[0] .= 's';
+                $bindParamTypes .= 's';
                 $bindValues[] = $plan;
             }
             
             if ($hasSubscriptionStatus) {
                 $insertFields[] = 'subscription_status';
                 $insertValues[] = '?';
-                $bindParams[0] .= 's';
+                $bindParamTypes .= 's';
                 $bindValues[] = $subscriptionStatus;
             }
+            
+            // Debug: Log the bind parameters for troubleshooting
+            error_log("Registration: bindParamTypes length: " . strlen($bindParamTypes) . ", bindValues count: " . count($bindValues));
+            error_log("Registration: bindParamTypes: $bindParamTypes");
+            error_log("Registration: bindValues count: " . count($bindValues));
             
             // Build and execute INSERT query
             $insertQuery = "INSERT INTO users (" . implode(', ', $insertFields) . ") VALUES (" . implode(', ', $insertValues) . ")";
@@ -474,7 +479,15 @@ try {
             
             // Dynamically bind parameters
             try {
-                $stmt->bind_param($bindParams[0], ...$bindValues);
+                // Verify parameter count matches
+                if (strlen($bindParamTypes) !== count($bindValues)) {
+                    error_log("Registration error: Parameter count mismatch. Types: " . strlen($bindParamTypes) . ", Values: " . count($bindValues));
+                    error_log("Registration error: bindParamTypes: $bindParamTypes");
+                    error_log("Registration error: bindValues: " . json_encode($bindValues));
+                    $stmt->close();
+                    sendJSON(['error' => 'Database error', 'error_type' => 'database_error', 'message' => 'Parameter binding error'], 500);
+                }
+                $stmt->bind_param($bindParamTypes, ...$bindValues);
             } catch (Exception $e) {
                 error_log("Registration error: bind_param failed: " . $e->getMessage());
                 error_log("Registration error: bindParams: " . $bindParams[0] . ", bindValues count: " . count($bindValues));
