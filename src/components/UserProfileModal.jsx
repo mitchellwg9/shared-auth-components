@@ -288,21 +288,25 @@ export function UserProfileModal({
                 {!twoFactorEnabled ? (
                   <div className="space-y-4">
                     {!showQRCode ? (
-                      <div className="flex items-center justify-between">
-                        <span className="text-sm text-gray-700">2FA is currently disabled</span>
-                        <button
-                          onClick={generate2FASecret}
-                          disabled={loading || !authAPI}
-                          className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors focus:outline-none focus:ring-2 focus:ring-offset-2 disabled:opacity-50 ${
-                            twoFactorEnabled ? 'bg-green-600 focus:ring-green-500' : 'bg-gray-300 focus:ring-gray-400'
-                          }`}
-                        >
-                          <span
-                            className={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform ${
-                              twoFactorEnabled ? 'translate-x-6' : 'translate-x-1'
-                            }`}
-                          />
-                        </button>
+                      <div className="bg-gray-50 rounded-lg p-4 border border-gray-200">
+                        <div className="flex items-center justify-between">
+                          <div className="flex items-center gap-3">
+                            <Shield className="w-5 h-5 text-gray-600" />
+                            <div>
+                              <p className="text-sm font-medium text-gray-900">2FA is Disabled</p>
+                              <p className="text-xs text-gray-600">Enable 2FA to protect your account</p>
+                            </div>
+                          </div>
+                          <button
+                            onClick={generate2FASecret}
+                            disabled={loading || !authAPI}
+                            className="px-4 py-2 text-white rounded-lg hover:opacity-90 transition-colors font-medium disabled:opacity-50 flex items-center gap-2"
+                            style={{ backgroundColor: primaryColor }}
+                          >
+                            <Shield className="w-4 h-4" />
+                            Enable 2FA
+                          </button>
+                        </div>
                       </div>
                     ) : (
                       <div className="space-y-4">
@@ -361,30 +365,27 @@ export function UserProfileModal({
                   <div className="space-y-4">
                     <div className="bg-green-50 border border-green-200 rounded-lg p-4">
                       <div className="flex items-center justify-between">
-                        <div>
-                          <p className="text-sm font-medium text-green-900">2FA is enabled</p>
-                          <p className="text-xs text-green-700 mt-1">
-                            Your account is protected with two-factor authentication
-                          </p>
-                        </div>
                         <div className="flex items-center gap-3">
-                          <span className="px-2 py-1 bg-green-100 text-green-800 text-xs font-medium rounded-full">
-                            Active
-                          </span>
-                          <button
-                            onClick={disable2FA}
-                            disabled={loading || !authAPI}
-                            className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors focus:outline-none focus:ring-2 focus:ring-offset-2 disabled:opacity-50 ${
-                              twoFactorEnabled ? 'bg-green-600 focus:ring-green-500' : 'bg-gray-300 focus:ring-gray-400'
-                            }`}
-                          >
-                            <span
-                              className={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform ${
-                                twoFactorEnabled ? 'translate-x-6' : 'translate-x-1'
-                              }`}
-                            />
-                          </button>
+                          <Shield className="w-5 h-5 text-green-600" />
+                          <div>
+                            <p className="text-sm font-medium text-green-900">2FA is Enabled</p>
+                            <p className="text-xs text-green-700">
+                              Your account is protected with two-factor authentication
+                            </p>
+                          </div>
                         </div>
+                        <button
+                          onClick={async () => {
+                            if (window.confirm('Are you sure you want to disable 2FA? This will reduce your account security.')) {
+                              await disable2FA();
+                            }
+                          }}
+                          disabled={loading || !authAPI}
+                          className="px-4 py-2 bg-gray-200 text-gray-700 rounded-lg hover:bg-gray-300 transition-colors font-medium disabled:opacity-50 flex items-center gap-2"
+                        >
+                          <Shield className="w-4 h-4" />
+                          Disable
+                        </button>
                       </div>
                     </div>
                   </div>
