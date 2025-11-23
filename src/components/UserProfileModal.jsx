@@ -29,6 +29,9 @@ export function UserProfileModal({
   const [verificationCode, setVerificationCode] = useState('');
   const [showQRCode, setShowQRCode] = useState(false);
   const [loading, setLoading] = useState(false);
+  const [showDisable2FAModal, setShowDisable2FAModal] = useState(false);
+  const [disable2FAPassword, setDisable2FAPassword] = useState('');
+  const [showDisable2FAPassword, setShowDisable2FAPassword] = useState(false);
 
   useEffect(() => {
     if (isOpen && currentUser) {
@@ -235,20 +238,24 @@ export function UserProfileModal({
     }
   };
 
-  const disable2FA = async () => {
+  const handleDisable2FA = async () => {
     if (!authAPI || !authAPI.disable2FA) {
       showToast?.('2FA is not available', 'error');
       return;
     }
 
-    const password = prompt('Please enter your password to disable 2FA:');
-    if (!password) return;
+    if (!disable2FAPassword) {
+      showToast?.('Please enter your password', 'error');
+      return;
+    }
 
     try {
       setLoading(true);
-      await authAPI.disable2FA(password);
+      await authAPI.disable2FA(disable2FAPassword);
       setTwoFactorEnabled(false);
       setTwoFactorSecret(null);
+      setShowDisable2FAModal(false);
+      setDisable2FAPassword('');
       showToast?.('Two-factor authentication disabled', 'success');
       
       // Update current user
@@ -258,6 +265,19 @@ export function UserProfileModal({
           two_factor_enabled: false,
           twoFactorEnabled: false
         });
+      }
+      
+      // Also update localStorage
+      try {
+        const userStr = localStorage.getItem('currentUser');
+        if (userStr) {
+          const user = JSON.parse(userStr);
+          user.two_factor_enabled = false;
+          user.twoFactorEnabled = false;
+          localStorage.setItem('currentUser', JSON.stringify(user));
+        }
+      } catch (e) {
+        console.error('Failed to update localStorage:', e);
       }
     } catch (error) {
       showToast?.(error.message || 'Failed to disable 2FA', 'error');
@@ -613,11 +633,7 @@ export function UserProfileModal({
                           </div>
                         </div>
                         <button
-                          onClick={async () => {
-                            if (window.confirm('Are you sure you want to disable 2FA? This will reduce your account security.')) {
-                              await disable2FA();
-                            }
-                          }}
+                          onClick={() => setShowDisable2FAModal(true)}
                           disabled={loading || !authAPI}
                           className="px-4 py-2 bg-gray-200 text-gray-700 rounded-lg hover:bg-gray-300 transition-colors font-medium disabled:opacity-50 flex items-center gap-2"
                         >
