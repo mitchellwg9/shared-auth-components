@@ -76,10 +76,9 @@ export function UserProfileModal({
       const accountName = currentUser.email || currentUser.name;
       // Use proper TOTP URL format that Google Authenticator can scan
       // Format: otpauth://totp/ISSUER:ACCOUNT?secret=SECRET&issuer=ISSUER
-      // Don't include algorithm/digits/period as they're defaults and can cause issues
       const otpAuthUrl = `otpauth://totp/${encodeURIComponent(issuer)}:${encodeURIComponent(accountName)}?secret=${setup.secret}&issuer=${encodeURIComponent(issuer)}`;
-      // Use Google Charts API for more reliable QR codes
-      const qrUrl = `https://chart.googleapis.com/chart?chs=300x300&cht=qr&chl=${encodeURIComponent(otpAuthUrl)}&choe=UTF-8`;
+      // Use QR Server API (same as TymTrackr) - more reliable
+      const qrUrl = `https://api.qrserver.com/v1/create-qr-code/?size=300x300&data=${encodeURIComponent(otpAuthUrl)}&ecc=M`;
       setQrCodeUrl(qrUrl);
       setShowQRCode(true);
     } catch (error) {
@@ -428,8 +427,20 @@ export function UserProfileModal({
                             Scan this QR code with your authenticator app:
                           </p>
                           <div className="flex justify-center mb-4">
-                            {qrCodeUrl && (
-                              <img src={qrCodeUrl} alt="2FA QR Code" className="border border-gray-300 rounded" />
+                            {qrCodeUrl ? (
+                              <img 
+                                src={qrCodeUrl} 
+                                alt="2FA QR Code" 
+                                className="border border-gray-300 rounded"
+                                onError={(e) => {
+                                  console.error('QR code image failed to load:', qrCodeUrl);
+                                  e.target.style.display = 'none';
+                                }}
+                              />
+                            ) : (
+                              <div className="w-[300px] h-[300px] border border-gray-300 rounded flex items-center justify-center bg-gray-50">
+                                <p className="text-gray-500 text-sm">Loading QR code...</p>
+                              </div>
                             )}
                           </div>
                           <p className="text-xs text-gray-600 mb-4">
