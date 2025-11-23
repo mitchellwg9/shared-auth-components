@@ -324,11 +324,21 @@ try {
             
             // Check if email exists
             $check = $conn->prepare("SELECT id FROM users WHERE email = ?");
+            if (!$check) {
+                error_log("Registration error: Prepare failed for email check: " . $conn->error);
+                sendJSON(['error' => 'Database error', 'error_type' => 'database_error'], 500);
+            }
             $check->bind_param("s", $email);
-            $check->execute();
+            if (!$check->execute()) {
+                error_log("Registration error: Execute failed for email check: " . $check->error);
+                $check->close();
+                sendJSON(['error' => 'Database error', 'error_type' => 'database_error'], 500);
+            }
             if ($check->get_result()->num_rows > 0) {
+                $check->close();
                 sendJSON(['error' => 'Email already exists'], 400);
             }
+            $check->close();
             
             // Check if email verification columns exist
             $checkEmailVerification = $conn->query("SHOW COLUMNS FROM users LIKE 'email_verified'");
@@ -456,8 +466,21 @@ try {
             $insertQuery = "INSERT INTO users (" . implode(', ', $insertFields) . ") VALUES (" . implode(', ', $insertValues) . ")";
             $stmt = $conn->prepare($insertQuery);
             
+            if (!$stmt) {
+                error_log("Registration error: Prepare failed: " . $conn->error);
+                error_log("Registration error: Query was: " . $insertQuery);
+                sendJSON(['error' => 'Database error', 'error_type' => 'database_error', 'message' => 'Failed to prepare registration query'], 500);
+            }
+            
             // Dynamically bind parameters
-            $stmt->bind_param($bindParams[0], ...$bindValues);
+            try {
+                $stmt->bind_param($bindParams[0], ...$bindValues);
+            } catch (Exception $e) {
+                error_log("Registration error: bind_param failed: " . $e->getMessage());
+                error_log("Registration error: bindParams: " . $bindParams[0] . ", bindValues count: " . count($bindValues));
+                $stmt->close();
+                sendJSON(['error' => 'Database error', 'error_type' => 'database_error', 'message' => 'Failed to bind parameters'], 500);
+            }
             
             if ($stmt->execute()) {
                 // Send verification email if email verification is enabled
@@ -492,13 +515,22 @@ try {
                     error_log("⚠️ Email verification skipped - hasEmailVerification: " . ($hasEmailVerification ? 'true' : 'false') . ", token: " . ($verificationToken ? 'set' : 'null'));
                 }
                 
+                $stmt->close();
                 sendJSON([
                     'success' => true, 
                     'user' => ['id' => $userId, 'email' => $email, 'name' => $name, 'role' => $role],
                     'email_verification_required' => $hasEmailVerification
                 ], 201);
             } else {
-                sendJSON(['error' => 'Registration failed'], 500);
+                error_log("Registration error: Execute failed: " . $stmt->error);
+                error_log("Registration error: Query was: " . $insertQuery);
+                error_log("Registration error: bindParams: " . $bindParams[0]);
+                $stmt->close();
+                sendJSON([
+                    'error' => 'Registration failed', 
+                    'error_type' => 'database_error',
+                    'message' => 'Failed to create user account'
+                ], 500);
             }
         } elseif ($action === 'resend-verification') {
             // Resend verification email
