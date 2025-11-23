@@ -32,24 +32,32 @@ export function UserProfileModal({
 
   useEffect(() => {
     if (isOpen && currentUser) {
+      const is2FAEnabled = currentUser.two_factor_enabled || currentUser.twoFactorEnabled || false;
+      
       setFormData({
         name: currentUser.name || '',
         email: currentUser.email || '',
         newPassword: '',
         confirmPassword: ''
       });
-      setTwoFactorEnabled(currentUser.two_factor_enabled || currentUser.twoFactorEnabled || false);
+      setTwoFactorEnabled(is2FAEnabled);
       
-      // Only reset secret if 2FA is already enabled (don't reset during setup)
-      // If showQRCode is true, we're in the middle of setup, so preserve the secret
-      if (!showQRCode) {
+      // Only reset secret and QR code if 2FA is already enabled
+      // If 2FA is not enabled, preserve the setup state (secret, QR code, etc.)
+      if (is2FAEnabled) {
         setTwoFactorSecret(currentUser.two_factor_secret || currentUser.twoFactorSecret || null);
-        setVerificationCode('');
-      }
-      
-      // Only reset QR code display if 2FA is already enabled
-      if (currentUser.two_factor_enabled || currentUser.twoFactorEnabled) {
         setShowQRCode(false);
+        setVerificationCode('');
+      } else {
+        // If 2FA is not enabled, only reset if we're not in the middle of setup
+        // Check if we have a secret in state - if not, it's safe to reset
+        // This prevents resetting during active setup
+        if (!twoFactorSecret && !showQRCode) {
+          setTwoFactorSecret(null);
+          setShowQRCode(false);
+          setVerificationCode('');
+        }
+        // If we have a secret or showQRCode is true, preserve the setup state
       }
       
       setPasswordErrors({});
@@ -79,6 +87,15 @@ export function UserProfileModal({
     try {
       setLoading(true);
       const setup = await authAPI.get2FASetup();
+      
+      if (!setup || !setup.secret) {
+        showToast?.('Failed to generate 2FA secret', 'error');
+        return;
+      }
+      
+      console.log('2FA Secret generated:', setup.secret.substring(0, 8) + '...');
+      
+      // Set secret first, then generate QR code
       setTwoFactorSecret(setup.secret);
       
       // Generate QR code URL with proper encoding for Google Authenticator
@@ -92,7 +109,10 @@ export function UserProfileModal({
       const qrUrl = `https://api.qrserver.com/v1/create-qr-code/?size=250x250&data=${encodeURIComponent(otpAuthUrl)}&ecc=M`;
       setQrCodeUrl(qrUrl);
       setShowQRCode(true);
+      
+      console.log('2FA Setup state - Secret set:', !!setup.secret, 'QR Code shown:', true);
     } catch (error) {
+      console.error('2FA Secret generation error:', error);
       showToast?.(error.message || 'Failed to generate 2FA secret', 'error');
     } finally {
       setLoading(false);
