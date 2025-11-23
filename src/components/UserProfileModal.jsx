@@ -95,14 +95,26 @@ export function UserProfileModal({
       return;
     }
 
-    if (verificationCode.length !== 6 || !twoFactorSecret) {
+    // Clean the code - remove any spaces, dashes, or other non-digit characters
+    const cleanCode = verificationCode.replace(/[^0-9]/g, '');
+    
+    if (cleanCode.length !== 6) {
       showToast?.('Please enter a valid 6-digit verification code', 'error');
       return;
     }
+    
+    if (!twoFactorSecret) {
+      showToast?.('2FA secret is missing. Please try enabling 2FA again.', 'error');
+      return;
+    }
+
+    console.log('2FA Verification - Code:', cleanCode, 'Secret:', twoFactorSecret.substring(0, 8) + '...');
 
     try {
       setLoading(true);
-      const response = await authAPI.enable2FA(twoFactorSecret, verificationCode);
+      const response = await authAPI.enable2FA(twoFactorSecret, cleanCode);
+      
+      console.log('2FA Enable response:', response);
       
       if (response && response.success) {
         setTwoFactorEnabled(true);
@@ -136,7 +148,9 @@ export function UserProfileModal({
           console.error('Failed to update localStorage:', e);
         }
       } else {
-        showToast?.(response?.error || response?.message || 'Failed to enable 2FA', 'error');
+        const errorMsg = response?.error || response?.message || 'Failed to enable 2FA';
+        console.error('2FA Enable failed:', errorMsg, response);
+        showToast?.(errorMsg, 'error');
       }
     } catch (error) {
       console.error('2FA enable error:', error);
