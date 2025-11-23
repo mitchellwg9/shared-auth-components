@@ -1,6 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { User, Lock, Shield, X } from 'lucide-react';
-import { ChangePasswordModal } from './ChangePasswordModal';
+import { User, Lock, Shield, X, Eye, EyeOff } from 'lucide-react';
 
 /**
  * UserProfileModal - Shared component for editing user profile
@@ -15,11 +14,15 @@ export function UserProfileModal({
   authAPI,
   primaryColor = "#6366f1"
 }) {
-  const [showPasswordModal, setShowPasswordModal] = useState(false);
   const [formData, setFormData] = useState({
     name: '',
-    email: ''
+    email: '',
+    newPassword: '',
+    confirmPassword: ''
   });
+  const [showNewPassword, setShowNewPassword] = useState(false);
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
+  const [passwordErrors, setPasswordErrors] = useState({});
   const [twoFactorEnabled, setTwoFactorEnabled] = useState(false);
   const [twoFactorSecret, setTwoFactorSecret] = useState(null);
   const [qrCodeUrl, setQrCodeUrl] = useState('');
@@ -31,12 +34,15 @@ export function UserProfileModal({
     if (isOpen && currentUser) {
       setFormData({
         name: currentUser.name || '',
-        email: currentUser.email || ''
+        email: currentUser.email || '',
+        newPassword: '',
+        confirmPassword: ''
       });
       setTwoFactorEnabled(currentUser.two_factor_enabled || currentUser.twoFactorEnabled || false);
       setTwoFactorSecret(currentUser.two_factor_secret || currentUser.twoFactorSecret || null);
       setShowQRCode(false);
       setVerificationCode('');
+      setPasswordErrors({});
       
       // Load 2FA status if API is available
       if (authAPI && authAPI.get2FAStatus) {
@@ -254,25 +260,74 @@ export function UserProfileModal({
                     />
                     <p className="text-xs text-gray-500 mt-1">Email cannot be changed</p>
                   </div>
+                  
+                  {/* Password Change - Inline */}
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-2">New Password</label>
+                    <div className="relative">
+                      <input
+                        type={showNewPassword ? 'text' : 'password'}
+                        value={formData.newPassword}
+                        onChange={(e) => {
+                          setFormData({ ...formData, newPassword: e.target.value });
+                          if (passwordErrors.newPassword) {
+                            setPasswordErrors({ ...passwordErrors, newPassword: '' });
+                          }
+                        }}
+                        className={`w-full px-3 py-2 pr-10 border rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent ${
+                          passwordErrors.newPassword ? 'border-red-300' : 'border-gray-300'
+                        }`}
+                        style={{ '--tw-ring-color': primaryColor }}
+                        placeholder="Enter new password"
+                      />
+                      <button
+                        type="button"
+                        onClick={() => setShowNewPassword(!showNewPassword)}
+                        className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-gray-600"
+                      >
+                        {showNewPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+                      </button>
+                    </div>
+                    {passwordErrors.newPassword && (
+                      <p className="mt-1 text-sm text-red-600">{passwordErrors.newPassword}</p>
+                    )}
+                  </div>
+                  
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-2">Confirm New Password</label>
+                    <div className="relative">
+                      <input
+                        type={showConfirmPassword ? 'text' : 'password'}
+                        value={formData.confirmPassword}
+                        onChange={(e) => {
+                          setFormData({ ...formData, confirmPassword: e.target.value });
+                          if (passwordErrors.confirmPassword) {
+                            setPasswordErrors({ ...passwordErrors, confirmPassword: '' });
+                          }
+                          // Clear error if passwords now match
+                          if (e.target.value === formData.newPassword && passwordErrors.confirmPassword) {
+                            setPasswordErrors({ ...passwordErrors, confirmPassword: '' });
+                          }
+                        }}
+                        className={`w-full px-3 py-2 pr-10 border rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent ${
+                          passwordErrors.confirmPassword ? 'border-red-300' : 'border-gray-300'
+                        }`}
+                        style={{ '--tw-ring-color': primaryColor }}
+                        placeholder="Confirm new password"
+                      />
+                      <button
+                        type="button"
+                        onClick={() => setShowConfirmPassword(!showConfirmPassword)}
+                        className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-gray-600"
+                      >
+                        {showConfirmPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+                      </button>
+                    </div>
+                    {passwordErrors.confirmPassword && (
+                      <p className="mt-1 text-sm text-red-600">{passwordErrors.confirmPassword}</p>
+                    )}
+                  </div>
                 </div>
-              </div>
-
-              {/* Password Change */}
-              <div className="border-t border-gray-200 pt-6">
-                <h4 className="text-sm font-semibold text-gray-900 mb-4 flex items-center gap-2">
-                  <Lock className="w-4 h-4" />
-                  Password
-                </h4>
-                <p className="text-sm text-gray-600 mb-4">
-                  Change your password to keep your account secure.
-                </p>
-                <button
-                  onClick={() => setShowPasswordModal(true)}
-                  className="px-4 py-2 text-white rounded-lg hover:opacity-90 transition-colors font-medium"
-                  style={{ backgroundColor: primaryColor }}
-                >
-                  Change Password
-                </button>
               </div>
 
               {/* 2FA Section */}
@@ -395,7 +450,14 @@ export function UserProfileModal({
               {/* Save Button */}
               <div className="flex gap-2 pt-4 border-t border-gray-200">
                 <button
-                  onClick={handleSaveProfile}
+                  onClick={async () => {
+                    // Save profile first
+                    await handleSaveProfile();
+                    // Then change password if new password is provided
+                    if (formData.newPassword) {
+                      await handleChangePassword();
+                    }
+                  }}
                   disabled={loading}
                   className="px-4 py-2 text-white rounded-lg hover:opacity-90 transition-colors font-medium disabled:opacity-50"
                   style={{ backgroundColor: primaryColor }}
@@ -414,17 +476,6 @@ export function UserProfileModal({
         </div>
       </div>
 
-      <ChangePasswordModal
-        isOpen={showPasswordModal}
-        onClose={() => setShowPasswordModal(false)}
-        currentUser={currentUser}
-        onSave={async (oldPassword, newPassword) => {
-          await handleChangePassword(oldPassword, newPassword);
-        }}
-        showToast={showToast}
-        authAPI={authAPI}
-        primaryColor={primaryColor}
-      />
     </>
   );
 }
