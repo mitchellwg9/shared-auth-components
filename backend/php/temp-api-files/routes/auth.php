@@ -1,6 +1,20 @@
 <?php
+// Suppress any output before JSON response
+ob_start();
+
 require_once __DIR__ . '/../config.php';
 require_once __DIR__ . '/../utils/email.php';
+
+// Clear any output buffer
+ob_clean();
+
+// Set error handler to ensure JSON responses
+set_error_handler(function($severity, $message, $file, $line) {
+    // Log the error but don't output it
+    error_log("PHP Error in auth.php: $message in $file:$line");
+    // Return false to let PHP handle it normally, but we'll catch it in try-catch
+    return false;
+}, E_ALL);
 
 $method = $_SERVER['REQUEST_METHOD'];
 $data = getRequestData();
@@ -28,7 +42,8 @@ error_log("Auth route - Method: $method, REQUEST_URI: " . ($_SERVER['REQUEST_URI
 error_log("Auth route - Path after processing: '$path', PathParts: " . json_encode($pathParts));
 error_log("Auth route - PathParts[0]: " . ($pathParts[0] ?? 'empty') . ", PathParts[1]: " . ($pathParts[1] ?? 'empty'));
 
-switch ($method) {
+try {
+    switch ($method) {
     case 'POST':
         $action = $pathParts[1] ?? '';
         if ($action === 'login') {
@@ -100,40 +115,70 @@ switch ($method) {
             
             $selectQuery = "SELECT " . implode(', ', $selectFields) . " FROM users WHERE email = ?";
             $stmt = $conn->prepare($selectQuery);
+            
+            if (!$stmt) {
+                error_log("Login error: Prepare failed: " . $conn->error);
+                sendJSON(['error' => 'Database error', 'error_type' => 'database_error'], 500);
+            }
+            
             $stmt->bind_param("s", $email);
-            $stmt->execute();
+            
+            if (!$stmt->execute()) {
+                error_log("Login error: Execute failed: " . $stmt->error);
+                sendJSON(['error' => 'Database error', 'error_type' => 'database_error'], 500);
+            }
+            
             $result = $stmt->get_result();
             
             if ($result->num_rows === 0) {
+                $stmt->close();
                 sendJSON(['error' => 'Email address not found', 'error_type' => 'email_not_found'], 401);
             }
             
             $user = $result->fetch_assoc();
+            $stmt->close();
             
             // Check password - support both hashed (password_hash) and plain text (for migration)
             $passwordValid = false;
-            if (password_verify($data['password'], $user['password'])) {
-                // Password is hashed and matches
-                $passwordValid = true;
+            
+            try {
+                // Check if password is a valid hash format (starts with $2y$ or similar)
+                $isHash = (strlen($user['password']) >= 60 && substr($user['password'], 0, 4) === '$2y$');
                 
-                // If password was stored with old algorithm, rehash it with current algorithm
-                if (password_needs_rehash($user['password'], PASSWORD_DEFAULT)) {
-                    $newHash = password_hash($data['password'], PASSWORD_DEFAULT);
-                    $updateStmt = $conn->prepare("UPDATE users SET password = ? WHERE email = ?");
-                    $updateStmt->bind_param("ss", $newHash, $email);
-                    $updateStmt->execute();
-                    $updateStmt->close();
+                if ($isHash) {
+                    // Password is hashed, use password_verify
+                    if (password_verify($data['password'], $user['password'])) {
+                        // Password is hashed and matches
+                        $passwordValid = true;
+                        
+                        // If password was stored with old algorithm, rehash it with current algorithm
+                        if (password_needs_rehash($user['password'], PASSWORD_DEFAULT)) {
+                            $newHash = password_hash($data['password'], PASSWORD_DEFAULT);
+                            $updateStmt = $conn->prepare("UPDATE users SET password = ? WHERE email = ?");
+                            if ($updateStmt) {
+                                $updateStmt->bind_param("ss", $newHash, $email);
+                                $updateStmt->execute();
+                                $updateStmt->close();
+                            }
+                        }
+                    }
+                } else {
+                    // Legacy: plain text password (for existing users during migration)
+                    if ($user['password'] === $data['password']) {
+                        $passwordValid = true;
+                        $newHash = password_hash($data['password'], PASSWORD_DEFAULT);
+                        $updateStmt = $conn->prepare("UPDATE users SET password = ? WHERE email = ?");
+                        if ($updateStmt) {
+                            $updateStmt->bind_param("ss", $newHash, $email);
+                            $updateStmt->execute();
+                            $updateStmt->close();
+                            error_log("⚠️ Migrated plain text password to hash for user: $email");
+                        }
+                    }
                 }
-            } elseif ($user['password'] === $data['password']) {
-                // Legacy: plain text password (for existing users during migration)
-                // Hash it now and update the database
-                $passwordValid = true;
-                $newHash = password_hash($data['password'], PASSWORD_DEFAULT);
-                $updateStmt = $conn->prepare("UPDATE users SET password = ? WHERE email = ?");
-                $updateStmt->bind_param("ss", $newHash, $email);
-                $updateStmt->execute();
-                $updateStmt->close();
-                error_log("⚠️ Migrated plain text password to hash for user: $email");
+            } catch (Exception $e) {
+                error_log("Login error: Exception during password verification: " . $e->getMessage());
+                sendJSON(['error' => 'Authentication error', 'error_type' => 'auth_error'], 500);
             }
             
             if (!$passwordValid) {
@@ -729,6 +774,23 @@ switch ($method) {
         break;
     default:
         sendJSON(['error' => 'Method not allowed'], 405);
+    }
+} catch (Exception $e) {
+    error_log("Auth route exception: " . $e->getMessage());
+    error_log("Stack trace: " . $e->getTraceAsString());
+    sendJSON([
+        'error' => 'Server error',
+        'error_type' => 'server_error',
+        'message' => 'An error occurred while processing your request'
+    ], 500);
+} catch (Error $e) {
+    error_log("Auth route fatal error: " . $e->getMessage());
+    error_log("Stack trace: " . $e->getTraceAsString());
+    sendJSON([
+        'error' => 'Server error',
+        'error_type' => 'server_error',
+        'message' => 'An error occurred while processing your request'
+    ], 500);
 }
 
 ?>
