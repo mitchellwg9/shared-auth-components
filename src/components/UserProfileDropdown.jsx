@@ -214,12 +214,12 @@ export function UserProfileDropdown({
                     item.isDanger ? 'hover:bg-red-50' : ''
                   }`}
                 >
-                  <Icon className={`w-5 h-5 ${item.isDanger ? 'text-red-600' : 'text-gray-600'}`} />
-                  <div className="flex-1 text-left">
-                    <p className={`text-sm font-medium ${item.isDanger ? 'text-red-600' : 'text-gray-900'}`}>
+                  <Icon className={`w-5 h-5 flex-shrink-0 ${item.isDanger ? 'text-red-600' : 'text-gray-600'}`} />
+                  <div className="flex-1 text-left" style={{ minWidth: 0 }}>
+                    <p className={`text-sm font-medium leading-normal ${item.isDanger ? 'text-red-600' : 'text-gray-900'}`}>
                       {item.label}
                     </p>
-                    <p className="text-xs text-gray-500">{item.description}</p>
+                    <p className="text-xs text-gray-500 leading-normal mt-0.5">{item.description}</p>
                   </div>
                 </button>
               );

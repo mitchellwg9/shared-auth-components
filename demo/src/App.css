@@ -1,26 +1,23 @@
-* {
-  margin: 0;
-  padding: 0;
-  box-sizing: border-box;
-}
+/* Import Shared Auth Design System */
+@import '../../src/styles/base.css';
 
+/* Demo-specific overrides for better spacing */
 body {
-  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen',
-    'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue',
-    sans-serif;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
-  background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+  line-height: 1.5;
 }
 
-#root {
-  min-height: 100vh;
+/* Ensure buttons have proper spacing when used in components */
+button {
+  line-height: inherit;
 }
 
-/* Smooth transitions */
-* {
-  transition-property: color, background-color, border-color, text-decoration-color, fill, stroke, opacity, box-shadow, transform, filter, backdrop-filter;
-  transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
-  transition-duration: 150ms;
+/* Better spacing for text elements */
+p, span, div {
+  line-height: 1.5;
+}
+
+/* Ensure proper text alignment */
+.text-left {
+  text-align: left;
 }
 
