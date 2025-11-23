@@ -131,15 +131,22 @@ if (empty($resource)) {
                     
                     // Handle 2FA routes - include after getting data to avoid output issues
                     try {
+                        // Ensure database connection is available
+                        if (!isset($conn) || $conn === null) {
+                            $conn = getDBConnection();
+                        }
+                        
                         require_once __DIR__ . '/twoFactorRoutes.php';
                         handle2FARoute($conn, $method, $pathParts, $data, $userId);
                     } catch (Exception $e) {
                         ob_clean();
                         error_log("2FA route exception in index.php: " . $e->getMessage());
+                        error_log("2FA route exception stack: " . $e->getTraceAsString());
                         sendJSON(['error' => 'Server error', 'message' => 'An error occurred processing the 2FA request'], 500);
                     } catch (Error $e) {
                         ob_clean();
                         error_log("2FA route fatal error in index.php: " . $e->getMessage());
+                        error_log("2FA route fatal error stack: " . $e->getTraceAsString());
                         sendJSON(['error' => 'Server error', 'message' => 'An error occurred processing the 2FA request'], 500);
                     }
                     exit;
