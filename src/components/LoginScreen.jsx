@@ -40,8 +40,6 @@ export function LoginScreen({
   const [verificationEmail, setVerificationEmail] = useState('');
   const [requires2FA, setRequires2FA] = useState(false);
   const [twoFactorEmail, setTwoFactorEmail] = useState('');
-  const [requires2FA, setRequires2FA] = useState(false);
-  const [twoFactorEmail, setTwoFactorEmail] = useState('');
 
   // Create API client
   const authAPI = React.useMemo(() => {
