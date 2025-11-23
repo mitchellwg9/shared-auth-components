@@ -90,8 +90,33 @@ switch ($method) {
             
             $user = $result->fetch_assoc();
             
-            // Check password
-            if ($user['password'] !== $data['password']) {
+            // Check password - support both hashed (password_hash) and plain text (for migration)
+            $passwordValid = false;
+            if (password_verify($data['password'], $user['password'])) {
+                // Password is hashed and matches
+                $passwordValid = true;
+                
+                // If password was stored with old algorithm, rehash it with current algorithm
+                if (password_needs_rehash($user['password'], PASSWORD_DEFAULT)) {
+                    $newHash = password_hash($data['password'], PASSWORD_DEFAULT);
+                    $updateStmt = $conn->prepare("UPDATE users SET password = ? WHERE email = ?");
+                    $updateStmt->bind_param("ss", $newHash, $email);
+                    $updateStmt->execute();
+                    $updateStmt->close();
+                }
+            } elseif ($user['password'] === $data['password']) {
+                // Legacy: plain text password (for existing users during migration)
+                // Hash it now and update the database
+                $passwordValid = true;
+                $newHash = password_hash($data['password'], PASSWORD_DEFAULT);
+                $updateStmt = $conn->prepare("UPDATE users SET password = ? WHERE email = ?");
+                $updateStmt->bind_param("ss", $newHash, $email);
+                $updateStmt->execute();
+                $updateStmt->close();
+                error_log("⚠️ Migrated plain text password to hash for user: $email");
+            }
+            
+            if (!$passwordValid) {
                 sendJSON(['error' => 'Invalid password', 'error_type' => 'invalid_password'], 401);
             }
             
@@ -198,7 +223,8 @@ switch ($method) {
             $conn = getDBConnection();
             $email = strtolower(trim($data['email']));
             $emailEscaped = $conn->real_escape_string($email);
-            $password = $conn->real_escape_string($data['password']); // Should be hashed
+            // Hash password using PHP's password_hash() - uses bcrypt by default
+            $password = password_hash($data['password'], PASSWORD_DEFAULT);
             $name = $conn->real_escape_string($data['name']);
             $role = isset($data['role']) ? $conn->real_escape_string($data['role']) : 'user';
             
