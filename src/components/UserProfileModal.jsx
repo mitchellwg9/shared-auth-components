@@ -35,7 +35,6 @@ export function UserProfileModal({
       });
       setTwoFactorEnabled(currentUser.two_factor_enabled || currentUser.twoFactorEnabled || false);
       setTwoFactorSecret(currentUser.two_factor_secret || currentUser.twoFactorSecret || null);
-      setActiveTab('profile');
       setShowQRCode(false);
       setVerificationCode('');
       
