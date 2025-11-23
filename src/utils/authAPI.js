@@ -133,7 +133,24 @@ export function createAuthAPI(apiBaseUrl) {
     },
 
     get2FASetup: async () => {
-      return apiRequest('/auth/two-factor/setup', {
+      // Get current user ID from localStorage
+      const currentUserStr = localStorage.getItem('currentUser');
+      let currentUserId = null;
+      if (currentUserStr) {
+        try {
+          const currentUser = JSON.parse(currentUserStr);
+          currentUserId = currentUser.id || currentUser.user_id;
+        } catch (e) {
+          console.error('Failed to parse currentUser from localStorage:', e);
+        }
+      }
+      
+      // Add current_user_id to query string
+      const url = currentUserId 
+        ? `/auth/two-factor/setup?current_user_id=${encodeURIComponent(currentUserId)}`
+        : '/auth/two-factor/setup';
+      
+      return apiRequest(url, {
         method: 'GET',
       });
     },
