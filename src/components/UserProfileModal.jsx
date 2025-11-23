@@ -102,21 +102,44 @@ export function UserProfileModal({
 
     try {
       setLoading(true);
-      await authAPI.enable2FA(twoFactorSecret, verificationCode);
-      setTwoFactorEnabled(true);
-      showToast?.('Two-factor authentication enabled successfully!', 'success');
-      setVerificationCode('');
-      setShowQRCode(false);
+      const response = await authAPI.enable2FA(twoFactorSecret, verificationCode);
       
-      // Update current user
-      if (onUserUpdate) {
-        onUserUpdate({
-          ...currentUser,
-          two_factor_enabled: true,
-          twoFactorEnabled: true
-        });
+      if (response && response.success) {
+        setTwoFactorEnabled(true);
+        showToast?.('Two-factor authentication enabled successfully!', 'success');
+        setVerificationCode('');
+        setShowQRCode(false);
+        
+        // Update current user
+        if (onUserUpdate) {
+          onUserUpdate({
+            ...currentUser,
+            two_factor_enabled: true,
+            twoFactorEnabled: true,
+            two_factor_secret: twoFactorSecret,
+            twoFactorSecret: twoFactorSecret
+          });
+        }
+        
+        // Also update localStorage
+        try {
+          const userStr = localStorage.getItem('currentUser');
+          if (userStr) {
+            const user = JSON.parse(userStr);
+            user.two_factor_enabled = true;
+            user.twoFactorEnabled = true;
+            user.two_factor_secret = twoFactorSecret;
+            user.twoFactorSecret = twoFactorSecret;
+            localStorage.setItem('currentUser', JSON.stringify(user));
+          }
+        } catch (e) {
+          console.error('Failed to update localStorage:', e);
+        }
+      } else {
+        showToast?.(response?.error || response?.message || 'Failed to enable 2FA', 'error');
       }
     } catch (error) {
+      console.error('2FA enable error:', error);
       showToast?.(error.message || 'Failed to enable 2FA', 'error');
     } finally {
       setLoading(false);
