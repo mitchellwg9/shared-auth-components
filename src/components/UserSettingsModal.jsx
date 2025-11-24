@@ -155,12 +155,12 @@ export function UserSettingsModal({
 
         {/* Content */}
         <div className="p-6">
-          <div className="space-y-6">
+          <div className="space-y-4">
             {/* Dark Mode */}
-            <div className="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
+            <div className={`flex items-center justify-between p-3 ${currentDarkMode ? 'bg-gray-700' : 'bg-gray-50'} rounded-lg`}>
               <div>
-                <h4 className="font-medium text-sm text-gray-900">Dark Mode</h4>
-                <p className="text-xs text-gray-500">Switch between light and dark themes</p>
+                <h4 className={`font-medium text-sm ${currentDarkMode ? 'text-gray-200' : 'text-gray-900'}`}>Dark Mode</h4>
+                <p className={`text-xs ${currentDarkMode ? 'text-gray-400' : 'text-gray-500'}`}>Switch between light and dark themes</p>
               </div>
               <button
                 onClick={() => {
