@@ -281,8 +281,11 @@ export function UserSettingsModal({
                           return (
                             <>
                               <div 
-                                className="w-4 h-4 rounded border border-gray-400"
-                                style={{ backgroundColor: selectedTheme.colors.column }}
+                                className="w-5 h-5 rounded border-2 flex-shrink-0"
+                                style={{ 
+                                  backgroundColor: selectedTheme.colors.column,
+                                  borderColor: localDarkMode ? '#6B7280' : '#9CA3AF'
+                                }}
                               />
                               <span>{selectedTheme.name}</span>
                             </>
@@ -317,8 +320,11 @@ export function UserSettingsModal({
                             } ${localDarkMode ? 'text-gray-200' : 'text-gray-900'}`}
                           >
                             <div 
-                              className="w-4 h-4 rounded border border-gray-400 flex-shrink-0"
-                              style={{ backgroundColor: themeOption.colors.column }}
+                              className="w-5 h-5 rounded border-2 flex-shrink-0"
+                              style={{ 
+                                backgroundColor: themeOption.colors.column,
+                                borderColor: localDarkMode ? '#6B7280' : '#9CA3AF'
+                              }}
                             />
                             <span>{themeOption.name}</span>
                             {isSelected && (
