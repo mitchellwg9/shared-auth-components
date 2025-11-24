@@ -181,9 +181,9 @@ export function UserSettingsModal({
 
   return (
       <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
-        <div className={`rounded-lg max-w-2xl w-full mx-auto max-h-[85vh] overflow-y-auto shadow-xl ${currentDarkMode ? 'bg-gray-800' : 'bg-white'}`} style={{ maxWidth: '42rem', width: 'calc(100% - 2rem)' }}>
+        <div className={`rounded-lg max-w-2xl w-full mx-auto max-h-[85vh] overflow-y-auto shadow-xl ${localDarkMode ? 'bg-gray-800' : 'bg-white'}`} style={{ maxWidth: '42rem', width: 'calc(100% - 2rem)' }}>
         {/* Header */}
-        <div className={`sticky top-0 border-b px-6 py-4 flex items-center justify-between ${currentDarkMode ? 'bg-gray-800 border-gray-700' : 'bg-white border-gray-200'}`}>
+        <div className={`sticky top-0 border-b px-6 py-4 flex items-center justify-between ${localDarkMode ? 'bg-gray-800 border-gray-700' : 'bg-white border-gray-200'}`}>
           <div className="flex items-center gap-3">
             <div 
               className="w-10 h-10 rounded-lg flex items-center justify-center"
@@ -192,14 +192,14 @@ export function UserSettingsModal({
               <Settings className="w-5 h-5" style={{ color: primaryColor }} />
             </div>
             <div>
-              <h3 className={`text-lg font-bold ${currentDarkMode ? 'text-gray-200' : 'text-gray-900'}`}>Settings</h3>
-              <p className={`text-sm ${currentDarkMode ? 'text-gray-400' : 'text-gray-500'}`}>Manage your application settings</p>
+              <h3 className={`text-lg font-bold ${localDarkMode ? 'text-gray-200' : 'text-gray-900'}`}>Settings</h3>
+              <p className={`text-sm ${localDarkMode ? 'text-gray-400' : 'text-gray-500'}`}>Manage your application settings</p>
             </div>
           </div>
           <button
             onClick={onClose}
             className={`p-2 rounded-lg transition-colors ${
-              currentDarkMode 
+              localDarkMode 
                 ? 'text-gray-400 hover:text-gray-200 hover:bg-gray-700' 
                 : 'text-gray-400 hover:text-gray-600 hover:bg-gray-100'
             }`}
