@@ -525,7 +525,7 @@ export function UserProfileModal({
                 {!twoFactorEnabled ? (
                   <div className="space-y-4">
                     {!showQRCode ? (
-                      <div className="bg-gray-50 rounded-lg p-4 border border-gray-200">
+                      <div className="rounded-lg p-4 border border-gray-200" style={{ backgroundColor: '#F3F4F6' }}>
                         <div className="flex items-center justify-between">
                           <div className="flex items-center gap-3">
                             <Shield className="w-5 h-5 text-gray-600" />
@@ -547,7 +547,7 @@ export function UserProfileModal({
                       </div>
                     ) : (
                       <div className="space-y-4">
-                        <div className="bg-gray-50 rounded-lg p-4 border border-gray-200">
+                        <div className="rounded-lg p-4 border border-gray-200" style={{ backgroundColor: '#F3F4F6' }}>
                           <p className="text-sm font-medium text-gray-900 mb-2">
                             Scan this QR code with your authenticator app:
                           </p>
@@ -564,7 +564,7 @@ export function UserProfileModal({
                                 }}
                               />
                             ) : (
-                              <div className="w-[250px] h-[250px] border border-gray-300 rounded flex items-center justify-center bg-gray-50">
+                              <div className="w-[250px] h-[250px] border border-gray-300 rounded flex items-center justify-center" style={{ backgroundColor: '#F3F4F6' }}>
                                 <p className="text-gray-500 text-sm">Loading QR code...</p>
                               </div>
                             )}
