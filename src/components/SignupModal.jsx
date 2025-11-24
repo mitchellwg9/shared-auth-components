@@ -130,8 +130,9 @@ export function SignupModal({
         role: 'user'
       });
 
-
-      if (response.success) {
+      // The register endpoint returns the user object directly (not wrapped in {success: true})
+      // Check if we have a user ID or email to determine success
+      if (response.id || response.email || (response.success !== false && !response.error)) {
         if (showToast) {
           showToast('Account created! Please check your email to verify your account.', 'success');
         }
@@ -147,7 +148,7 @@ export function SignupModal({
         
         // Call onSignup callback if provided
         if (onSignup) {
-          await onSignup(response.user || { email: formData.email });
+          await onSignup(response.user || response || { email: formData.email });
         }
         
         // Close modal
