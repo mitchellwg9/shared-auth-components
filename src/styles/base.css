@@ -50,6 +50,12 @@ body {
   color: var(--gray-50);
 }
 
+/* Dark mode for root element */
+.dark #root {
+  background: var(--gray-900);
+  color: var(--gray-50);
+}
+
 #root {
   min-height: 100vh;
   display: flex;
