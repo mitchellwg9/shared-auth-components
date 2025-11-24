@@ -332,29 +332,20 @@ function App() {
           authAPI={authAPI}
           primaryColor="#6366f1"
           darkMode={darkMode}
-          onToggleDarkMode={async () => {
+          onToggleDarkMode={() => {
+            // This will be called after save to update parent state
             const newDarkMode = !darkMode;
             setDarkMode(newDarkMode);
-            // Apply dark mode to document
-            if (newDarkMode) {
-              document.documentElement.classList.add('dark');
-            } else {
-              document.documentElement.classList.remove('dark');
-            }
-            // Save to API (silently, no toast)
-            await saveUserSettings({ darkMode: newDarkMode });
           }}
           theme={theme}
-          onThemeChange={async (newTheme) => {
+          onThemeChange={(newTheme) => {
+            // This will be called after save to update parent state
             setTheme(newTheme);
-            // Save to API (silently, no toast)
-            await saveUserSettings({ theme: newTheme });
           }}
           dateFormat={dateFormat}
-          onDateFormatChange={async (newFormat) => {
+          onDateFormatChange={(newFormat) => {
+            // This will be called after save to update parent state
             setDateFormat(newFormat);
-            // Save to API (silently, no toast)
-            await saveUserSettings({ dateFormat: newFormat });
           }}
         />
       </div>
