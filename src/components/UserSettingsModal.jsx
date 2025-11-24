@@ -71,20 +71,21 @@ export function UserSettingsModal({
       });
 
       // Update parent component state and apply changes
-      if (localDarkMode !== darkMode && onToggleDarkMode) {
-        // Apply dark mode to document immediately
-        if (localDarkMode) {
-          document.documentElement.classList.add('dark');
-        } else {
-          document.documentElement.classList.remove('dark');
-        }
-        // Update parent state
+      // Apply dark mode to document immediately
+      if (localDarkMode) {
+        document.documentElement.classList.add('dark');
+      } else {
+        document.documentElement.classList.remove('dark');
+      }
+      
+      // Update parent state (callbacks will update parent's state)
+      if (onToggleDarkMode && localDarkMode !== darkMode) {
         onToggleDarkMode();
       }
-      if (localTheme !== theme && onThemeChange) {
+      if (onThemeChange && localTheme !== theme) {
         onThemeChange(localTheme);
       }
-      if (localDateFormat !== dateFormat && onDateFormatChange) {
+      if (onDateFormatChange && localDateFormat !== dateFormat) {
         onDateFormatChange(localDateFormat);
       }
 
