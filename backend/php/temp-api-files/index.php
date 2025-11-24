@@ -189,6 +189,11 @@ if (empty($resource)) {
             case 'leave-policies':
                 require_once __DIR__ . '/routes/leave_policies.php';
                 break;
+            case 'user-settings':
+                // Handle user settings (theme, date format, dark mode)
+                require_once __DIR__ . '/user-settings.php';
+                exit;
+                break;
             case 'test-email':
             case 'test-email.php':
                 // Direct access to test-email.php for SMTP testing

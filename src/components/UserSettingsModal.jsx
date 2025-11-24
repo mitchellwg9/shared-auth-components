@@ -64,11 +64,17 @@ export function UserSettingsModal({
     setIsSaving(true);
     try {
       // Save to database
-      await authAPI.updateUserSettings({
+      console.log('Saving settings:', {
         darkMode: localDarkMode,
         theme: localTheme,
         dateFormat: localDateFormat
       });
+      const response = await authAPI.updateUserSettings({
+        darkMode: localDarkMode,
+        theme: localTheme,
+        dateFormat: localDateFormat
+      });
+      console.log('Settings save response:', response);
 
       // Update parent component state and apply changes
       // Apply dark mode to document immediately
