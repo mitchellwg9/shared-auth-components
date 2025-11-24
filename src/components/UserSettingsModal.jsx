@@ -251,7 +251,20 @@ export function UserSettingsModal({
                 type="button"
                 onClick={() => {
                   console.log('Dark mode toggle clicked, current:', localDarkMode);
-                  setLocalDarkMode(!localDarkMode);
+                  const newDarkMode = !localDarkMode;
+                  setLocalDarkMode(newDarkMode);
+                  
+                  // Apply dark mode immediately to the entire app
+                  if (newDarkMode) {
+                    document.documentElement.classList.add('dark');
+                  } else {
+                    document.documentElement.classList.remove('dark');
+                  }
+                  
+                  // Call parent callback to update parent state
+                  if (onToggleDarkMode) {
+                    onToggleDarkMode();
+                  }
                 }}
                 className={`relative inline-flex items-center rounded-full transition-colors focus:outline-none focus:ring-2 focus:ring-offset-2 border-2 ${
                   localDarkMode 

@@ -339,9 +339,15 @@ function App() {
           primaryColor="#6366f1"
           darkMode={darkMode}
           onToggleDarkMode={() => {
-            // This will be called after save to update parent state
+            // Apply dark mode immediately when toggle is clicked
             const newDarkMode = !darkMode;
             setDarkMode(newDarkMode);
+            // Apply dark mode to document immediately
+            if (newDarkMode) {
+              document.documentElement.classList.add('dark');
+            } else {
+              document.documentElement.classList.remove('dark');
+            }
           }}
           theme={theme}
           onThemeChange={(newTheme) => {
