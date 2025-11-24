@@ -27,11 +27,8 @@ export function SubscriptionsManagementView({ showToast, ownerAPI, primaryColor 
     try {
       setLoading(true);
       const data = await ownerAPI.getSubscriptions();
-      console.log('Subscriptions data loaded:', data);
       setSubscriptions(data);
     } catch (error) {
-      console.error('Failed to load subscriptions:', error);
-      console.error('Error details:', error.details);
       if (showToast) {
         showToast(error.message || 'Failed to load subscriptions. Make sure you are set as system owner.', 'error');
       }

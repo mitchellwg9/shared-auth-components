@@ -103,10 +103,8 @@ export function SignupModal({
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    console.log('SignupModal: Form submitted', { formData, authAPI: !!authAPI });
     
     if (!authAPI) {
-      console.error('SignupModal: authAPI is null');
       if (showToast) {
         showToast('API configuration error. Please contact support.', 'error');
       }
@@ -114,7 +112,6 @@ export function SignupModal({
     }
     
     if (!validate()) {
-      console.log('SignupModal: Validation failed', errors);
       // Show first validation error to user
       const firstError = Object.values(errors)[0];
       if (firstError && showToast) {
@@ -124,7 +121,6 @@ export function SignupModal({
     }
 
     setIsLoading(true);
-    console.log('SignupModal: Starting registration...');
     
     try {
       const response = await authAPI.register({
@@ -134,7 +130,6 @@ export function SignupModal({
         role: 'user'
       });
 
-      console.log('SignupModal: Registration response', response);
 
       if (response.success) {
         if (showToast) {
@@ -161,7 +156,6 @@ export function SignupModal({
         }
       } else {
         const errorMsg = response.error || 'Failed to create account. Please try again.';
-        console.error('SignupModal: Registration failed', errorMsg);
         setErrors({ submit: errorMsg });
         if (showToast) {
           showToast(errorMsg, 'error');
@@ -169,7 +163,6 @@ export function SignupModal({
       }
     } catch (error) {
       const errorMsg = error.message || error.details?.error || 'Failed to create account. Please try again.';
-      console.error('SignupModal: Registration error', error, errorMsg);
       setErrors({ submit: errorMsg });
       if (showToast) {
         showToast(errorMsg, 'error');

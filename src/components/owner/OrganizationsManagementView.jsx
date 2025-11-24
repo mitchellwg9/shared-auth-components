@@ -28,11 +28,8 @@ export function OrganizationsManagementView({ showToast, ownerAPI, primaryColor 
     try {
       setLoading(true);
       const data = await ownerAPI.getOrganizations();
-      console.log('Organizations data loaded:', data);
       setOrganizations(data);
     } catch (error) {
-      console.error('Failed to load organizations:', error);
-      console.error('Error details:', error.details);
       if (showToast) {
         showToast(error.message || 'Failed to load organizations. Make sure you are set as system owner.', 'error');
       }

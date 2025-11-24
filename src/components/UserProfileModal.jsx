@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { User, Lock, Shield, X, Eye, EyeOff } from 'lucide-react';
+import { getCurrentUser } from '../utils/apiHelpers';
 
 /**
  * UserProfileModal - Shared component for editing user profile
@@ -92,45 +93,14 @@ export function UserProfileModal({
       return;
     }
 
-    // Check localStorage for user ID
-    try {
-      const userStr = localStorage.getItem('currentUser');
-      if (userStr) {
-        const user = JSON.parse(userStr);
-        console.log('2FA Setup - Current user from localStorage:', { id: user.id, user_id: user.user_id, email: user.email });
-      } else {
-        console.warn('2FA Setup - No user in localStorage');
-      }
-    } catch (e) {
-      console.error('2FA Setup - Failed to read localStorage:', e);
-    }
-
     try {
       setLoading(true);
-      console.log('2FA Setup - Calling get2FASetup API...');
       const setup = await authAPI.get2FASetup();
       
-      console.log('2FA Setup - API response:', setup);
-      
-      if (!setup) {
-        console.error('2FA Setup - No response from API');
-        showToast?.('Failed to generate 2FA secret: No response from server', 'error');
+      if (!setup || setup.error || !setup.secret) {
+        showToast?.(setup?.error || 'Failed to generate 2FA secret', 'error');
         return;
       }
-      
-      if (setup.error) {
-        console.error('2FA Setup - API error:', setup.error);
-        showToast?.(setup.error || 'Failed to generate 2FA secret', 'error');
-        return;
-      }
-      
-      if (!setup.secret) {
-        console.error('2FA Setup - No secret in response:', setup);
-        showToast?.('Failed to generate 2FA secret: Invalid response', 'error');
-        return;
-      }
-      
-      console.log('2FA Secret generated:', setup.secret.substring(0, 8) + '...');
       
       // Set secret first, then generate QR code
       setTwoFactorSecret(setup.secret);
@@ -147,7 +117,6 @@ export function UserProfileModal({
       setQrCodeUrl(qrUrl);
       setShowQRCode(true);
       
-      console.log('2FA Setup state - Secret set:', !!setup.secret, 'QR Code shown:', true);
     } catch (error) {
       console.error('2FA Secret generation error:', error);
       console.error('2FA Secret generation error details:', {
@@ -184,13 +153,9 @@ export function UserProfileModal({
       return;
     }
 
-    console.log('2FA Verification - Code:', cleanCode, 'Secret:', twoFactorSecret.substring(0, 8) + '...');
-
     try {
       setLoading(true);
       const response = await authAPI.enable2FA(twoFactorSecret, cleanCode);
-      
-      console.log('2FA Enable response:', response);
       
       if (response && response.success) {
         setTwoFactorEnabled(true);
@@ -211,9 +176,8 @@ export function UserProfileModal({
         
         // Also update localStorage
         try {
-          const userStr = localStorage.getItem('currentUser');
-          if (userStr) {
-            const user = JSON.parse(userStr);
+          const user = getCurrentUser();
+          if (user) {
             user.two_factor_enabled = true;
             user.twoFactorEnabled = true;
             user.two_factor_secret = twoFactorSecret;
@@ -221,7 +185,7 @@ export function UserProfileModal({
             localStorage.setItem('currentUser', JSON.stringify(user));
           }
         } catch (e) {
-          console.error('Failed to update localStorage:', e);
+          // Ignore localStorage errors
         }
       } else {
         const errorMsg = response?.error || response?.message || 'Failed to enable 2FA';
@@ -261,15 +225,14 @@ export function UserProfileModal({
       
       // Also update localStorage
       try {
-        const userStr = localStorage.getItem('currentUser');
-        if (userStr) {
-          const user = JSON.parse(userStr);
+        const user = getCurrentUser();
+        if (user) {
           user.two_factor_enabled = false;
           user.twoFactorEnabled = false;
           localStorage.setItem('currentUser', JSON.stringify(user));
         }
       } catch (e) {
-        console.error('Failed to update localStorage:', e);
+        // Ignore localStorage errors
       }
     } catch (error) {
       showToast?.(error.message || 'Failed to disable 2FA', 'error');
@@ -594,10 +557,9 @@ export function UserProfileModal({
                             alt="2FA QR Code" 
                             className="border border-gray-300 rounded max-w-full h-auto"
                             style={{ maxWidth: '250px', width: '100%' }}
-                            onError={(e) => {
-                              console.error('QR code image failed to load:', qrCodeUrl);
-                              e.target.style.display = 'none';
-                            }}
+                                onError={(e) => {
+                                  e.target.style.display = 'none';
+                                }}
                           />
                         ) : (
                           <div className="w-[250px] h-[250px] border border-gray-300 rounded flex items-center justify-center" style={{ backgroundColor: '#F3F4F6' }}>
@@ -675,7 +637,7 @@ export function UserProfileModal({
                         }, 300);
                       }
                     } catch (error) {
-                      console.error('Save error:', error);
+                      // Error already handled by showToast
                       showToast?.(error.message || 'Failed to save changes', 'error');
                     } finally {
                       setLoading(false);

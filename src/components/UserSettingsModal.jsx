@@ -83,17 +83,11 @@ export function UserSettingsModal({
     setIsSaving(true);
     try {
       // Save to database
-      console.log('Saving settings:', {
-        darkMode: localDarkMode,
-        theme: localTheme,
-        dateFormat: localDateFormat
-      });
       const response = await authAPI.updateUserSettings({
         darkMode: localDarkMode,
         theme: localTheme,
         dateFormat: localDateFormat
       });
-      console.log('Settings save response:', response);
 
       // Update parent component state and apply changes
       // Apply dark mode to document immediately
@@ -250,7 +244,6 @@ export function UserSettingsModal({
               <button
                 type="button"
                 onClick={() => {
-                  console.log('Dark mode toggle clicked, current:', localDarkMode);
                   const newDarkMode = !localDarkMode;
                   setLocalDarkMode(newDarkMode);
                   

@@ -21,11 +21,8 @@ export function SystemAnalyticsView({ showToast, ownerAPI, primaryColor = "#6366
     try {
       setLoading(true);
       const data = await ownerAPI.getAnalytics();
-      console.log('Analytics data loaded:', data);
       setAnalytics(data);
     } catch (error) {
-      console.error('Failed to load analytics:', error);
-      console.error('Error details:', error.details);
       if (showToast) {
         showToast(error.message || 'Failed to load analytics. Make sure you are set as system owner.', 'error');
       }
