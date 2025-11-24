@@ -248,8 +248,10 @@ export function UserSettingsModal({
                   console.log('Dark mode toggle clicked, current:', localDarkMode);
                   setLocalDarkMode(!localDarkMode);
                 }}
-                className={`relative inline-flex items-center rounded-full transition-colors focus:outline-none focus:ring-2 focus:ring-offset-2 ${
-                  localDarkMode ? 'bg-blue-600 focus:ring-blue-500' : 'bg-gray-200 focus:ring-gray-400'
+                className={`relative inline-flex items-center rounded-full transition-colors focus:outline-none focus:ring-2 focus:ring-offset-2 border-2 ${
+                  localDarkMode 
+                    ? 'bg-blue-600 border-blue-700 focus:ring-blue-500' 
+                    : 'bg-gray-300 border-gray-400 focus:ring-gray-400'
                 }`}
                 style={{ 
                   width: '2.75rem',
@@ -263,7 +265,7 @@ export function UserSettingsModal({
                 aria-label={localDarkMode ? 'Disable dark mode' : 'Enable dark mode'}
               >
                 <span
-                  className={`inline-block rounded-full bg-white transition-transform shadow-sm absolute ${
+                  className={`inline-block rounded-full bg-white transition-transform shadow-md absolute ${
                     localDarkMode ? 'translate-x-6' : 'translate-x-1'
                   }`}
                   style={{ 
@@ -271,7 +273,8 @@ export function UserSettingsModal({
                     height: '1rem',
                     minWidth: '1rem',
                     minHeight: '1rem',
-                    left: '0.25rem'
+                    left: '0.25rem',
+                    border: '1px solid rgba(0, 0, 0, 0.1)'
                   }}
                 />
               </button>
