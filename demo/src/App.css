@@ -22,7 +22,10 @@ p, span, div {
 }
 
 /* Dark mode overrides for demo app */
-.dark .min-h-screen.bg-gradient-to-br {
+.dark .min-h-screen.bg-gradient-to-br,
+.dark [class*="bg-gradient-to-br"][class*="from-slate-50"],
+.dark [class*="bg-gradient-to-br"][class*="via-blue-50"],
+.dark [class*="bg-gradient-to-br"][class*="to-indigo-50"] {
   background: linear-gradient(to bottom right, var(--gray-900) 0%, var(--gray-800) 50%, var(--gray-900) 100%) !important;
 }
 
@@ -72,6 +75,7 @@ p, span, div {
   color: var(--primary-200) !important;
 }
 
+.dark [class*="bg-gradient-to-r"][class*="from-blue-600"][class*="to-indigo-600"],
 .dark .bg-gradient-to-r.from-blue-600.to-indigo-600 {
   background: linear-gradient(to right, var(--primary-600) 0%, var(--accent-indigo) 100%) !important;
 }
