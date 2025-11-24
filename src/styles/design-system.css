@@ -64,6 +64,7 @@
   /* Spacing */
   --space-1: 0.2rem;
   --space-2: 0.4rem;
+  --space-2.5: 0.55rem;
   --space-3: 0.65rem;
   --space-4: 0.85rem;
   --space-5: 1.1rem;
@@ -236,7 +237,7 @@ body {
   align-items: center;
   justify-content: center;
   gap: var(--space-2);
-  padding: var(--space-2.5) var(--space-5);
+  padding: 0.55rem var(--space-5);
   border-radius: var(--radius-lg);
   font-weight: 500;
   font-size: 0.8rem;
@@ -297,7 +298,7 @@ body {
 /* Input Styles */
 .input {
   width: 100%;
-  padding: var(--space-2.5) var(--space-3);
+  padding: 0.55rem var(--space-3);
   border: 1px solid var(--gray-300);
   border-radius: var(--radius-lg);
   font-size: 0.8rem;
