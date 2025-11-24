@@ -237,7 +237,7 @@ export function UserSettingsModal({
         <div className="p-6">
           <div className="space-y-4">
             {/* Dark Mode */}
-            <div className={`flex items-center justify-between p-3 ${localDarkMode ? 'bg-gray-700' : 'bg-gray-50'} rounded-lg`}>
+            <div className={`flex items-center justify-between p-3 ${localDarkMode ? 'bg-gray-700' : 'bg-gray-100'} rounded-lg border ${localDarkMode ? 'border-gray-600' : 'border-gray-200'}`}>
               <div>
                 <h4 className={`font-medium text-sm ${localDarkMode ? 'text-gray-200' : 'text-gray-900'}`}>Dark Mode</h4>
                 <p className={`text-xs ${localDarkMode ? 'text-gray-400' : 'text-gray-500'}`}>Switch between light and dark themes</p>
@@ -281,7 +281,7 @@ export function UserSettingsModal({
             </div>
 
             {/* Color Theme */}
-            <div className={`p-3 ${localDarkMode ? 'bg-gray-700' : 'bg-gray-50'} rounded-lg`}>
+            <div className={`p-3 ${localDarkMode ? 'bg-gray-700' : 'bg-gray-100'} rounded-lg border ${localDarkMode ? 'border-gray-600' : 'border-gray-200'}`}>
               <div className="flex items-center justify-between">
                 <div>
                   <h4 className={`font-medium text-sm ${localDarkMode ? 'text-gray-200' : 'text-gray-900'}`}>Color Theme</h4>
@@ -364,7 +364,7 @@ export function UserSettingsModal({
             </div>
 
             {/* Date Format */}
-            <div className={`p-3 ${localDarkMode ? 'bg-gray-700' : 'bg-gray-50'} rounded-lg`}>
+            <div className={`p-3 ${localDarkMode ? 'bg-gray-700' : 'bg-gray-100'} rounded-lg border ${localDarkMode ? 'border-gray-600' : 'border-gray-200'}`}>
               <div className="flex items-center justify-between">
                 <div>
                   <h4 className={`font-medium text-sm ${localDarkMode ? 'text-gray-200' : 'text-gray-900'}`}>Date Format</h4>
@@ -392,7 +392,7 @@ export function UserSettingsModal({
             {customAppearanceOptions.length > 0 && (
               <div className="space-y-4">
                 {customAppearanceOptions.map((option, index) => (
-                  <div key={index} className={`p-3 ${localDarkMode ? 'bg-gray-700' : 'bg-gray-50'} rounded-lg`}>
+                  <div key={index} className={`p-3 ${localDarkMode ? 'bg-gray-700' : 'bg-gray-100'} rounded-lg border ${localDarkMode ? 'border-gray-600' : 'border-gray-200'}`}>
                     {option.render ? option.render() : (
                       <div>
                         <h4 className={`font-medium text-sm ${localDarkMode ? 'text-gray-200' : 'text-gray-900'}`}>{option.label}</h4>
