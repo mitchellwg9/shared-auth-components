@@ -180,6 +180,14 @@ if (existsSync(testApiVersionPath)) {
   console.log('✅ Prepared test-api-version.php');
 }
 
+// Copy user-settings.php
+const userSettingsPath = resolve(__dirname, 'user-settings.php');
+if (existsSync(userSettingsPath)) {
+  const userSettingsContent = readFileSync(userSettingsPath, 'utf-8');
+  writeFileSync(resolve(tempDir, 'user-settings.php'), userSettingsContent);
+  console.log('✅ Prepared user-settings.php');
+}
+
 const ftp = new FtpDeploy();
 
 // Deploy to public_html/api directory (web-accessible API location)
