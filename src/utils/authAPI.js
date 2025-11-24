@@ -190,6 +190,20 @@ export function createAuthAPI(apiBaseUrl) {
         body: { currentPassword, newPassword },
       });
     },
+
+    // User settings
+    getUserSettings: async () => {
+      return apiRequest('/user-settings', {
+        method: 'GET',
+      });
+    },
+
+    updateUserSettings: async (settings) => {
+      return apiRequest('/user-settings', {
+        method: 'PUT',
+        body: settings,
+      });
+    },
   };
 }
 

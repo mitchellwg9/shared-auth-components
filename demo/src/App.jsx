@@ -52,11 +52,50 @@ function App() {
         const userData = JSON.parse(userStr);
         setUser(userData);
         setShowLogin(false);
+        
+        // Load user settings
+        loadUserSettings();
       }
     } catch (e) {
       console.error('Failed to load user:', e);
     }
   }, []);
+
+  // Load user settings from API
+  const loadUserSettings = async () => {
+    if (!user) return;
+    
+    try {
+      const settings = await authAPI.getUserSettings();
+      if (settings) {
+        setDarkMode(settings.darkMode || false);
+        setTheme(settings.theme || 'sapphire');
+        setDateFormat(settings.dateFormat || 'dd/mm/yyyy');
+        
+        // Apply dark mode
+        if (settings.darkMode) {
+          document.documentElement.classList.add('dark');
+        } else {
+          document.documentElement.classList.remove('dark');
+        }
+      }
+    } catch (error) {
+      console.error('Failed to load user settings:', error);
+    }
+  };
+
+  // Save user settings to API
+  const saveUserSettings = async (updates) => {
+    if (!user) return;
+    
+    try {
+      await authAPI.updateUserSettings(updates);
+      showToast('Settings saved successfully!', 'success');
+    } catch (error) {
+      console.error('Failed to save user settings:', error);
+      showToast('Failed to save settings', 'error');
+    }
+  };
 
   const showToast = (message, type = 'info') => {
     const id = Date.now();
