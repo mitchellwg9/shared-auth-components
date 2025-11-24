@@ -341,23 +341,20 @@ function App() {
             } else {
               document.documentElement.classList.remove('dark');
             }
-            // Save to API
+            // Save to API (silently, no toast)
             await saveUserSettings({ darkMode: newDarkMode });
-            showToast(`Dark mode ${newDarkMode ? 'enabled' : 'disabled'}`, 'success');
           }}
           theme={theme}
           onThemeChange={async (newTheme) => {
             setTheme(newTheme);
-            // Save to API
+            // Save to API (silently, no toast)
             await saveUserSettings({ theme: newTheme });
-            showToast(`Theme changed to ${newTheme}`, 'success');
           }}
           dateFormat={dateFormat}
           onDateFormatChange={async (newFormat) => {
             setDateFormat(newFormat);
-            // Save to API
+            // Save to API (silently, no toast)
             await saveUserSettings({ dateFormat: newFormat });
-            showToast(`Date format changed to ${newFormat}`, 'success');
           }}
         />
       </div>
@@ -470,23 +467,20 @@ function App() {
             } else {
               document.documentElement.classList.remove('dark');
             }
-            // Save to API
+            // Save to API (silently, no toast)
             await saveUserSettings({ darkMode: newDarkMode });
-            showToast(`Dark mode ${newDarkMode ? 'enabled' : 'disabled'}`, 'success');
           }}
           theme={theme}
           onThemeChange={async (newTheme) => {
             setTheme(newTheme);
-            // Save to API
+            // Save to API (silently, no toast)
             await saveUserSettings({ theme: newTheme });
-            showToast(`Theme changed to ${newTheme}`, 'success');
           }}
           dateFormat={dateFormat}
           onDateFormatChange={async (newFormat) => {
             setDateFormat(newFormat);
-            // Save to API
+            // Save to API (silently, no toast)
             await saveUserSettings({ dateFormat: newFormat });
-            showToast(`Date format changed to ${newFormat}`, 'success');
           }}
         />
       )}
