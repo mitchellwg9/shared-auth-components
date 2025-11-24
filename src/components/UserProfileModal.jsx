@@ -392,9 +392,9 @@ export function UserProfileModal({
     <>
       {/* Main Profile Modal */}
       <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50 overflow-y-auto">
-        <div className={`rounded-lg max-w-2xl w-full mx-auto my-4 shadow-xl flex flex-col ${darkMode ? 'bg-gray-700' : 'bg-white'}`} style={{ maxWidth: '42rem', width: 'calc(100% - 2rem)', maxHeight: '90vh' }}>
+        <div className={`rounded-lg max-w-2xl w-full mx-auto my-4 shadow-2xl border-2 flex flex-col ${darkMode ? 'bg-gray-500 border-gray-400' : 'bg-white border-gray-200'}`} style={{ maxWidth: '42rem', width: 'calc(100% - 2rem)', maxHeight: '90vh' }}>
           {/* Header - Fixed at top */}
-          <div className={`flex-shrink-0 border-b px-6 py-4 flex items-center justify-between rounded-t-lg ${darkMode ? 'bg-gray-700 border-gray-600' : 'bg-white border-gray-200'}`}>
+          <div className={`flex-shrink-0 border-b px-6 py-4 flex items-center justify-between rounded-t-lg ${darkMode ? 'bg-gray-500 border-gray-400' : 'bg-white border-gray-200'}`}>
             <div className="flex items-center gap-3">
               <div 
                 className="w-10 h-10 rounded-lg flex items-center justify-center"
@@ -651,7 +651,7 @@ export function UserProfileModal({
           </div>
           
           {/* Footer - Fixed at bottom */}
-          <div className={`flex-shrink-0 border-t px-6 py-4 ${darkMode ? 'bg-gray-700 border-gray-600' : 'bg-white border-gray-200'}`}>
+          <div className={`flex-shrink-0 border-t px-6 py-4 ${darkMode ? 'bg-gray-500 border-gray-400' : 'bg-white border-gray-200'}`}>
             <div className="flex gap-2">
                 <button
                   onClick={async () => {

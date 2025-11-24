@@ -206,9 +206,9 @@ export function UserSettingsModal({
 
   return (
       <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
-        <div className={`rounded-lg max-w-2xl w-full mx-auto max-h-[85vh] overflow-y-auto shadow-xl ${localDarkMode ? 'bg-gray-700' : 'bg-white'}`} style={{ maxWidth: '42rem', width: 'calc(100% - 2rem)' }}>
+        <div className={`rounded-lg max-w-2xl w-full mx-auto max-h-[85vh] overflow-y-auto shadow-2xl border-2 ${localDarkMode ? 'bg-gray-500 border-gray-400' : 'bg-white border-gray-200'}`} style={{ maxWidth: '42rem', width: 'calc(100% - 2rem)' }}>
         {/* Header */}
-        <div className={`sticky top-0 border-b px-6 py-4 flex items-center justify-between ${localDarkMode ? 'bg-gray-700 border-gray-600' : 'bg-white border-gray-200'}`}>
+        <div className={`sticky top-0 border-b px-6 py-4 flex items-center justify-between ${localDarkMode ? 'bg-gray-500 border-gray-400' : 'bg-white border-gray-200'}`}>
           <div className="flex items-center gap-3">
             <div 
               className="w-10 h-10 rounded-lg flex items-center justify-center"
@@ -318,7 +318,7 @@ export function UserSettingsModal({
                     onClick={() => setThemeDropdownOpen(!themeDropdownOpen)}
                     className={`w-full px-3 py-2 border rounded-lg text-sm focus:ring-2 focus:border-transparent flex items-center justify-between ${
                       localDarkMode 
-                        ? 'bg-gray-600 border-gray-500 text-gray-200 focus:ring-blue-500' 
+                        ? 'bg-gray-400 border-gray-300 text-gray-200 focus:ring-blue-500' 
                         : 'bg-white border-gray-300 text-gray-900 focus:ring-blue-500'
                     }`}
                     style={{ '--tw-ring-color': primaryColor }}
@@ -349,7 +349,7 @@ export function UserSettingsModal({
                   {themeDropdownOpen && (
                     <div className={`absolute z-50 w-full mt-1 border rounded-lg shadow-lg ${
                       localDarkMode 
-                        ? 'bg-gray-700 border-gray-600' 
+                        ? 'bg-gray-400 border-gray-300' 
                         : 'bg-white border-gray-300'
                     }`}>
                       {themes.map((themeOption) => {
@@ -457,7 +457,7 @@ export function UserSettingsModal({
                 disabled={isSaving}
                 className={`px-4 py-2 rounded-lg transition-colors disabled:opacity-50 disabled:cursor-not-allowed ${
                   localDarkMode 
-                    ? 'bg-gray-700 text-gray-200 hover:bg-gray-600' 
+                    ? 'bg-gray-400 text-gray-200 hover:bg-gray-500' 
                     : 'bg-gray-200 text-gray-700 hover:bg-gray-300'
                 }`}
               >
