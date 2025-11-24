@@ -168,7 +168,8 @@ export function createAuthAPI(apiBaseUrl) {
       });
     },
 
-    disable2FA: async (password) => {
+    disable2FA: async (password = '') => {
+      // Password is optional (like StickeeBoard) - just disable 2FA directly
       return apiRequest('/auth/two-factor/disable', {
         method: 'POST',
         body: { password },
