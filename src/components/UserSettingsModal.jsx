@@ -240,7 +240,7 @@ export function UserSettingsModal({
             <div 
               className={`flex items-center justify-between p-3 rounded-lg border ${localDarkMode ? 'border-gray-600' : 'border-gray-300'}`}
               style={{
-                backgroundColor: localDarkMode ? '#374151' : '#E5E7EB'
+                backgroundColor: localDarkMode ? '#374151' : '#F3F4F6'
               }}
             >
               <div>
@@ -255,8 +255,8 @@ export function UserSettingsModal({
                 }}
                 className={`relative inline-flex items-center rounded-full transition-colors focus:outline-none focus:ring-2 focus:ring-offset-2 border-2 ${
                   localDarkMode 
-                    ? 'bg-blue-600 border-blue-700 focus:ring-blue-500' 
-                    : 'bg-gray-300 border-gray-400 focus:ring-gray-400'
+                    ? 'focus:ring-blue-500' 
+                    : 'focus:ring-gray-400'
                 }`}
                 style={{ 
                   width: '2.75rem',
@@ -265,7 +265,9 @@ export function UserSettingsModal({
                   minHeight: '1.5rem',
                   display: 'flex',
                   alignItems: 'center',
-                  position: 'relative'
+                  position: 'relative',
+                  backgroundColor: localDarkMode ? '#2563EB' : '#6B7280',
+                  borderColor: localDarkMode ? '#1D4ED8' : '#4B5563'
                 }}
                 aria-label={localDarkMode ? 'Disable dark mode' : 'Enable dark mode'}
               >
@@ -289,7 +291,7 @@ export function UserSettingsModal({
             <div 
               className={`p-3 rounded-lg border ${localDarkMode ? 'border-gray-600' : 'border-gray-300'}`}
               style={{
-                backgroundColor: localDarkMode ? '#374151' : '#E5E7EB'
+                backgroundColor: localDarkMode ? '#374151' : '#F3F4F6'
               }}
             >
               <div className="flex items-center justify-between">
@@ -377,7 +379,7 @@ export function UserSettingsModal({
             <div 
               className={`p-3 rounded-lg border ${localDarkMode ? 'border-gray-600' : 'border-gray-300'}`}
               style={{
-                backgroundColor: localDarkMode ? '#374151' : '#E5E7EB'
+                backgroundColor: localDarkMode ? '#374151' : '#F3F4F6'
               }}
             >
               <div className="flex items-center justify-between">
@@ -411,7 +413,7 @@ export function UserSettingsModal({
                     key={index} 
                     className={`p-3 rounded-lg border ${localDarkMode ? 'border-gray-600' : 'border-gray-300'}`}
                     style={{
-                      backgroundColor: localDarkMode ? '#374151' : '#E5E7EB'
+                      backgroundColor: localDarkMode ? '#374151' : '#F3F4F6'
                     }}
                   >
                     {option.render ? option.render() : (
