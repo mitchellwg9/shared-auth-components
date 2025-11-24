@@ -487,38 +487,44 @@ function handle2FADisable($conn, $method, $userId, $data) {
         sendJSON(['error' => 'Method not allowed'], 405);
     }
     
-    // Verify password before disabling
-    if (empty($data['password'])) {
-        sendJSON(['error' => 'Password required to disable 2FA'], 400);
-    }
-    
-    $password = $data['password'];
-    
-    // Get user password hash
-    $stmt = $conn->prepare("SELECT password FROM users WHERE id = ?");
-    $stmt->bind_param("i", $userId);
-    $stmt->execute();
-    $result = $stmt->get_result();
-    $user = $result->fetch_assoc();
-    
-    if (!$user) {
-        sendJSON(['error' => 'User not found'], 404);
-    }
-    
-    // Verify password
-    if (!password_verify($password, $user['password'])) {
-        sendJSON(['error' => 'Invalid password'], 401);
-    }
-    
-    // Disable 2FA
+    // Password is optional (like StickeeBoard) - just disable 2FA directly
+    // Disable 2FA - set columns to null/0
     $twoFactorEnabled = 0;
-    $stmt = $conn->prepare("UPDATE users SET two_factor_enabled = 0, two_factor_secret = NULL, two_factor_backup_codes = NULL WHERE id = ?");
-    $stmt->bind_param("i", $userId);
     
-    if ($stmt->execute()) {
-        sendJSON(['success' => true, 'message' => '2FA disabled successfully']);
-    } else {
+    error_log("2FA Disable - User ID: $userId");
+    
+    $stmt = $conn->prepare("
+        UPDATE users 
+        SET two_factor_enabled = ?, 
+            two_factor_secret = NULL,
+            two_factor_backup_codes = NULL
+        WHERE id = ?
+    ");
+    
+    if (!$stmt) {
+        error_log("2FA Disable error: Prepare failed: " . $conn->error);
+        sendJSON(['error' => 'Database error'], 500);
+        return;
+    }
+    
+    $stmt->bind_param("is", $twoFactorEnabled, $userId);
+    
+    if (!$stmt->execute()) {
+        error_log("2FA Disable error: Execute failed: " . $stmt->error);
         sendJSON(['error' => 'Failed to disable 2FA'], 500);
+        $stmt->close();
+        return;
+    }
+    
+    $affectedRows = $stmt->affected_rows;
+    $stmt->close();
+    
+    if ($affectedRows === 0) {
+        error_log("2FA Disable warning: No rows updated. User ID might not exist: $userId");
+        sendJSON(['error' => 'User not found or no changes made'], 404);
+    } else {
+        error_log("2FA Disable success - User ID: $userId, Affected rows: $affectedRows");
+        sendJSON(['success' => true, 'message' => '2FA disabled successfully']);
     }
 }
 
