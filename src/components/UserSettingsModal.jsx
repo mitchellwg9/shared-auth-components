@@ -1,6 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Settings, Shield, Eye, EyeOff, X } from 'lucide-react';
-import { TwoFactorVerify } from './TwoFactorVerify';
+import { Settings, X } from 'lucide-react';
 
 /**
  * UserSettingsModal - Shared component for user settings
@@ -17,7 +16,7 @@ export function UserSettingsModal({
   // Appearance settings
   darkMode = false,
   onToggleDarkMode,
-  theme = 'default',
+  theme = 'sapphire',
   onThemeChange,
   dateFormat = 'dd/mm/yyyy',
   onDateFormatChange,
@@ -26,7 +25,7 @@ export function UserSettingsModal({
 }) {
   // Default values if not provided
   const currentDarkMode = darkMode !== undefined ? darkMode : false;
-  const currentTheme = theme || 'default';
+  const currentTheme = theme || 'sapphire';
   const currentDateFormat = dateFormat || 'dd/mm/yyyy';
 
   if (!isOpen) return null;
@@ -125,8 +124,8 @@ export function UserSettingsModal({
   ];
 
   return (
-      <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
-        <div className={`rounded-lg max-w-2xl w-full mx-auto max-h-[85vh] overflow-y-auto shadow-xl ${currentDarkMode ? 'bg-gray-800' : 'bg-white'}`} style={{ maxWidth: '42rem', width: 'calc(100% - 2rem)' }}>
+    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
+      <div className={`rounded-lg max-w-2xl w-full mx-auto max-h-[85vh] overflow-y-auto shadow-xl ${currentDarkMode ? 'bg-gray-800' : 'bg-white'}`} style={{ maxWidth: '42rem', width: 'calc(100% - 2rem)' }}>
         {/* Header */}
         <div className={`sticky top-0 border-b px-6 py-4 flex items-center justify-between ${currentDarkMode ? 'bg-gray-800 border-gray-700' : 'bg-white border-gray-200'}`}>
           <div className="flex items-center gap-3">
@@ -156,117 +155,117 @@ export function UserSettingsModal({
         {/* Content */}
         <div className="p-6">
           <div className="space-y-4">
-            {/* Dark Mode */}
-            <div className={`flex items-center justify-between p-3 ${currentDarkMode ? 'bg-gray-700' : 'bg-gray-50'} rounded-lg`}>
-              <div>
-                <h4 className={`font-medium text-sm ${currentDarkMode ? 'text-gray-200' : 'text-gray-900'}`}>Dark Mode</h4>
-                <p className={`text-xs ${currentDarkMode ? 'text-gray-400' : 'text-gray-500'}`}>Switch between light and dark themes</p>
-              </div>
-              <button
-                onClick={onToggleDarkMode}
-                className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors ${
-                  currentDarkMode ? 'bg-blue-600' : 'bg-gray-200'
-                }`}
-              >
-                <span
-                  className={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform ${
-                    currentDarkMode ? 'translate-x-6' : 'translate-x-1'
-                  }`}
-                />
-              </button>
-            </div>
+            {/* Appearance Section - Copied from StickeeBoard */}
+            <div>
+              <h3 className={`font-semibold mb-2 text-sm flex items-center gap-1 ${currentDarkMode ? 'text-gray-200' : 'text-gray-900'}`}>
+                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z" />
+                </svg>
+                Appearance Settings
+              </h3>
+              <div className="space-y-4">
+                <div className={`flex items-center justify-between p-3 ${currentDarkMode ? 'bg-gray-700' : 'bg-gray-50'} rounded-lg`}>
+                  <div>
+                    <h4 className={`font-medium text-sm ${currentDarkMode ? 'text-gray-200' : 'text-gray-900'}`}>Dark Mode</h4>
+                    <p className={`text-xs ${currentDarkMode ? 'text-gray-400' : 'text-gray-500'}`}>Switch between light and dark themes</p>
+                  </div>
+                  <button
+                    onClick={onToggleDarkMode}
+                    className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors ${
+                      currentDarkMode ? 'bg-blue-600' : 'bg-gray-200'
+                    }`}
+                  >
+                    <span
+                      className={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform ${
+                        currentDarkMode ? 'translate-x-6' : 'translate-x-1'
+                      }`}
+                    />
+                  </button>
+                </div>
 
-            {/* Color Theme */}
-            <div className={`p-3 ${currentDarkMode ? 'bg-gray-700' : 'bg-gray-50'} rounded-lg`}>
-              <div className="mb-3">
-                <h4 className={`font-medium text-sm mb-1 ${currentDarkMode ? 'text-gray-200' : 'text-gray-900'}`}>Color Theme</h4>
-                <p className={`text-xs mb-3 ${currentDarkMode ? 'text-gray-400' : 'text-gray-500'}`}>Choose a color theme for your boards</p>
-                <div className="grid grid-cols-3 gap-2">
-                  {themes.map((themeOption) => {
-                    const isSelected = currentTheme === themeOption.id;
-                    const themeColors = themeOption.colors;
-                    return (
-                      <button
-                        key={themeOption.id}
-                        onClick={() => {
-                          if (onThemeChange) {
-                            onThemeChange(themeOption.id);
-                          }
-                        }}
-                        className={`p-3 rounded-lg border-2 transition-all text-left ${
-                          isSelected 
-                            ? `${currentDarkMode ? 'border-blue-500' : 'border-blue-600'} ring-2 ${currentDarkMode ? 'ring-blue-500/50' : 'ring-blue-600/50'}` 
-                            : `${currentDarkMode ? 'border-gray-600 hover:border-gray-500' : 'border-gray-300 hover:border-gray-400'}`
-                        }`}
-                        style={{
-                          ...(typeof themeColors.column === 'string' && themeColors.column.startsWith('linear-gradient')
-                            ? { background: themeColors.column }
-                            : { backgroundColor: themeColors.column }),
-                          color: themeColors.text,
-                        }}
-                      >
-                        <div className="flex items-center gap-2 mb-2">
-                          <div 
-                            className="w-4 h-4 rounded-full border border-gray-400"
-                            style={
-                              typeof themeColors.background === 'string' && themeColors.background.startsWith('linear-gradient')
-                                ? { background: themeColors.background }
-                                : { backgroundColor: themeColors.background }
-                            }
-                          />
-                          <div 
-                            className="w-4 h-4 rounded-full border border-gray-400"
-                            style={
-                              typeof themeColors.column === 'string' && themeColors.column.startsWith('linear-gradient')
+                <div className={`p-3 ${currentDarkMode ? 'bg-gray-700' : 'bg-gray-50'} rounded-lg`}>
+                  <div className="mb-3">
+                    <h4 className={`font-medium text-sm mb-1 ${currentDarkMode ? 'text-gray-200' : 'text-gray-900'}`}>Color Theme</h4>
+                    <p className={`text-xs mb-3 ${currentDarkMode ? 'text-gray-400' : 'text-gray-500'}`}>Choose a color theme for your boards</p>
+                    <div className="grid grid-cols-3 gap-2">
+                      {themes.map((themeOption) => {
+                        const isSelected = currentTheme === themeOption.id;
+                        const themeColors = themeOption.colors;
+                        return (
+                          <button
+                            key={themeOption.id}
+                            onClick={() => onThemeChange?.(themeOption.id)}
+                            className={`p-3 rounded-lg border-2 transition-all text-left ${
+                              isSelected 
+                                ? `${currentDarkMode ? 'border-blue-500' : 'border-blue-600'} ring-2 ${currentDarkMode ? 'ring-blue-500/50' : 'ring-blue-600/50'}` 
+                                : `${currentDarkMode ? 'border-gray-600 hover:border-gray-500' : 'border-gray-300 hover:border-gray-400'}`
+                            }`}
+                            style={{
+                              ...(typeof themeColors.column === 'string' && themeColors.column.startsWith('linear-gradient')
                                 ? { background: themeColors.column }
-                                : { backgroundColor: themeColors.column }
-                            }
-                          />
-                          <div 
-                            className="w-4 h-4 rounded-full border border-gray-400"
-                            style={
-                              typeof themeColors.taskCard === 'string' && themeColors.taskCard.startsWith('linear-gradient')
-                                ? { background: themeColors.taskCard }
-                                : { backgroundColor: themeColors.taskCard }
-                            }
-                          />
-                        </div>
-                        <div className="text-xs font-medium" style={{ color: themeColors.text }}>
-                          {themeOption.name}
-                        </div>
-                      </button>
-                    );
-                  })}
+                                : { backgroundColor: themeColors.column }),
+                              color: themeColors.text,
+                            }}
+                          >
+                            <div className="flex items-center gap-2 mb-2">
+                              <div 
+                                className="w-4 h-4 rounded-full border border-gray-400"
+                                style={
+                                  typeof themeColors.background === 'string' && themeColors.background.startsWith('linear-gradient')
+                                    ? { background: themeColors.background }
+                                    : { backgroundColor: themeColors.background }
+                                }
+                              />
+                              <div 
+                                className="w-4 h-4 rounded-full border border-gray-400"
+                                style={
+                                  typeof themeColors.column === 'string' && themeColors.column.startsWith('linear-gradient')
+                                    ? { background: themeColors.column }
+                                    : { backgroundColor: themeColors.column }
+                                }
+                              />
+                              <div 
+                                className="w-4 h-4 rounded-full border border-gray-400"
+                                style={
+                                  typeof themeColors.taskCard === 'string' && themeColors.taskCard.startsWith('linear-gradient')
+                                    ? { background: themeColors.taskCard }
+                                    : { backgroundColor: themeColors.taskCard }
+                                }
+                              />
+                            </div>
+                            <div className="text-xs font-medium" style={{ color: themeColors.text }}>
+                              {themeOption.name}
+                            </div>
+                          </button>
+                        );
+                      })}
+                    </div>
+                  </div>
                 </div>
-              </div>
-            </div>
 
-            {/* Date Format */}
-            <div className={`p-3 ${currentDarkMode ? 'bg-gray-700' : 'bg-gray-50'} rounded-lg`}>
-              <div className="flex items-center justify-between">
-                <div>
-                  <h4 className={`font-medium text-sm ${currentDarkMode ? 'text-gray-200' : 'text-gray-900'}`}>Date Format</h4>
-                  <p className={`text-xs ${currentDarkMode ? 'text-gray-400' : 'text-gray-500'}`}>Choose how dates are displayed throughout the app</p>
+                <div className={`p-3 ${currentDarkMode ? 'bg-gray-700' : 'bg-gray-50'} rounded-lg`}>
+                  <div className="flex items-center justify-between">
+                    <div>
+                      <h4 className={`font-medium text-sm ${currentDarkMode ? 'text-gray-200' : 'text-gray-900'}`}>Date Format</h4>
+                      <p className={`text-xs ${currentDarkMode ? 'text-gray-400' : 'text-gray-500'}`}>Choose how dates are displayed throughout the app</p>
+                    </div>
+                    <select
+                      value={currentDateFormat}
+                      onChange={(e) => onDateFormatChange?.(e.target.value)}
+                      className={`px-3 py-2 border rounded-lg text-sm focus:ring-2 focus:border-transparent w-48 ${
+                        currentDarkMode 
+                          ? 'bg-gray-600 border-gray-500 text-gray-200 focus:ring-blue-500' 
+                          : 'bg-white border-gray-300 text-gray-900 focus:ring-blue-500'
+                      }`}
+                      style={{ '--tw-ring-color': primaryColor }}
+                    >
+                      <option value="dd/mm/yyyy">DD/MM/YYYY (25/12/2024)</option>
+                      <option value="mm/dd/yyyy">MM/DD/YYYY (12/25/2024)</option>
+                      <option value="yyyy-mm-dd">YYYY-MM-DD (2024-12-25)</option>
+                      <option value="dd-mmm-yyyy">DD-MMM-YYYY (25-Dec-2024)</option>
+                    </select>
+                  </div>
                 </div>
-                <select
-                  value={currentDateFormat}
-                  onChange={(e) => {
-                    if (onDateFormatChange) {
-                      onDateFormatChange(e.target.value);
-                    }
-                  }}
-                  className={`px-3 py-2 border rounded-lg text-sm focus:ring-2 focus:border-transparent w-48 ${
-                    currentDarkMode 
-                      ? 'bg-gray-600 border-gray-500 text-gray-200 focus:ring-blue-500' 
-                      : 'bg-white border-gray-300 text-gray-900 focus:ring-blue-500'
-                  }`}
-                  style={{ '--tw-ring-color': primaryColor }}
-                >
-                  <option value="dd/mm/yyyy">DD/MM/YYYY (25/12/2024)</option>
-                  <option value="mm/dd/yyyy">MM/DD/YYYY (12/25/2024)</option>
-                  <option value="yyyy-mm-dd">YYYY-MM-DD (2024-12-25)</option>
-                  <option value="dd-mmm-yyyy">DD-MMM-YYYY (25-Dec-2024)</option>
-                </select>
               </div>
             </div>
 
@@ -274,12 +273,12 @@ export function UserSettingsModal({
             {customAppearanceOptions.length > 0 && (
               <div className="space-y-4">
                 {customAppearanceOptions.map((option, index) => (
-                  <div key={index} className={`p-3 ${darkMode ? 'bg-gray-700' : 'bg-gray-50'} rounded-lg`}>
+                  <div key={index} className={`p-3 ${currentDarkMode ? 'bg-gray-700' : 'bg-gray-50'} rounded-lg`}>
                     {option.render ? option.render() : (
                       <div>
-                        <h4 className={`font-medium text-sm ${darkMode ? 'text-gray-200' : 'text-gray-900'}`}>{option.label}</h4>
+                        <h4 className={`font-medium text-sm ${currentDarkMode ? 'text-gray-200' : 'text-gray-900'}`}>{option.label}</h4>
                         {option.description && (
-                          <p className={`text-xs ${darkMode ? 'text-gray-400' : 'text-gray-500'}`}>{option.description}</p>
+                          <p className={`text-xs ${currentDarkMode ? 'text-gray-400' : 'text-gray-500'}`}>{option.description}</p>
                         )}
                       </div>
                     )}
@@ -317,4 +316,3 @@ export function UserSettingsModal({
     </div>
   );
 }
-
