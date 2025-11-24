@@ -163,11 +163,7 @@ export function UserSettingsModal({
                 <p className={`text-xs ${currentDarkMode ? 'text-gray-400' : 'text-gray-500'}`}>Switch between light and dark themes</p>
               </div>
               <button
-                onClick={() => {
-                  if (onToggleDarkMode) {
-                    onToggleDarkMode();
-                  }
-                }}
+                onClick={onToggleDarkMode}
                 className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors ${
                   currentDarkMode ? 'bg-blue-600' : 'bg-gray-200'
                 }`}
