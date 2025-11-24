@@ -14,7 +14,7 @@ export function UserSettingsModal({
   showToast,
   authAPI,
   primaryColor = "#6366f1",
-  // Appearance settings
+  // Appearance settings (initial values)
   darkMode = false,
   onToggleDarkMode,
   theme = 'default',
@@ -24,10 +24,20 @@ export function UserSettingsModal({
   // Custom appearance options (for app-specific customization)
   customAppearanceOptions = []
 }) {
-  // Default values if not provided
-  const currentDarkMode = darkMode !== undefined ? darkMode : false;
-  const currentTheme = theme || 'default';
-  const currentDateFormat = dateFormat || 'dd/mm/yyyy';
+  // Local state for settings (only saved when "Save Settings" is clicked)
+  const [localDarkMode, setLocalDarkMode] = useState(darkMode !== undefined ? darkMode : false);
+  const [localTheme, setLocalTheme] = useState(theme || 'default');
+  const [localDateFormat, setLocalDateFormat] = useState(dateFormat || 'dd/mm/yyyy');
+  const [isSaving, setIsSaving] = useState(false);
+
+  // Update local state when props change (when modal opens with new values)
+  useEffect(() => {
+    if (isOpen) {
+      setLocalDarkMode(darkMode !== undefined ? darkMode : false);
+      setLocalTheme(theme || 'default');
+      setLocalDateFormat(dateFormat || 'dd/mm/yyyy');
+    }
+  }, [isOpen, darkMode, theme, dateFormat]);
 
   if (!isOpen) return null;
 
@@ -43,6 +53,50 @@ export function UserSettingsModal({
 
   const rgb = hexToRgb(primaryColor);
   const primaryColorRgb = rgb ? `${rgb.r}, ${rgb.g}, ${rgb.b}` : '99, 102, 241';
+
+  // Handle save - save all settings to database
+  const handleSave = async () => {
+    if (!authAPI || !authAPI.updateUserSettings) {
+      showToast?.('Error: API not configured', 'error');
+      return;
+    }
+
+    setIsSaving(true);
+    try {
+      // Save to database
+      await authAPI.updateUserSettings({
+        darkMode: localDarkMode,
+        theme: localTheme,
+        dateFormat: localDateFormat
+      });
+
+      // Update parent component state and apply changes
+      if (localDarkMode !== darkMode && onToggleDarkMode) {
+        // Apply dark mode to document immediately
+        if (localDarkMode) {
+          document.documentElement.classList.add('dark');
+        } else {
+          document.documentElement.classList.remove('dark');
+        }
+        // Update parent state
+        onToggleDarkMode();
+      }
+      if (localTheme !== theme && onThemeChange) {
+        onThemeChange(localTheme);
+      }
+      if (localDateFormat !== dateFormat && onDateFormatChange) {
+        onDateFormatChange(localDateFormat);
+      }
+
+      showToast?.('Settings saved successfully!', 'success');
+      onClose();
+    } catch (error) {
+      console.error('Failed to save settings:', error);
+      showToast?.('Failed to save settings. Please try again.', 'error');
+    } finally {
+      setIsSaving(false);
+    }
+  };
 
   const themes = [
     {
@@ -157,46 +211,42 @@ export function UserSettingsModal({
         <div className="p-6">
           <div className="space-y-4">
             {/* Dark Mode */}
-            <div className={`flex items-center justify-between p-3 ${currentDarkMode ? 'bg-gray-700' : 'bg-gray-50'} rounded-lg`}>
+            <div className={`flex items-center justify-between p-3 ${localDarkMode ? 'bg-gray-700' : 'bg-gray-50'} rounded-lg`}>
               <div>
-                <h4 className={`font-medium text-sm ${currentDarkMode ? 'text-gray-200' : 'text-gray-900'}`}>Dark Mode</h4>
-                <p className={`text-xs ${currentDarkMode ? 'text-gray-400' : 'text-gray-500'}`}>Switch between light and dark themes</p>
+                <h4 className={`font-medium text-sm ${localDarkMode ? 'text-gray-200' : 'text-gray-900'}`}>Dark Mode</h4>
+                <p className={`text-xs ${localDarkMode ? 'text-gray-400' : 'text-gray-500'}`}>Switch between light and dark themes</p>
               </div>
               <button
-                onClick={onToggleDarkMode}
+                onClick={() => setLocalDarkMode(!localDarkMode)}
                 className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors ${
-                  currentDarkMode ? 'bg-blue-600' : 'bg-gray-200'
+                  localDarkMode ? 'bg-blue-600' : 'bg-gray-200'
                 }`}
               >
                 <span
                   className={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform ${
-                    currentDarkMode ? 'translate-x-6' : 'translate-x-1'
+                    localDarkMode ? 'translate-x-6' : 'translate-x-1'
                   }`}
                 />
               </button>
             </div>
 
             {/* Color Theme */}
-            <div className={`p-3 ${currentDarkMode ? 'bg-gray-700' : 'bg-gray-50'} rounded-lg`}>
+            <div className={`p-3 ${localDarkMode ? 'bg-gray-700' : 'bg-gray-50'} rounded-lg`}>
               <div className="mb-3">
-                <h4 className={`font-medium text-sm mb-1 ${currentDarkMode ? 'text-gray-200' : 'text-gray-900'}`}>Color Theme</h4>
-                <p className={`text-xs mb-3 ${currentDarkMode ? 'text-gray-400' : 'text-gray-500'}`}>Choose a color theme for your boards</p>
+                <h4 className={`font-medium text-sm mb-1 ${localDarkMode ? 'text-gray-200' : 'text-gray-900'}`}>Color Theme</h4>
+                <p className={`text-xs mb-3 ${localDarkMode ? 'text-gray-400' : 'text-gray-500'}`}>Choose a color theme for your boards</p>
                 <div className="grid grid-cols-3 gap-2">
                   {themes.map((themeOption) => {
-                    const isSelected = currentTheme === themeOption.id;
+                    const isSelected = localTheme === themeOption.id;
                     const themeColors = themeOption.colors;
                     return (
                       <button
                         key={themeOption.id}
-                        onClick={() => {
-                          if (onThemeChange) {
-                            onThemeChange(themeOption.id);
-                          }
-                        }}
+                        onClick={() => setLocalTheme(themeOption.id)}
                         className={`p-3 rounded-lg border-2 transition-all text-left ${
                           isSelected 
-                            ? `${currentDarkMode ? 'border-blue-500' : 'border-blue-600'} ring-2 ${currentDarkMode ? 'ring-blue-500/50' : 'ring-blue-600/50'}` 
-                            : `${currentDarkMode ? 'border-gray-600 hover:border-gray-500' : 'border-gray-300 hover:border-gray-400'}`
+                            ? `${localDarkMode ? 'border-blue-500' : 'border-blue-600'} ring-2 ${localDarkMode ? 'ring-blue-500/50' : 'ring-blue-600/50'}` 
+                            : `${localDarkMode ? 'border-gray-600 hover:border-gray-500' : 'border-gray-300 hover:border-gray-400'}`
                         }`}
                         style={{
                           ...(typeof themeColors.column === 'string' && themeColors.column.startsWith('linear-gradient')
@@ -242,21 +292,17 @@ export function UserSettingsModal({
             </div>
 
             {/* Date Format */}
-            <div className={`p-3 ${currentDarkMode ? 'bg-gray-700' : 'bg-gray-50'} rounded-lg`}>
+            <div className={`p-3 ${localDarkMode ? 'bg-gray-700' : 'bg-gray-50'} rounded-lg`}>
               <div className="flex items-center justify-between">
                 <div>
-                  <h4 className={`font-medium text-sm ${currentDarkMode ? 'text-gray-200' : 'text-gray-900'}`}>Date Format</h4>
-                  <p className={`text-xs ${currentDarkMode ? 'text-gray-400' : 'text-gray-500'}`}>Choose how dates are displayed throughout the app</p>
+                  <h4 className={`font-medium text-sm ${localDarkMode ? 'text-gray-200' : 'text-gray-900'}`}>Date Format</h4>
+                  <p className={`text-xs ${localDarkMode ? 'text-gray-400' : 'text-gray-500'}`}>Choose how dates are displayed throughout the app</p>
                 </div>
                 <select
-                  value={currentDateFormat}
-                  onChange={(e) => {
-                    if (onDateFormatChange) {
-                      onDateFormatChange(e.target.value);
-                    }
-                  }}
+                  value={localDateFormat}
+                  onChange={(e) => setLocalDateFormat(e.target.value)}
                   className={`px-3 py-2 border rounded-lg text-sm focus:ring-2 focus:border-transparent w-48 ${
-                    currentDarkMode 
+                    localDarkMode 
                       ? 'bg-gray-600 border-gray-500 text-gray-200 focus:ring-blue-500' 
                       : 'bg-white border-gray-300 text-gray-900 focus:ring-blue-500'
                   }`}
@@ -274,12 +320,12 @@ export function UserSettingsModal({
             {customAppearanceOptions.length > 0 && (
               <div className="space-y-4">
                 {customAppearanceOptions.map((option, index) => (
-                  <div key={index} className={`p-3 ${darkMode ? 'bg-gray-700' : 'bg-gray-50'} rounded-lg`}>
+                  <div key={index} className={`p-3 ${localDarkMode ? 'bg-gray-700' : 'bg-gray-50'} rounded-lg`}>
                     {option.render ? option.render() : (
                       <div>
-                        <h4 className={`font-medium text-sm ${darkMode ? 'text-gray-200' : 'text-gray-900'}`}>{option.label}</h4>
+                        <h4 className={`font-medium text-sm ${localDarkMode ? 'text-gray-200' : 'text-gray-900'}`}>{option.label}</h4>
                         {option.description && (
-                          <p className={`text-xs ${darkMode ? 'text-gray-400' : 'text-gray-500'}`}>{option.description}</p>
+                          <p className={`text-xs ${localDarkMode ? 'text-gray-400' : 'text-gray-500'}`}>{option.description}</p>
                         )}
                       </div>
                     )}
@@ -289,21 +335,20 @@ export function UserSettingsModal({
             )}
 
             {/* Save Button */}
-            <div className={`flex gap-2 pt-4 border-t ${currentDarkMode ? 'border-gray-700' : 'border-gray-200'}`}>
+            <div className={`flex gap-2 pt-4 border-t ${localDarkMode ? 'border-gray-700' : 'border-gray-200'}`}>
               <button
-                onClick={() => {
-                  showToast?.('Settings saved successfully!', 'success');
-                  onClose();
-                }}
-                className="px-4 py-2 text-white rounded-lg hover:opacity-90 transition-colors font-medium"
+                onClick={handleSave}
+                disabled={isSaving}
+                className="px-4 py-2 text-white rounded-lg hover:opacity-90 transition-colors font-medium disabled:opacity-50 disabled:cursor-not-allowed"
                 style={{ backgroundColor: primaryColor }}
               >
-                Save Settings
+                {isSaving ? 'Saving...' : 'Save Settings'}
               </button>
               <button
                 onClick={onClose}
-                className={`px-4 py-2 rounded-lg transition-colors ${
-                  currentDarkMode 
+                disabled={isSaving}
+                className={`px-4 py-2 rounded-lg transition-colors disabled:opacity-50 disabled:cursor-not-allowed ${
+                  localDarkMode 
                     ? 'bg-gray-700 text-gray-200 hover:bg-gray-600' 
                     : 'bg-gray-200 text-gray-700 hover:bg-gray-300'
                 }`}
