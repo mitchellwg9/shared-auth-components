@@ -1,6 +1,17 @@
 # @wayne/shared-auth
 
-Reusable authentication components with email verification for React applications.
+A comprehensive, reusable authentication and user management component library for React applications. Built with dark mode support, 2FA, organization management, and a complete design system.
+
+## Features
+
+- 🔐 **Authentication**: Login, Signup, Email Verification
+- 🔒 **2FA Support**: TOTP-based two-factor authentication with QR code setup
+- 👤 **User Management**: Profile editing, password change, settings
+- 🎨 **Dark Mode**: Full dark mode support across all components
+- 🏢 **Organization Support**: Multi-tenant with admin features
+- 👑 **System Owner Panel**: Complete admin panel for app creators
+- 📧 **Email Integration**: SMTP support with email templates
+- 🎨 **Design System**: Complete design system based on TymTrackr styling
 
 ## Installation
 
@@ -8,73 +19,63 @@ Reusable authentication components with email verification for React application
 npm install @wayne/shared-auth
 ```
 
-## Demo
-
-A demo application is included in the `demo` folder to test the components.
-
-### Running the Demo
-
-1. Install dependencies:
-```bash
-npm install
-```
-
-2. Start the demo development server:
-```bash
-npm run demo
-```
-
-3. Build the demo for production:
-```bash
-npm run demo:build
-```
-
-The demo connects to `https://data-q.org/api` and demonstrates all authentication features including login, signup, and email verification.
-
 ## Quick Start
 
+### 1. Import Styles
+
 ```javascript
-import { LoginScreen, SignupModal, EmailVerificationPage, createAuthAPI, useAuth } from '@wayne/shared-auth';
+// In your main.jsx or App.jsx
+import '@wayne/shared-auth/styles/base.css';
+```
+
+### 2. Create API Client
+
+```javascript
+import { createAuthAPI } from '@wayne/shared-auth';
+
+const authAPI = createAuthAPI('https://your-api.com/api');
+```
+
+### 3. Use Components
+
+```javascript
+import { 
+  LoginScreen, 
+  SignupModal, 
+  UserProfileDropdown,
+  UserProfileModal,
+  UserSettingsModal
+} from '@wayne/shared-auth';
 
 function App() {
-  const [showLogin, setShowLogin] = useState(true);
-  const [showSignup, setShowSignup] = useState(false);
-
+  const [user, setUser] = useState(null);
+  const [showLogin, setShowLogin] = useState(false);
+  
   return (
     <>
-      {showLogin && (
-        <LoginScreen
-          apiBaseUrl="https://api.yourapp.com"
-          appName="My App"
+      {!user ? (
+        <button onClick={() => setShowLogin(true)}>Login</button>
+      ) : (
+        <UserProfileDropdown
+          currentUser={user}
+          onProfileClick={() => {/* open profile */}}
+          onSettingsClick={() => {/* open settings */}}
+          onLogoutClick={() => setUser(null)}
           primaryColor="#6366f1"
-          onLogin={(user) => {
-            console.log('Logged in:', user);
-            setShowLogin(false);
-          }}
-          onSwitchToSignup={() => {
-            setShowLogin(false);
-            setShowSignup(true);
-          }}
         />
       )}
       
-      {showSignup && (
-        <SignupModal
-          isOpen={showSignup}
-          onClose={() => setShowSignup(false)}
-          apiBaseUrl="https://api.yourapp.com"
-          appName="My App"
-          onSignup={(user) => {
-            console.log('Signed up:', user);
-            setShowSignup(false);
-            setShowLogin(true);
-          }}
-          onSwitchToLogin={() => {
-            setShowSignup(false);
-            setShowLogin(true);
-          }}
-        />
-      )}
+      <LoginScreen
+        isOpen={showLogin}
+        onClose={() => setShowLogin(false)}
+        apiBaseUrl="https://your-api.com/api"
+        appName="My App"
+        primaryColor="#6366f1"
+        onLogin={(userData) => {
+          setUser(userData);
+          setShowLogin(false);
+        }}
+      />
     </>
   );
 }
@@ -82,279 +83,588 @@ function App() {
 
 ## Components
 
-### LoginScreen
+### Authentication Components
 
-A configurable login component that supports email verification and can be used as a modal or full-page component.
+#### LoginScreen
 
-**Props:**
-- `apiBaseUrl` (string, required) - Base URL for your API
-- `appName` (string, default: "App") - App name for branding
-- `primaryColor` (string, default: "#6366f1") - Primary color for buttons
-- `logo` (string, optional) - URL to logo image
-- `isOpen` (boolean, optional) - If provided, renders as modal
-- `onClose` (function, optional) - Callback when modal is closed
-- `onLogin` (function, optional) - Callback when login succeeds (receives user object)
-- `showToast` (function, optional) - Toast notification function
-- `onSwitchToSignup` (function, optional) - Callback to switch to signup
-- `customStyles` (object, optional) - Custom CSS classes
+Login modal/page with 2FA support.
 
-**Example:**
 ```javascript
+import { LoginScreen } from '@wayne/shared-auth';
+
 <LoginScreen
-  apiBaseUrl="https://api.yourapp.com"
+  isOpen={true}
+  onClose={() => {}}
+  apiBaseUrl="https://your-api.com/api"
   appName="My App"
   primaryColor="#6366f1"
-  onLogin={(user) => {
-    // Handle successful login
-    localStorage.setItem('currentUser', JSON.stringify(user));
+  onLogin={(userData) => {
+    console.log('User logged in:', userData);
   }}
-  showToast={(message, type) => {
-    // Show toast notification
-  }}
+  showToast={(message, type) => {}}
+  onSwitchToSignup={() => {}}
 />
 ```
 
-### SignupModal
-
-A configurable user registration modal with form validation.
-
 **Props:**
-- `isOpen` (boolean, required) - Whether the modal is open
-- `onClose` (function, required) - Callback when modal is closed
-- `apiBaseUrl` (string, required) - Base URL for your API
-- `appName` (string, default: "App") - App name for branding
-- `primaryColor` (string, default: "#6366f1") - Primary color for buttons
-- `onSignup` (function, optional) - Callback when signup succeeds
+- `isOpen` (boolean) - Whether the modal is open
+- `onClose` (function) - Callback when modal is closed
+- `apiBaseUrl` (string) - Base URL for your API
+- `appName` (string) - Name of your app
+- `primaryColor` (string) - Primary color hex code (default: "#6366f1")
+- `onLogin` (function) - Callback when login succeeds (receives user object)
 - `showToast` (function, optional) - Toast notification function
-- `onSwitchToLogin` (function, optional) - Callback to switch to login
-- `validatePassword` (function, optional) - Custom password validation function
-- `customStyles` (object, optional) - Custom CSS classes
+- `onSwitchToSignup` (function, optional) - Callback to switch to signup
 
-**Example:**
+#### SignupModal
+
+User registration modal.
+
 ```javascript
+import { SignupModal } from '@wayne/shared-auth';
+
 <SignupModal
-  isOpen={showSignup}
-  onClose={() => setShowSignup(false)}
-  apiBaseUrl="https://api.yourapp.com"
+  isOpen={true}
+  onClose={() => {}}
+  apiBaseUrl="https://your-api.com/api"
   appName="My App"
-  onSignup={(user) => {
-    // Handle successful signup
+  primaryColor="#6366f1"
+  onSignup={(userData) => {
+    console.log('User signed up:', userData);
   }}
+  showToast={(message, type) => {}}
+  onSwitchToLogin={() => {}}
 />
 ```
 
-### EmailVerificationPage
+#### EmailVerificationPage
 
-A page component for handling email verification from verification links.
+Email verification page.
 
-**Props:**
-- `token` (string, required) - Verification token from URL
-- `apiBaseUrl` (string, required) - Base URL for your API
-- `appName` (string, default: "App") - App name for branding
-- `primaryColor` (string, default: "#6366f1") - Primary color for buttons
-- `onVerificationComplete` (function, optional) - Callback when verification completes
-- `showToast` (function, optional) - Toast notification function
-- `customStyles` (object, optional) - Custom CSS classes
-
-**Example:**
 ```javascript
-// Extract token from URL
-const urlParams = new URLSearchParams(window.location.search);
-const token = urlParams.get('token');
+import { EmailVerificationPage } from '@wayne/shared-auth';
 
 <EmailVerificationPage
-  token={token}
-  apiBaseUrl="https://api.yourapp.com"
+  token="verification-token-from-url"
+  apiBaseUrl="https://your-api.com/api"
   appName="My App"
+  primaryColor="#6366f1"
   onVerificationComplete={() => {
-    // Redirect to login
-    window.location.href = '/login';
+    console.log('Email verified!');
   }}
+  showToast={(message, type) => {}}
 />
 ```
 
-## Utilities
+#### TwoFactorVerify
+
+2FA code verification component (used internally by LoginScreen).
+
+### User Profile Components
+
+#### UserProfileDropdown
+
+User menu dropdown that appears when clicking on the logged-in user's name.
+
+```javascript
+import { UserProfileDropdown } from '@wayne/shared-auth';
+
+<UserProfileDropdown
+  currentUser={user}
+  onProfileClick={() => setShowProfileModal(true)}
+  onSettingsClick={() => setShowSettingsModal(true)}
+  onSubscriptionClick={() => {}} // Only shown for org admins
+  onTeamManagementClick={() => {}} // Only shown for org admins
+  onHelpClick={() => {}}
+  onLogoutClick={() => setUser(null)}
+  primaryColor="#6366f1"
+  customItems={[
+    {
+      label: 'Templates',
+      icon: FileText,
+      onClick: () => {},
+      description: 'Manage templates'
+    }
+  ]}
+/>
+```
+
+**Props:**
+- `currentUser` (object) - Current logged-in user object
+- `onProfileClick` (function) - Callback when "Edit Profile" is clicked
+- `onSettingsClick` (function) - Callback when "Settings" is clicked
+- `onSubscriptionClick` (function, optional) - Only shown if `is_organization_admin = true`
+- `onTeamManagementClick` (function, optional) - Only shown if `is_organization_admin = true`
+- `onHelpClick` (function) - Callback when "Help & Support" is clicked
+- `onLogoutClick` (function) - Callback when "Logout" is clicked
+- `primaryColor` (string) - Primary color hex code
+- `customItems` (array, optional) - Array of custom menu items
+
+#### UserProfileModal
+
+Profile editing modal with personal information, password change, and 2FA.
+
+```javascript
+import { UserProfileModal } from '@wayne/shared-auth';
+
+<UserProfileModal
+  isOpen={showProfileModal}
+  onClose={() => setShowProfileModal(false)}
+  currentUser={user}
+  onUserUpdate={(updatedUser) => {
+    setUser(updatedUser);
+  }}
+  showToast={(message, type) => {}}
+  authAPI={authAPI}
+  primaryColor="#6366f1"
+  darkMode={darkMode}
+/>
+```
+
+**Props:**
+- `isOpen` (boolean) - Whether the modal is open
+- `onClose` (function) - Callback when modal is closed
+- `currentUser` (object) - Current user object
+- `onUserUpdate` (function) - Callback when user is updated
+- `showToast` (function, optional) - Toast notification function
+- `authAPI` (object) - Auth API client from `createAuthAPI`
+- `primaryColor` (string) - Primary color hex code
+- `darkMode` (boolean, optional) - Whether dark mode is enabled
+
+#### UserSettingsModal
+
+Settings modal with dark mode, theme colors, and date format.
+
+```javascript
+import { UserSettingsModal } from '@wayne/shared-auth';
+
+<UserSettingsModal
+  isOpen={showSettingsModal}
+  onClose={() => setShowSettingsModal(false)}
+  currentUser={user}
+  onUserUpdate={(updatedUser) => {
+    setUser(updatedUser);
+  }}
+  showToast={(message, type) => {}}
+  authAPI={authAPI}
+  primaryColor="#6366f1"
+  darkMode={darkMode}
+  onToggleDarkMode={() => {
+    setDarkMode(!darkMode);
+    // Apply dark mode to document
+    if (!darkMode) {
+      document.documentElement.classList.add('dark');
+    } else {
+      document.documentElement.classList.remove('dark');
+    }
+  }}
+  theme={theme}
+  onThemeChange={(newTheme) => setTheme(newTheme)}
+  dateFormat={dateFormat}
+  onDateFormatChange={(newFormat) => setDateFormat(newFormat)}
+/>
+```
+
+**Props:**
+- All props from `UserProfileModal` plus:
+- `darkMode` (boolean) - Current dark mode state
+- `onToggleDarkMode` (function) - Callback when dark mode is toggled
+- `theme` (string) - Current theme ID
+- `onThemeChange` (function) - Callback when theme changes
+- `dateFormat` (string) - Current date format
+- `onDateFormatChange` (function) - Callback when date format changes
+
+### System Owner Components
+
+#### SystemOwnerPanel
+
+Complete admin panel for app owners/creators.
+
+```javascript
+import { SystemOwnerPanel, createOwnerAPI } from '@wayne/shared-auth';
+
+const ownerAPI = createOwnerAPI('https://your-api.com/api');
+
+<SystemOwnerPanel
+  currentUser={user}
+  showToast={(message, type) => {}}
+  onLogout={() => setUser(null)}
+  ownerAPI={ownerAPI}
+  appName="My App"
+  primaryColor="#6366f1"
+/>
+```
+
+**Note:** Only shown if `user.is_system_owner === true` or `user.isSystemOwner === true`
+
+## API Clients
 
 ### createAuthAPI
 
-Creates a configured API client for authentication operations.
+Creates an API client for authentication endpoints.
 
 ```javascript
 import { createAuthAPI } from '@wayne/shared-auth';
 
-const authAPI = createAuthAPI('https://api.yourapp.com');
+const authAPI = createAuthAPI('https://your-api.com/api');
 
-// Use the API client
-const response = await authAPI.login(email, password);
-await authAPI.register(userData);
+// Available methods:
+await authAPI.login(email, password);
+await authAPI.register(name, email, password);
 await authAPI.verifyEmail(token);
-await authAPI.resendVerification(email);
+await authAPI.updateProfile(userId, updates);
+await authAPI.changePassword(userId, newPassword, currentPassword);
+await authAPI.getUserSettings();
+await authAPI.updateUserSettings(settings);
+await authAPI.setup2FA(userId);
+await authAPI.verify2FA(userId, code);
+await authAPI.disable2FA(userId);
+await authAPI.get2FAStatus(userId);
 ```
 
-### useAuth
+### createOwnerAPI
 
-A React hook for managing authentication state.
+Creates an API client for system owner endpoints.
 
 ```javascript
-import { useAuth } from '@wayne/shared-auth';
+import { createOwnerAPI } from '@wayne/shared-auth';
 
-function MyComponent() {
-  const { user, isAuthenticated, isLoading, login, logout, register } = useAuth('https://api.yourapp.com');
+const ownerAPI = createOwnerAPI('https://your-api.com/api');
 
-  if (isLoading) return <div>Loading...</div>;
+// Available methods:
+await ownerAPI.getAnalytics();
+await ownerAPI.getOrganizations();
+await ownerAPI.createOrganization(data);
+await ownerAPI.updateOrganization(id, data);
+await ownerAPI.getSubscriptions();
+await ownerAPI.updateSubscription(id, data);
+await ownerAPI.getAllUsers();
+await ownerAPI.updateUser(id, data);
+```
+
+## Design System
+
+### Import Styles
+
+```javascript
+// Option 1: Import base styles (recommended)
+import '@wayne/shared-auth/styles/base.css';
+
+// Option 2: Import design system only
+import '@wayne/shared-auth/styles/design-system.css';
+```
+
+### Use Theme in JavaScript
+
+```javascript
+import { theme } from '@wayne/shared-auth';
+
+const primaryColor = theme.colors.primary[500];
+const spacing = theme.spacing[4];
+```
+
+### CSS Variables
+
+All design tokens are available as CSS custom properties:
+
+```css
+.my-component {
+  background: var(--primary-500);
+  color: var(--gray-900);
+  padding: var(--space-4);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-md);
+}
+```
+
+### Dark Mode
+
+Dark mode is supported via the `.dark` class on the document element:
+
+```javascript
+// Enable dark mode
+document.documentElement.classList.add('dark');
+
+// Disable dark mode
+document.documentElement.classList.remove('dark');
+```
+
+## Database Schema
+
+Your `users` table should include these columns:
+
+```sql
+CREATE TABLE users (
+  id INT PRIMARY KEY AUTO_INCREMENT,
+  name VARCHAR(255),
+  email VARCHAR(255) UNIQUE,
+  password VARCHAR(255), -- Stores password_hash
+  email_verified BOOLEAN DEFAULT FALSE,
+  email_verification_token VARCHAR(255),
+  email_verification_token_expires DATETIME,
   
-  if (!isAuthenticated) {
-    return <button onClick={() => login(email, password)}>Login</button>;
+  -- Organization support
+  organization_id INT,
+  is_organization_admin BOOLEAN DEFAULT FALSE,
+  is_system_owner BOOLEAN DEFAULT FALSE,
+  
+  -- Subscription support
+  plan VARCHAR(50),
+  subscription_status VARCHAR(50),
+  
+  -- 2FA support
+  two_factor_enabled BOOLEAN DEFAULT FALSE,
+  two_factor_secret VARCHAR(255),
+  two_factor_backup_codes TEXT,
+  
+  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+  updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
+);
+
+-- User settings table
+CREATE TABLE user_settings (
+  id INT PRIMARY KEY AUTO_INCREMENT,
+  user_id INT UNIQUE,
+  theme VARCHAR(50) DEFAULT 'default',
+  date_format VARCHAR(20) DEFAULT 'dd/mm/yyyy',
+  dark_mode BOOLEAN DEFAULT FALSE,
+  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+  updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  FOREIGN KEY (user_id) REFERENCES users(id)
+);
+```
+
+## Backend API
+
+The package includes PHP backend files in `backend/php/` that you can deploy to your server:
+
+- `config.php` - Database and SMTP configuration
+- `routes/auth.php` - Authentication routes
+- `routes/twoFactorRoutes.php` - 2FA routes
+- `routes/user-settings.php` - User settings routes
+- `utils/email.php` - Email sending utilities
+- `utils/twoFactorHelper.php` - 2FA helper functions
+
+See `backend/php/README.md` for setup instructions.
+
+## Email Integration
+
+### SMTP Configuration
+
+Configure SMTP in your backend `config.php`:
+
+```php
+define('SMTP_ENABLED', true);
+define('SMTP_HOST', 'mail.yourdomain.com');
+define('SMTP_USER', 'noreply@yourdomain.com');
+define('SMTP_PASS', 'your-password');
+define('SMTP_SECURE', 'ssl'); // 'tls' or 'ssl'
+define('SMTP_PORT', 465);
+define('EMAIL_FROM', 'noreply@yourdomain.com');
+```
+
+### Email Templates
+
+```javascript
+import { 
+  generateVerificationEmail, 
+  generatePasswordResetEmail,
+  generateWelcomeEmail 
+} from '@wayne/shared-auth';
+
+const verificationEmail = generateVerificationEmail({
+  name: 'John Doe',
+  token: 'verification-token',
+  appName: 'My App',
+  appUrl: 'https://myapp.com'
+});
+```
+
+## Customization
+
+### Primary Color
+
+All components accept a `primaryColor` prop:
+
+```javascript
+<LoginScreen
+  primaryColor="#your-color"
+  // ... other props
+/>
+```
+
+### Custom Menu Items
+
+Add custom items to the user dropdown:
+
+```javascript
+import { FileText } from 'lucide-react';
+
+<UserProfileDropdown
+  customItems={[
+    {
+      label: 'Templates',
+      icon: FileText,
+      onClick: () => {},
+      description: 'Manage templates'
+    }
+  ]}
+  // ... other props
+/>
+```
+
+### Theme Colors
+
+Override CSS variables:
+
+```css
+:root {
+  --primary-500: #your-color;
+  --font-sans: 'Your Font', sans-serif;
+}
+```
+
+## Complete Example
+
+```javascript
+import { useState } from 'react';
+import {
+  LoginScreen,
+  SignupModal,
+  UserProfileDropdown,
+  UserProfileModal,
+  UserSettingsModal,
+  createAuthAPI
+} from '@wayne/shared-auth';
+import '@wayne/shared-auth/styles/base.css';
+
+const API_BASE_URL = 'https://your-api.com/api';
+
+function App() {
+  const [user, setUser] = useState(null);
+  const [showLogin, setShowLogin] = useState(false);
+  const [showSignup, setShowSignup] = useState(false);
+  const [showProfileModal, setShowProfileModal] = useState(false);
+  const [showSettingsModal, setShowSettingsModal] = useState(false);
+  const [darkMode, setDarkMode] = useState(false);
+  const [theme, setTheme] = useState('default');
+  const [dateFormat, setDateFormat] = useState('dd/mm/yyyy');
+
+  const authAPI = createAuthAPI(API_BASE_URL);
+
+  const handleLogin = (userData) => {
+    setUser(userData);
+    setShowLogin(false);
+  };
+
+  const handleLogout = () => {
+    setUser(null);
+    document.documentElement.classList.remove('dark');
+  };
+
+  const handleToggleDarkMode = () => {
+    const newDarkMode = !darkMode;
+    setDarkMode(newDarkMode);
+    if (newDarkMode) {
+      document.documentElement.classList.add('dark');
+    } else {
+      document.documentElement.classList.remove('dark');
+    }
+  };
+
+  if (!user) {
+    return (
+      <>
+        <button onClick={() => setShowLogin(true)}>Login</button>
+        <button onClick={() => setShowSignup(true)}>Sign Up</button>
+
+        <LoginScreen
+          isOpen={showLogin}
+          onClose={() => setShowLogin(false)}
+          apiBaseUrl={API_BASE_URL}
+          appName="My App"
+          primaryColor="#6366f1"
+          onLogin={handleLogin}
+          onSwitchToSignup={() => {
+            setShowLogin(false);
+            setShowSignup(true);
+          }}
+        />
+
+        <SignupModal
+          isOpen={showSignup}
+          onClose={() => setShowSignup(false)}
+          apiBaseUrl={API_BASE_URL}
+          appName="My App"
+          primaryColor="#6366f1"
+          onSignup={handleLogin}
+          onSwitchToLogin={() => {
+            setShowSignup(false);
+            setShowLogin(true);
+          }}
+        />
+      </>
+    );
   }
 
   return (
     <div>
-      <p>Welcome, {user.name}!</p>
-      <button onClick={logout}>Logout</button>
+      <header>
+        <h1>My App</h1>
+        <UserProfileDropdown
+          currentUser={user}
+          onProfileClick={() => setShowProfileModal(true)}
+          onSettingsClick={() => setShowSettingsModal(true)}
+          onLogoutClick={handleLogout}
+          primaryColor="#6366f1"
+        />
+      </header>
+
+      <main>
+        {/* Your app content */}
+      </main>
+
+      <UserProfileModal
+        isOpen={showProfileModal}
+        onClose={() => setShowProfileModal(false)}
+        currentUser={user}
+        onUserUpdate={setUser}
+        authAPI={authAPI}
+        primaryColor="#6366f1"
+        darkMode={darkMode}
+      />
+
+      <UserSettingsModal
+        isOpen={showSettingsModal}
+        onClose={() => setShowSettingsModal(false)}
+        currentUser={user}
+        onUserUpdate={setUser}
+        authAPI={authAPI}
+        primaryColor="#6366f1"
+        darkMode={darkMode}
+        onToggleDarkMode={handleToggleDarkMode}
+        theme={theme}
+        onThemeChange={setTheme}
+        dateFormat={dateFormat}
+        onDateFormatChange={setDateFormat}
+      />
     </div>
   );
 }
+
+export default App;
 ```
 
-## API Requirements
+## Peer Dependencies
 
-Your backend API should implement the following endpoints:
-
-### POST /auth/login
-- Request: `{ email: string, password: string }`
-- Success Response: `{ success: true, user: {...} }`
-- Error Response: `{ error: string, error_type?: string }`
-  - `error_type` can be: `email_not_found`, `invalid_password`, `email_not_verified`
-
-### POST /auth/register
-- Request: `{ name: string, email: string, password: string, role?: string }`
-- Success Response: `{ success: true, user: {...} }`
-- Error Response: `{ error: string }`
-
-### GET /auth/verify-email?token={token}
-- Success Response: `{ success: true, already_verified?: boolean, message?: string }`
-- Error Response: `{ error: string }`
-
-### POST /auth/resend-verification
-- Request: `{ email: string }`
-- Success Response: `{ success: true, message?: string }`
-- Error Response: `{ error: string }`
-
-## Backend Support
-
-This package includes both **frontend React components** and **backend utilities** for complete authentication functionality.
-
-### PHP Backend (Recommended for PHP APIs)
-
-If your backend API is PHP, use the shared PHP backend package:
-
-1. Copy the PHP files from `backend/php/` to your API directory
-2. Include them in your auth routes
-3. Configure SMTP settings
-4. Use `handleAuthRoute()` to handle all authentication endpoints
-
-See `backend/php/README.md` for detailed PHP backend documentation.
-
-**Quick PHP Example:**
-```php
-require_once __DIR__ . '/utils/emailTemplates.php';
-require_once __DIR__ . '/utils/smtpClient.php';
-require_once __DIR__ . '/utils/authRoutes.php';
-
-// Configure SMTP
-$smtpConfig = [
-    'host' => 'mail.data-q.org',
-    'port' => 465,
-    'secure' => 'ssl',
-    'auth' => [
-        'user' => 'noreply@data-q.org',
-        'pass' => 'your-password'
-    ],
-    'from' => 'noreply@data-q.org',
-    'fromName' => 'My App'
-];
-
-// Handle auth routes
-handleAuthRoute($conn, $method, $pathParts, $data, [
-    'appUrl' => 'https://data-q.org',
-    'appName' => 'My App',
-    'smtp' => $smtpConfig
-]);
-```
-
-### Node.js Backend
-
-For Node.js backend services, use the JavaScript email templates and SMTP client:
-
-## Email Templates & SMTP
-
-The package includes email template generators and SMTP client utilities for sending authentication emails.
-
-### Email Templates (JavaScript/Node.js)
-
-Generate HTML email templates for verification, password reset, and welcome emails:
-
-```javascript
-import { generateVerificationEmail } from '@wayne/shared-auth';
-
-const html = generateVerificationEmail({
-  appName: 'My App',
-  userName: 'John Doe',
-  verificationUrl: 'https://myapp.com/verify?token=abc123',
-  primaryColor: '#6366f1',
-  logoUrl: 'https://myapp.com/logo.png' // optional
-});
-```
-
-Available templates:
-- `generateVerificationEmail()` - Email verification
-- `generatePasswordResetEmail()` - Password reset
-- `generateWelcomeEmail()` - Welcome email (after verification)
-
-### SMTP Client (Node.js Backend)
-
-For Node.js backend services, use the SMTP client to send emails:
-
-```javascript
-import { createSMTPClient, generateVerificationEmail } from '@wayne/shared-auth';
-
-// Create SMTP client (requires nodemailer: npm install nodemailer)
-const smtp = await createSMTPClient({
-  host: 'mail.example.com',
-  port: 465,
-  secure: true,
-  auth: {
-    user: 'noreply@example.com',
-    pass: 'password'
-  }
-});
-
-// Generate and send email
-const html = generateVerificationEmail({
-  appName: 'My App',
-  userName: 'John Doe',
-  verificationUrl: 'https://myapp.com/verify?token=abc123'
-});
-
-const result = await smtp.sendEmail({
-  to: 'user@example.com',
-  subject: 'Verify Your Email',
-  html: html
-});
-```
-
-See `src/utils/README.md` for detailed documentation.
-
-## Customization
-
-All components support customization through props:
-
-- **Branding**: `appName`, `logo`, `primaryColor`
-- **Styling**: `customStyles` object with CSS classes
-- **Behavior**: Custom validation functions, callbacks
-- **API**: Configurable API base URL
-- **Email**: Customizable email templates with branding
+- `react` ^18.0.0
+- `react-dom` ^18.0.0
+- `lucide-react` ^0.263.0
 
 ## License
 
 MIT
+
+## Support
+
+For issues, questions, or contributions, please see the repository.
