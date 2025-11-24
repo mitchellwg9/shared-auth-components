@@ -52,14 +52,18 @@ function App() {
         const userData = JSON.parse(userStr);
         setUser(userData);
         setShowLogin(false);
-        
-        // Load user settings
-        loadUserSettings();
       }
     } catch (e) {
       console.error('Failed to load user:', e);
     }
   }, []);
+
+  // Load user settings from API when user is available
+  useEffect(() => {
+    if (user) {
+      loadUserSettings();
+    }
+  }, [user]);
 
   // Load user settings from API
   const loadUserSettings = async () => {
@@ -67,6 +71,7 @@ function App() {
     
     try {
       const settings = await authAPI.getUserSettings();
+      console.log('Loaded user settings:', settings);
       if (settings) {
         setDarkMode(settings.darkMode || false);
         setTheme(settings.theme || 'sapphire');
@@ -109,6 +114,7 @@ function App() {
     setUser(userData);
     setShowLogin(false);
     showToast(`Welcome back, ${userData.name || userData.email}!`, 'success');
+    // Settings will be loaded automatically via useEffect when user is set
   };
 
   const handleSignup = (userData) => {
