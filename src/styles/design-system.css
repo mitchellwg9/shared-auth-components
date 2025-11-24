@@ -103,17 +103,17 @@ body {
 }
 
 /* Typography Scale */
-.text-xs { font-size: 0.7rem; line-height: 0.9rem; }
-.text-sm { font-size: 0.8rem; line-height: 1.1rem; }
-.leading-normal { line-height: 1.4; }
+.text-xs { font-size: 0.75rem; line-height: 0.95rem; }
+.text-sm { font-size: 0.85rem; line-height: 1.15rem; }
+.leading-normal { line-height: 1.45; }
 .mt-0\.5 { margin-top: 0.1rem; }
-.text-base { font-size: 0.9rem; line-height: 1.35rem; }
-.text-lg { font-size: 1rem; line-height: 1.55rem; }
-.text-xl { font-size: 1.1rem; line-height: 1.6rem; }
-.text-2xl { font-size: 1.35rem; line-height: 1.8rem; }
-.text-3xl { font-size: 1.7rem; line-height: 2rem; }
-.text-4xl { font-size: 2rem; line-height: 2.25rem; }
-.text-5xl { font-size: 2.7rem; line-height: 1; }
+.text-base { font-size: 0.95rem; line-height: 1.4rem; }
+.text-lg { font-size: 1.05rem; line-height: 1.6rem; }
+.text-xl { font-size: 1.15rem; line-height: 1.65rem; }
+.text-2xl { font-size: 1.4rem; line-height: 1.85rem; }
+.text-3xl { font-size: 1.75rem; line-height: 2.05rem; }
+.text-4xl { font-size: 2.1rem; line-height: 2.3rem; }
+.text-5xl { font-size: 2.8rem; line-height: 1; }
 
 .font-light { font-weight: 300; }
 .font-normal { font-weight: 400; }
@@ -167,7 +167,7 @@ body {
 
 .form-label {
   display: block;
-  font-size: 0.8rem;
+  font-size: 0.85rem;
   font-weight: 500;
   color: var(--gray-700);
   margin-bottom: var(--space-2);
@@ -207,7 +207,7 @@ body {
 
 .form-error {
   margin-top: var(--space-1);
-  font-size: 0.75rem;
+  font-size: 0.8rem;
   color: var(--error-600);
 }
 
@@ -239,7 +239,7 @@ body {
   padding: 0.55rem var(--space-5);
   border-radius: var(--radius-lg);
   font-weight: 500;
-  font-size: 0.8rem;
+  font-size: 0.85rem;
   transition: all var(--transition-fast);
   border: none;
   cursor: pointer;
@@ -300,10 +300,10 @@ body {
   padding: 0.55rem var(--space-3);
   border: 1px solid var(--gray-300);
   border-radius: var(--radius-lg);
-  font-size: 0.8rem;
+  font-size: 0.85rem;
   transition: all var(--transition-fast);
   background: white;
-  line-height: 1.4;
+  line-height: 1.45;
 }
 
 .input:focus {
@@ -347,7 +347,7 @@ body {
   align-items: center;
   padding: var(--space-1) var(--space-2.5);
   border-radius: var(--radius-full);
-  font-size: 0.7rem;
+  font-size: 0.75rem;
   font-weight: 500;
   text-transform: uppercase;
   letter-spacing: 0.05em;
