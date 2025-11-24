@@ -331,6 +331,34 @@ function App() {
           showToast={showToast}
           authAPI={authAPI}
           primaryColor="#6366f1"
+          darkMode={darkMode}
+          onToggleDarkMode={async () => {
+            const newDarkMode = !darkMode;
+            setDarkMode(newDarkMode);
+            // Apply dark mode to document
+            if (newDarkMode) {
+              document.documentElement.classList.add('dark');
+            } else {
+              document.documentElement.classList.remove('dark');
+            }
+            // Save to API
+            await saveUserSettings({ darkMode: newDarkMode });
+            showToast(`Dark mode ${newDarkMode ? 'enabled' : 'disabled'}`, 'success');
+          }}
+          theme={theme}
+          onThemeChange={async (newTheme) => {
+            setTheme(newTheme);
+            // Save to API
+            await saveUserSettings({ theme: newTheme });
+            showToast(`Theme changed to ${newTheme}`, 'success');
+          }}
+          dateFormat={dateFormat}
+          onDateFormatChange={async (newFormat) => {
+            setDateFormat(newFormat);
+            // Save to API
+            await saveUserSettings({ dateFormat: newFormat });
+            showToast(`Date format changed to ${newFormat}`, 'success');
+          }}
         />
       </div>
     );
