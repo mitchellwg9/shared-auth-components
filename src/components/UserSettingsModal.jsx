@@ -239,62 +239,27 @@ export function UserSettingsModal({
 
             {/* Color Theme */}
             <div className={`p-3 ${localDarkMode ? 'bg-gray-700' : 'bg-gray-50'} rounded-lg`}>
-              <div className="mb-3">
-                <h4 className={`font-medium text-sm mb-1 ${localDarkMode ? 'text-gray-200' : 'text-gray-900'}`}>Color Theme</h4>
-                <p className={`text-xs mb-3 ${localDarkMode ? 'text-gray-400' : 'text-gray-500'}`}>Choose a color theme for your boards</p>
-                <div className="grid grid-cols-3 gap-2">
-                  {themes.map((themeOption) => {
-                    const isSelected = localTheme === themeOption.id;
-                    const themeColors = themeOption.colors;
-                    return (
-                      <button
-                        key={themeOption.id}
-                        onClick={() => setLocalTheme(themeOption.id)}
-                        className={`p-3 rounded-lg border-2 transition-all text-left ${
-                          isSelected 
-                            ? `${localDarkMode ? 'border-blue-500' : 'border-blue-600'} ring-2 ${localDarkMode ? 'ring-blue-500/50' : 'ring-blue-600/50'}` 
-                            : `${localDarkMode ? 'border-gray-600 hover:border-gray-500' : 'border-gray-300 hover:border-gray-400'}`
-                        }`}
-                        style={{
-                          ...(typeof themeColors.column === 'string' && themeColors.column.startsWith('linear-gradient')
-                            ? { background: themeColors.column }
-                            : { backgroundColor: themeColors.column }),
-                          color: themeColors.text,
-                        }}
-                      >
-                        <div className="flex items-center gap-2 mb-2">
-                          <div 
-                            className="w-4 h-4 rounded-full border border-gray-400"
-                            style={
-                              typeof themeColors.background === 'string' && themeColors.background.startsWith('linear-gradient')
-                                ? { background: themeColors.background }
-                                : { backgroundColor: themeColors.background }
-                            }
-                          />
-                          <div 
-                            className="w-4 h-4 rounded-full border border-gray-400"
-                            style={
-                              typeof themeColors.column === 'string' && themeColors.column.startsWith('linear-gradient')
-                                ? { background: themeColors.column }
-                                : { backgroundColor: themeColors.column }
-                            }
-                          />
-                          <div 
-                            className="w-4 h-4 rounded-full border border-gray-400"
-                            style={
-                              typeof themeColors.taskCard === 'string' && themeColors.taskCard.startsWith('linear-gradient')
-                                ? { background: themeColors.taskCard }
-                                : { backgroundColor: themeColors.taskCard }
-                            }
-                          />
-                        </div>
-                        <div className="text-xs font-medium" style={{ color: themeColors.text }}>
-                          {themeOption.name}
-                        </div>
-                      </button>
-                    );
-                  })}
+              <div className="flex items-center justify-between">
+                <div>
+                  <h4 className={`font-medium text-sm ${localDarkMode ? 'text-gray-200' : 'text-gray-900'}`}>Color Theme</h4>
+                  <p className={`text-xs ${localDarkMode ? 'text-gray-400' : 'text-gray-500'}`}>Choose a color theme for your boards</p>
                 </div>
+                <select
+                  value={localTheme}
+                  onChange={(e) => setLocalTheme(e.target.value)}
+                  className={`px-3 py-2 border rounded-lg text-sm focus:ring-2 focus:border-transparent w-48 ${
+                    localDarkMode 
+                      ? 'bg-gray-600 border-gray-500 text-gray-200 focus:ring-blue-500' 
+                      : 'bg-white border-gray-300 text-gray-900 focus:ring-blue-500'
+                  }`}
+                  style={{ '--tw-ring-color': primaryColor }}
+                >
+                  {themes.map((themeOption) => (
+                    <option key={themeOption.id} value={themeOption.id}>
+                      {themeOption.name}
+                    </option>
+                  ))}
+                </select>
               </div>
             </div>
 
