@@ -162,21 +162,35 @@ export function UserSettingsModal({
                 <h4 className={`font-medium text-sm ${currentDarkMode ? 'text-gray-200' : 'text-gray-900'}`}>Dark Mode</h4>
                 <p className={`text-xs ${currentDarkMode ? 'text-gray-400' : 'text-gray-500'}`}>Switch between light and dark themes</p>
               </div>
-              <button
-                type="button"
-                onClick={onToggleDarkMode}
-                className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors focus:outline-none focus:ring-2 focus:ring-offset-2 ${
-                  currentDarkMode ? 'bg-blue-600 focus:ring-blue-500' : 'bg-gray-200 focus:ring-gray-400'
-                }`}
-                style={{ minWidth: '2.75rem', minHeight: '1.5rem' }}
-              >
-                <span
-                  className={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform shadow-sm ${
-                    currentDarkMode ? 'translate-x-6' : 'translate-x-1'
+              {onToggleDarkMode ? (
+                <button
+                  type="button"
+                  onClick={onToggleDarkMode}
+                  className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors focus:outline-none focus:ring-2 focus:ring-offset-2 ${
+                    currentDarkMode ? 'bg-blue-600 focus:ring-blue-500' : 'bg-gray-200 focus:ring-gray-400'
                   }`}
-                  style={{ minWidth: '1rem', minHeight: '1rem' }}
-                />
-              </button>
+                  style={{ 
+                    minWidth: '2.75rem', 
+                    minHeight: '1.5rem',
+                    width: '2.75rem',
+                    height: '1.5rem'
+                  }}
+                >
+                  <span
+                    className={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform shadow-sm ${
+                      currentDarkMode ? 'translate-x-6' : 'translate-x-1'
+                    }`}
+                    style={{ 
+                      minWidth: '1rem', 
+                      minHeight: '1rem',
+                      width: '1rem',
+                      height: '1rem'
+                    }}
+                  />
+                </button>
+              ) : (
+                <div className="text-xs text-red-500">onToggleDarkMode not provided</div>
+              )}
             </div>
 
             {/* Color Theme */}
