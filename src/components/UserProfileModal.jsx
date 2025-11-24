@@ -517,122 +517,127 @@ export function UserProfileModal({
 
               {/* 2FA Section */}
               <div className="border-t border-gray-200 pt-6 mt-6">
-                <h4 className="text-sm font-semibold text-gray-900 mb-4 flex items-center gap-2">
-                  <Shield className="w-4 h-4" />
-                  Two-Factor Authentication (2FA)
-                </h4>
+                <div 
+                  className="flex items-center justify-between p-3 rounded-lg border border-gray-300"
+                  style={{ backgroundColor: '#F3F4F6' }}
+                >
+                  <div>
+                    <h4 className="font-medium text-sm text-gray-900 flex items-center gap-2">
+                      <Shield className="w-4 h-4" />
+                      Two-Factor Authentication (2FA)
+                    </h4>
+                    <p className="text-xs text-gray-500 mt-0.5">
+                      {twoFactorEnabled || showQRCode 
+                        ? 'Protect your account with an extra layer of security' 
+                        : 'Enable 2FA to protect your account'}
+                    </p>
+                  </div>
+                  <button
+                    type="button"
+                    onClick={() => {
+                      if (twoFactorEnabled) {
+                        handleDisable2FA();
+                      } else if (!showQRCode) {
+                        generate2FASecret();
+                      }
+                    }}
+                    disabled={loading || !authAPI || showQRCode}
+                    className={`relative inline-flex items-center rounded-full transition-colors focus:outline-none focus:ring-2 focus:ring-offset-2 border-2 ${
+                      (twoFactorEnabled || showQRCode)
+                        ? 'focus:ring-blue-500' 
+                        : 'focus:ring-gray-400'
+                    } ${showQRCode ? 'opacity-50 cursor-not-allowed' : ''}`}
+                    style={{ 
+                      width: '2.75rem',
+                      height: '1.5rem',
+                      minWidth: '2.75rem',
+                      minHeight: '1.5rem',
+                      display: 'flex',
+                      alignItems: 'center',
+                      position: 'relative',
+                      backgroundColor: (twoFactorEnabled || showQRCode) ? '#2563EB' : '#6B7280',
+                      borderColor: (twoFactorEnabled || showQRCode) ? '#1D4ED8' : '#4B5563'
+                    }}
+                    aria-label={twoFactorEnabled ? 'Disable 2FA' : 'Enable 2FA'}
+                  >
+                    <span
+                      className={`inline-block rounded-full bg-white transition-transform shadow-md absolute ${
+                        (twoFactorEnabled || showQRCode) ? 'translate-x-6' : 'translate-x-1'
+                      }`}
+                      style={{ 
+                        width: '1rem',
+                        height: '1rem',
+                        minWidth: '1rem',
+                        minHeight: '1rem',
+                        left: '0.25rem',
+                        border: '1px solid rgba(0, 0, 0, 0.1)'
+                      }}
+                    />
+                  </button>
+                </div>
 
-                {!twoFactorEnabled ? (
-                  <div className="space-y-4">
-                    {!showQRCode ? (
-                      <div className="rounded-lg p-4 border border-gray-200" style={{ backgroundColor: '#F3F4F6' }}>
-                        <div className="flex items-center justify-between">
-                          <div className="flex items-center gap-3">
-                            <Shield className="w-5 h-5 text-gray-600" />
-                            <div>
-                              <p className="text-sm font-medium text-gray-900">2FA is Disabled</p>
-                              <p className="text-xs text-gray-600">Enable 2FA to protect your account</p>
-                            </div>
+                {showQRCode && (
+                  <div className="space-y-4 mt-4">
+                    <div className="rounded-lg p-4 border border-gray-200" style={{ backgroundColor: '#F3F4F6' }}>
+                      <p className="text-sm font-medium text-gray-900 mb-2">
+                        Scan this QR code with your authenticator app:
+                      </p>
+                      <div className="flex justify-center mb-4">
+                        {qrCodeUrl ? (
+                          <img 
+                            src={qrCodeUrl} 
+                            alt="2FA QR Code" 
+                            className="border border-gray-300 rounded max-w-full h-auto"
+                            style={{ maxWidth: '250px', width: '100%' }}
+                            onError={(e) => {
+                              console.error('QR code image failed to load:', qrCodeUrl);
+                              e.target.style.display = 'none';
+                            }}
+                          />
+                        ) : (
+                          <div className="w-[250px] h-[250px] border border-gray-300 rounded flex items-center justify-center" style={{ backgroundColor: '#F3F4F6' }}>
+                            <p className="text-gray-500 text-sm">Loading QR code...</p>
                           </div>
+                        )}
+                      </div>
+                      <p className="text-xs text-gray-600 mb-4">
+                        Use apps like Google Authenticator, Microsoft Authenticator, or Authy
+                      </p>
+                      <div>
+                        <label className="block text-sm font-medium text-gray-700 mb-2">
+                          Enter verification code:
+                        </label>
+                        <div className="flex gap-2">
+                          <input
+                            type="text"
+                            value={verificationCode}
+                            onChange={(e) => setVerificationCode(e.target.value.replace(/\D/g, '').slice(0, 6))}
+                            placeholder="000000"
+                            className="flex-1 px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent text-center text-lg font-mono tracking-widest"
+                            style={{ '--tw-ring-color': primaryColor }}
+                            maxLength={6}
+                          />
                           <button
-                            onClick={generate2FASecret}
-                            disabled={loading || !authAPI}
-                            className="px-4 py-2 text-white rounded-lg hover:opacity-90 transition-colors font-medium disabled:opacity-50 flex items-center gap-2"
+                            onClick={verifyAndEnable2FA}
+                            disabled={verificationCode.length !== 6 || loading}
+                            className="px-4 py-2 text-white rounded-lg hover:opacity-90 transition-colors font-medium disabled:opacity-50"
                             style={{ backgroundColor: primaryColor }}
                           >
-                            <Shield className="w-4 h-4" />
-                            Enable 2FA
+                            {loading ? 'Verifying...' : 'Verify'}
                           </button>
                         </div>
                       </div>
-                    ) : (
-                      <div className="space-y-4">
-                        <div className="rounded-lg p-4 border border-gray-200" style={{ backgroundColor: '#F3F4F6' }}>
-                          <p className="text-sm font-medium text-gray-900 mb-2">
-                            Scan this QR code with your authenticator app:
-                          </p>
-                          <div className="flex justify-center mb-4">
-                            {qrCodeUrl ? (
-                              <img 
-                                src={qrCodeUrl} 
-                                alt="2FA QR Code" 
-                                className="border border-gray-300 rounded max-w-full h-auto"
-                                style={{ maxWidth: '250px', width: '100%' }}
-                                onError={(e) => {
-                                  console.error('QR code image failed to load:', qrCodeUrl);
-                                  e.target.style.display = 'none';
-                                }}
-                              />
-                            ) : (
-                              <div className="w-[250px] h-[250px] border border-gray-300 rounded flex items-center justify-center" style={{ backgroundColor: '#F3F4F6' }}>
-                                <p className="text-gray-500 text-sm">Loading QR code...</p>
-                              </div>
-                            )}
-                          </div>
-                          <p className="text-xs text-gray-600 mb-4">
-                            Use apps like Google Authenticator, Microsoft Authenticator, or Authy
-                          </p>
-                          <div>
-                            <label className="block text-sm font-medium text-gray-700 mb-2">
-                              Enter verification code:
-                            </label>
-                            <div className="flex gap-2">
-                              <input
-                                type="text"
-                                value={verificationCode}
-                                onChange={(e) => setVerificationCode(e.target.value.replace(/\D/g, '').slice(0, 6))}
-                                placeholder="000000"
-                                className="flex-1 px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent text-center text-lg font-mono tracking-widest"
-                                style={{ '--tw-ring-color': primaryColor }}
-                                maxLength={6}
-                              />
-                              <button
-                                onClick={verifyAndEnable2FA}
-                                disabled={verificationCode.length !== 6 || loading}
-                                className="px-4 py-2 text-white rounded-lg hover:opacity-90 transition-colors font-medium disabled:opacity-50"
-                                style={{ backgroundColor: primaryColor }}
-                              >
-                                {loading ? 'Verifying...' : 'Verify'}
-                              </button>
-                            </div>
-                          </div>
-                          <button
-                            onClick={() => {
-                              setShowQRCode(false);
-                              setTwoFactorSecret(null);
-                              setQrCodeUrl('');
-                              setVerificationCode('');
-                            }}
-                            className="mt-2 text-sm text-gray-600 hover:text-gray-900"
-                          >
-                            Cancel
-                          </button>
-                        </div>
-                      </div>
-                    )}
-                  </div>
-                ) : (
-                  <div className="space-y-4">
-                    <div className="bg-green-50 border border-green-200 rounded-lg p-4">
-                      <div className="flex items-center justify-between">
-                        <div className="flex items-center gap-3">
-                          <Shield className="w-5 h-5 text-green-600" />
-                          <div>
-                            <p className="text-sm font-medium text-green-900">2FA is Enabled</p>
-                            <p className="text-xs text-green-700">
-                              Your account is protected with two-factor authentication
-                            </p>
-                          </div>
-                        </div>
-                        <button
-                          onClick={handleDisable2FA}
-                          disabled={loading || !authAPI}
-                          className="px-4 py-2 bg-gray-200 text-gray-700 rounded-lg hover:bg-gray-300 transition-colors font-medium disabled:opacity-50 flex items-center gap-2"
-                        >
-                          <Shield className="w-4 h-4" />
-                          Disable
-                        </button>
-                      </div>
+                      <button
+                        onClick={() => {
+                          setShowQRCode(false);
+                          setTwoFactorSecret(null);
+                          setQrCodeUrl('');
+                          setVerificationCode('');
+                        }}
+                        className="mt-2 text-sm text-gray-600 hover:text-gray-900"
+                      >
+                        Cancel
+                      </button>
                     </div>
                   </div>
                 )}
