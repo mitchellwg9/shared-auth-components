@@ -126,9 +126,9 @@ export function UserSettingsModal({
 
   return (
       <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
-        <div className="bg-white rounded-lg max-w-2xl w-full mx-auto max-h-[85vh] overflow-y-auto shadow-xl" style={{ maxWidth: '42rem', width: 'calc(100% - 2rem)' }}>
+        <div className={`rounded-lg max-w-2xl w-full mx-auto max-h-[85vh] overflow-y-auto shadow-xl ${currentDarkMode ? 'bg-gray-800' : 'bg-white'}`} style={{ maxWidth: '42rem', width: 'calc(100% - 2rem)' }}>
         {/* Header */}
-        <div className="sticky top-0 bg-white border-b border-gray-200 px-6 py-4 flex items-center justify-between">
+        <div className={`sticky top-0 border-b px-6 py-4 flex items-center justify-between ${currentDarkMode ? 'bg-gray-800 border-gray-700' : 'bg-white border-gray-200'}`}>
           <div className="flex items-center gap-3">
             <div 
               className="w-10 h-10 rounded-lg flex items-center justify-center"
@@ -163,15 +163,18 @@ export function UserSettingsModal({
                 <p className={`text-xs ${currentDarkMode ? 'text-gray-400' : 'text-gray-500'}`}>Switch between light and dark themes</p>
               </div>
               <button
+                type="button"
                 onClick={onToggleDarkMode}
-                className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors ${
-                  currentDarkMode ? 'bg-blue-600' : 'bg-gray-200'
+                className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors focus:outline-none focus:ring-2 focus:ring-offset-2 ${
+                  currentDarkMode ? 'bg-blue-600 focus:ring-blue-500' : 'bg-gray-200 focus:ring-gray-400'
                 }`}
+                style={{ minWidth: '2.75rem', minHeight: '1.5rem' }}
               >
                 <span
-                  className={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform ${
+                  className={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform shadow-sm ${
                     currentDarkMode ? 'translate-x-6' : 'translate-x-1'
                   }`}
+                  style={{ minWidth: '1rem', minHeight: '1rem' }}
                 />
               </button>
             </div>
