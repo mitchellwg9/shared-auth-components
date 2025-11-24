@@ -243,15 +243,25 @@ export function UserSettingsModal({
                 <p className={`text-xs ${localDarkMode ? 'text-gray-400' : 'text-gray-500'}`}>Switch between light and dark themes</p>
               </div>
               <button
+                type="button"
                 onClick={() => setLocalDarkMode(!localDarkMode)}
-                className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors ${
-                  localDarkMode ? 'bg-blue-600' : 'bg-gray-200'
+                className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors focus:outline-none focus:ring-2 focus:ring-offset-2 ${
+                  localDarkMode ? 'bg-blue-600 focus:ring-blue-500' : 'bg-gray-200 focus:ring-gray-400'
                 }`}
+                style={{ 
+                  minWidth: '2.75rem',
+                  minHeight: '1.5rem'
+                }}
+                aria-label={localDarkMode ? 'Disable dark mode' : 'Enable dark mode'}
               >
                 <span
-                  className={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform ${
+                  className={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform shadow-sm ${
                     localDarkMode ? 'translate-x-6' : 'translate-x-1'
                   }`}
+                  style={{ 
+                    minWidth: '1rem',
+                    minHeight: '1rem'
+                  }}
                 />
               </button>
             </div>
