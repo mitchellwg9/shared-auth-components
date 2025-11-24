@@ -396,6 +396,8 @@ export function UserProfileModal({
   const rgb = hexToRgb(primaryColor);
   const primaryColorRgb = rgb ? `${rgb.r}, ${rgb.g}, ${rgb.b}` : '99, 102, 241';
 
+  console.log('UserProfileModal render - showDisable2FAModal:', showDisable2FAModal);
+
   return (
     <>
       {/* Disable 2FA Modal */}
@@ -709,7 +711,12 @@ export function UserProfileModal({
                           </div>
                         </div>
                         <button
-                          onClick={() => setShowDisable2FAModal(true)}
+                          onClick={() => {
+                            console.log('Disable 2FA button clicked');
+                            console.log('Current showDisable2FAModal state:', showDisable2FAModal);
+                            setShowDisable2FAModal(true);
+                            console.log('Set showDisable2FAModal to true');
+                          }}
                           disabled={loading || !authAPI}
                           className="px-4 py-2 bg-gray-200 text-gray-700 rounded-lg hover:bg-gray-300 transition-colors font-medium disabled:opacity-50 flex items-center gap-2"
                         >
