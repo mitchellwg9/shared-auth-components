@@ -1,5 +1,5 @@
-import React, { useState, useEffect } from 'react';
-import { Settings, Shield, Eye, EyeOff, X } from 'lucide-react';
+import React, { useState, useEffect, useRef } from 'react';
+import { Settings, Shield, Eye, EyeOff, X, ChevronDown } from 'lucide-react';
 import { TwoFactorVerify } from './TwoFactorVerify';
 
 /**
@@ -29,6 +29,8 @@ export function UserSettingsModal({
   const [localTheme, setLocalTheme] = useState(theme || 'default');
   const [localDateFormat, setLocalDateFormat] = useState(dateFormat || 'dd/mm/yyyy');
   const [isSaving, setIsSaving] = useState(false);
+  const [themeDropdownOpen, setThemeDropdownOpen] = useState(false);
+  const themeDropdownRef = useRef(null);
 
   // Update local state when props change (when modal opens with new values)
   useEffect(() => {
@@ -38,6 +40,23 @@ export function UserSettingsModal({
       setLocalDateFormat(dateFormat || 'dd/mm/yyyy');
     }
   }, [isOpen, darkMode, theme, dateFormat]);
+
+  // Close theme dropdown when clicking outside
+  useEffect(() => {
+    const handleClickOutside = (event) => {
+      if (themeDropdownRef.current && !themeDropdownRef.current.contains(event.target)) {
+        setThemeDropdownOpen(false);
+      }
+    };
+
+    if (themeDropdownOpen) {
+      document.addEventListener('mousedown', handleClickOutside);
+    }
+
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutside);
+    };
+  }, [themeDropdownOpen]);
 
   if (!isOpen) return null;
 
@@ -244,22 +263,73 @@ export function UserSettingsModal({
                   <h4 className={`font-medium text-sm ${localDarkMode ? 'text-gray-200' : 'text-gray-900'}`}>Color Theme</h4>
                   <p className={`text-xs ${localDarkMode ? 'text-gray-400' : 'text-gray-500'}`}>Choose a color theme for your boards</p>
                 </div>
-                <select
-                  value={localTheme}
-                  onChange={(e) => setLocalTheme(e.target.value)}
-                  className={`px-3 py-2 border rounded-lg text-sm focus:ring-2 focus:border-transparent w-48 ${
-                    localDarkMode 
-                      ? 'bg-gray-600 border-gray-500 text-gray-200 focus:ring-blue-500' 
-                      : 'bg-white border-gray-300 text-gray-900 focus:ring-blue-500'
-                  }`}
-                  style={{ '--tw-ring-color': primaryColor }}
-                >
-                  {themes.map((themeOption) => (
-                    <option key={themeOption.id} value={themeOption.id}>
-                      {themeOption.name}
-                    </option>
-                  ))}
-                </select>
+                <div className="relative w-48" ref={themeDropdownRef}>
+                  <button
+                    type="button"
+                    onClick={() => setThemeDropdownOpen(!themeDropdownOpen)}
+                    className={`w-full px-3 py-2 border rounded-lg text-sm focus:ring-2 focus:border-transparent flex items-center justify-between ${
+                      localDarkMode 
+                        ? 'bg-gray-600 border-gray-500 text-gray-200 focus:ring-blue-500' 
+                        : 'bg-white border-gray-300 text-gray-900 focus:ring-blue-500'
+                    }`}
+                    style={{ '--tw-ring-color': primaryColor }}
+                  >
+                    <div className="flex items-center gap-2">
+                      {(() => {
+                        const selectedTheme = themes.find(t => t.id === localTheme);
+                        if (selectedTheme) {
+                          return (
+                            <>
+                              <div 
+                                className="w-4 h-4 rounded border border-gray-400"
+                                style={{ backgroundColor: selectedTheme.colors.column }}
+                              />
+                              <span>{selectedTheme.name}</span>
+                            </>
+                          );
+                        }
+                        return <span>Select theme</span>;
+                      })()}
+                    </div>
+                    <ChevronDown className={`w-4 h-4 transition-transform ${themeDropdownOpen ? 'rotate-180' : ''}`} />
+                  </button>
+                  
+                  {themeDropdownOpen && (
+                    <div className={`absolute z-50 w-full mt-1 border rounded-lg shadow-lg ${
+                      localDarkMode 
+                        ? 'bg-gray-700 border-gray-600' 
+                        : 'bg-white border-gray-300'
+                    }`}>
+                      {themes.map((themeOption) => {
+                        const isSelected = localTheme === themeOption.id;
+                        return (
+                          <button
+                            key={themeOption.id}
+                            type="button"
+                            onClick={() => {
+                              setLocalTheme(themeOption.id);
+                              setThemeDropdownOpen(false);
+                            }}
+                            className={`w-full px-3 py-2 text-left text-sm flex items-center gap-2 hover:bg-opacity-50 transition-colors ${
+                              isSelected
+                                ? localDarkMode ? 'bg-blue-600 bg-opacity-30' : 'bg-blue-50'
+                                : localDarkMode ? 'hover:bg-gray-600' : 'hover:bg-gray-50'
+                            } ${localDarkMode ? 'text-gray-200' : 'text-gray-900'}`}
+                          >
+                            <div 
+                              className="w-4 h-4 rounded border border-gray-400 flex-shrink-0"
+                              style={{ backgroundColor: themeOption.colors.column }}
+                            />
+                            <span>{themeOption.name}</span>
+                            {isSelected && (
+                              <span className="ml-auto text-blue-500">✓</span>
+                            )}
+                          </button>
+                        );
+                      })}
+                    </div>
+                  )}
+                </div>
               </div>
             </div>
 
