@@ -45,10 +45,83 @@ export function UserSettingsModal({
   const primaryColorRgb = rgb ? `${rgb.r}, ${rgb.g}, ${rgb.b}` : '99, 102, 241';
 
   const themes = [
-    { id: 'default', name: 'Default', colors: { primary: '#6366f1', background: '#ffffff', text: '#1f2937' } },
-    { id: 'blue', name: 'Blue', colors: { primary: '#3b82f6', background: '#ffffff', text: '#1f2937' } },
-    { id: 'green', name: 'Green', colors: { primary: '#10b981', background: '#ffffff', text: '#1f2937' } },
-    { id: 'purple', name: 'Purple', colors: { primary: '#8b5cf6', background: '#ffffff', text: '#1f2937' } },
+    {
+      id: 'sapphire',
+      name: 'Sapphire',
+      colors: {
+        background: '#EFF6FF',
+        column: '#DBEAFE',
+        taskCard: '#FFFFFF',
+        text: '#1E3A8A',
+        textSecondary: '#475569',
+      },
+    },
+    {
+      id: 'emerald',
+      name: 'Emerald',
+      colors: {
+        background: '#ECFDF5',
+        column: '#D1FAE5',
+        taskCard: '#FFFFFF',
+        text: '#064E3B',
+        textSecondary: '#475569',
+      },
+    },
+    {
+      id: 'amethyst',
+      name: 'Amethyst',
+      colors: {
+        background: '#F5F3FF',
+        column: '#EDE9FE',
+        taskCard: '#FFFFFF',
+        text: '#4C1D95',
+        textSecondary: '#6B7280',
+      },
+    },
+    {
+      id: 'rose',
+      name: 'Rose',
+      colors: {
+        background: '#FFF1F2',
+        column: '#FEE2E2',
+        taskCard: '#FFFFFF',
+        text: '#881337',
+        textSecondary: '#6B7280',
+      },
+    },
+    {
+      id: 'amber',
+      name: 'Amber',
+      colors: {
+        background: '#FFFBEB',
+        column: '#FEF3C7',
+        taskCard: '#FFFFFF',
+        text: '#78350F',
+        textSecondary: '#6B7280',
+      },
+    },
+    {
+      id: 'cyan',
+      name: 'Cyan',
+      colors: {
+        background: '#ECFEFF',
+        column: '#CFFAFE',
+        taskCard: '#FFFFFF',
+        text: '#164E63',
+        textSecondary: '#475569',
+      },
+    },
+    {
+      id: 'indigo',
+      name: 'Indigo',
+      colors: {
+        background: '#EEF2FF',
+        column: '#E0E7FF',
+        taskCard: '#FFFFFF',
+        text: '#312E81',
+        textSecondary: '#475569',
+      },
+    },
   ];
 
   return (
@@ -64,13 +137,17 @@ export function UserSettingsModal({
               <Settings className="w-5 h-5" style={{ color: primaryColor }} />
             </div>
             <div>
-              <h3 className="text-lg font-bold text-gray-900">Settings</h3>
-              <p className="text-sm text-gray-500">Manage your application settings</p>
+              <h3 className={`text-lg font-bold ${currentDarkMode ? 'text-gray-200' : 'text-gray-900'}`}>Settings</h3>
+              <p className={`text-sm ${currentDarkMode ? 'text-gray-400' : 'text-gray-500'}`}>Manage your application settings</p>
             </div>
           </div>
           <button
             onClick={onClose}
-            className="p-2 text-gray-400 hover:text-gray-600 hover:bg-gray-100 rounded-lg transition-colors"
+            className={`p-2 rounded-lg transition-colors ${
+              currentDarkMode 
+                ? 'text-gray-400 hover:text-gray-200 hover:bg-gray-700' 
+                : 'text-gray-400 hover:text-gray-600 hover:bg-gray-100'
+            }`}
           >
             <X className="w-5 h-5" />
           </button>
@@ -104,13 +181,14 @@ export function UserSettingsModal({
             </div>
 
             {/* Color Theme */}
-            <div className="p-3 bg-gray-50 rounded-lg">
+            <div className={`p-3 ${currentDarkMode ? 'bg-gray-700' : 'bg-gray-50'} rounded-lg`}>
               <div className="mb-3">
-                <h4 className="font-medium text-sm text-gray-900 mb-1">Color Theme</h4>
-                <p className="text-xs text-gray-500 mb-3">Choose a color theme for your app</p>
+                <h4 className={`font-medium text-sm mb-1 ${currentDarkMode ? 'text-gray-200' : 'text-gray-900'}`}>Color Theme</h4>
+                <p className={`text-xs mb-3 ${currentDarkMode ? 'text-gray-400' : 'text-gray-500'}`}>Choose a color theme for your boards</p>
                 <div className="grid grid-cols-3 gap-2">
                   {themes.map((themeOption) => {
                     const isSelected = currentTheme === themeOption.id;
+                    const themeColors = themeOption.colors;
                     return (
                       <button
                         key={themeOption.id}
@@ -121,20 +199,43 @@ export function UserSettingsModal({
                         }}
                         className={`p-3 rounded-lg border-2 transition-all text-left ${
                           isSelected 
-                            ? 'border-blue-600 ring-2 ring-blue-600/50' 
-                            : 'border-gray-300 hover:border-gray-400'
+                            ? `${currentDarkMode ? 'border-blue-500' : 'border-blue-600'} ring-2 ${currentDarkMode ? 'ring-blue-500/50' : 'ring-blue-600/50'}` 
+                            : `${currentDarkMode ? 'border-gray-600 hover:border-gray-500' : 'border-gray-300 hover:border-gray-400'}`
                         }`}
                         style={{
-                          backgroundColor: themeOption.colors.background,
+                          ...(typeof themeColors.column === 'string' && themeColors.column.startsWith('linear-gradient')
+                            ? { background: themeColors.column }
+                            : { backgroundColor: themeColors.column }),
+                          color: themeColors.text,
                         }}
                       >
                         <div className="flex items-center gap-2 mb-2">
                           <div 
                             className="w-4 h-4 rounded-full border border-gray-400"
-                            style={{ backgroundColor: themeOption.colors.primary }}
+                            style={
+                              typeof themeColors.background === 'string' && themeColors.background.startsWith('linear-gradient')
+                                ? { background: themeColors.background }
+                                : { backgroundColor: themeColors.background }
+                            }
+                          />
+                          <div 
+                            className="w-4 h-4 rounded-full border border-gray-400"
+                            style={
+                              typeof themeColors.column === 'string' && themeColors.column.startsWith('linear-gradient')
+                                ? { background: themeColors.column }
+                                : { backgroundColor: themeColors.column }
+                            }
+                          />
+                          <div 
+                            className="w-4 h-4 rounded-full border border-gray-400"
+                            style={
+                              typeof themeColors.taskCard === 'string' && themeColors.taskCard.startsWith('linear-gradient')
+                                ? { background: themeColors.taskCard }
+                                : { backgroundColor: themeColors.taskCard }
+                            }
                           />
                         </div>
-                        <div className="text-xs font-medium" style={{ color: themeOption.colors.text }}>
+                        <div className="text-xs font-medium" style={{ color: themeColors.text }}>
                           {themeOption.name}
                         </div>
                       </button>
@@ -145,11 +246,11 @@ export function UserSettingsModal({
             </div>
 
             {/* Date Format */}
-            <div className="p-3 bg-gray-50 rounded-lg">
+            <div className={`p-3 ${currentDarkMode ? 'bg-gray-700' : 'bg-gray-50'} rounded-lg`}>
               <div className="flex items-center justify-between">
                 <div>
-                  <h4 className="font-medium text-sm text-gray-900">Date Format</h4>
-                  <p className="text-xs text-gray-500">Choose how dates are displayed throughout the app</p>
+                  <h4 className={`font-medium text-sm ${currentDarkMode ? 'text-gray-200' : 'text-gray-900'}`}>Date Format</h4>
+                  <p className={`text-xs ${currentDarkMode ? 'text-gray-400' : 'text-gray-500'}`}>Choose how dates are displayed throughout the app</p>
                 </div>
                 <select
                   value={currentDateFormat}
@@ -158,7 +259,11 @@ export function UserSettingsModal({
                       onDateFormatChange(e.target.value);
                     }
                   }}
-                  className="px-3 py-2 border border-gray-300 rounded-lg text-sm bg-white text-gray-900 focus:ring-2 focus:ring-blue-500 focus:border-transparent w-48"
+                  className={`px-3 py-2 border rounded-lg text-sm focus:ring-2 focus:border-transparent w-48 ${
+                    currentDarkMode 
+                      ? 'bg-gray-600 border-gray-500 text-gray-200 focus:ring-blue-500' 
+                      : 'bg-white border-gray-300 text-gray-900 focus:ring-blue-500'
+                  }`}
                   style={{ '--tw-ring-color': primaryColor }}
                 >
                   <option value="dd/mm/yyyy">DD/MM/YYYY (25/12/2024)</option>
@@ -188,7 +293,7 @@ export function UserSettingsModal({
             )}
 
             {/* Save Button */}
-            <div className="flex gap-2 pt-4 border-t border-gray-200">
+            <div className={`flex gap-2 pt-4 border-t ${currentDarkMode ? 'border-gray-700' : 'border-gray-200'}`}>
               <button
                 onClick={() => {
                   showToast?.('Settings saved successfully!', 'success');
@@ -201,7 +306,11 @@ export function UserSettingsModal({
               </button>
               <button
                 onClick={onClose}
-                className="px-4 py-2 bg-gray-200 text-gray-700 rounded-lg hover:bg-gray-300 transition-colors"
+                className={`px-4 py-2 rounded-lg transition-colors ${
+                  currentDarkMode 
+                    ? 'bg-gray-700 text-gray-200 hover:bg-gray-600' 
+                    : 'bg-gray-200 text-gray-700 hover:bg-gray-300'
+                }`}
               >
                 Cancel
               </button>
