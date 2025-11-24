@@ -782,6 +782,67 @@ body {
   border-color: var(--gray-500);
 }
 
+/* Dark mode overrides for Tailwind utility classes used in the app */
+.dark .bg-gradient-to-br {
+  background: linear-gradient(to bottom right, var(--gray-800) 0%, var(--gray-900) 100%) !important;
+}
+
+.dark .from-slate-50,
+.dark .via-blue-50,
+.dark .to-indigo-50 {
+  background-color: transparent !important;
+}
+
+.dark .bg-white {
+  background-color: var(--gray-800) !important;
+}
+
+.dark .bg-gray-50 {
+  background-color: var(--gray-700) !important;
+}
+
+.dark .bg-purple-50 {
+  background-color: var(--gray-700) !important;
+}
+
+.dark .bg-gradient-to-r.from-blue-600.to-indigo-600 {
+  background: linear-gradient(to right, var(--primary-600) 0%, var(--accent-indigo) 100%) !important;
+}
+
+.dark .border-gray-200 {
+  border-color: var(--gray-700) !important;
+}
+
+.dark .border-purple-200 {
+  border-color: var(--gray-600) !important;
+}
+
+.dark .text-gray-500 {
+  color: var(--gray-400) !important;
+}
+
+.dark .text-gray-600 {
+  color: var(--gray-300) !important;
+}
+
+.dark .text-gray-900 {
+  color: var(--gray-50) !important;
+}
+
+.dark .text-blue-600 {
+  color: var(--primary-400) !important;
+}
+
+.dark .text-purple-600,
+.dark .text-purple-700,
+.dark .text-purple-900 {
+  color: var(--accent-purple) !important;
+}
+
+.dark .text-blue-100 {
+  color: var(--primary-200) !important;
+}
+
 /* System preference fallback */
 @media (prefers-color-scheme: dark) {
   :root:not(.light) {
