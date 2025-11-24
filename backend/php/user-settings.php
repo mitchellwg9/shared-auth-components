@@ -140,7 +140,7 @@ try {
         
         $theme = isset($data['theme']) ? $data['theme'] : null;
         $dateFormat = isset($data['dateFormat']) ? $data['dateFormat'] : null;
-        $darkMode = isset($data['darkMode']) !== null ? ($data['darkMode'] ? 1 : 0) : null;
+        $darkMode = isset($data['darkMode']) ? ($data['darkMode'] ? 1 : 0) : null;
 
         // Build update query
         $updates = [];
@@ -213,6 +213,7 @@ try {
 
         $stmt = $conn->prepare($sql);
         if (!$stmt) {
+            error_log("User Settings Prepare Error: " . $conn->error);
             ob_clean();
             http_response_code(500);
             echo json_encode(['error' => 'Database prepare failed: ' . $conn->error]);
@@ -222,19 +223,29 @@ try {
         // Bind all parameters for INSERT and UPDATE
         $allParams = array_merge($insertParams, $params);
         $allTypes = $insertTypes . $types;
+        
+        error_log("User Settings Bind Types: $allTypes");
+        error_log("User Settings Bind Params Count: " . count($allParams));
+        
         $stmt->bind_param($allTypes, ...$allParams);
         
         if (!$stmt->execute()) {
+            error_log("User Settings Execute Error: " . $stmt->error);
             ob_clean();
             http_response_code(500);
             echo json_encode(['error' => 'Database execute failed: ' . $stmt->error]);
+            $stmt->close();
             exit;
         }
         
+        $affectedRows = $stmt->affected_rows;
         $stmt->close();
+        
+        error_log("User Settings Success - Affected rows: $affectedRows");
+        
         ob_clean();
         http_response_code(200);
-        echo json_encode(['success' => true, 'message' => 'Settings updated successfully']);
+        echo json_encode(['success' => true, 'message' => 'Settings updated successfully', 'affected_rows' => $affectedRows]);
         exit;
     }
 
