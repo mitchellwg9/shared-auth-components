@@ -206,9 +206,9 @@ export function UserSettingsModal({
 
   return (
       <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
-        <div className={`rounded-lg max-w-2xl w-full mx-auto max-h-[85vh] overflow-y-auto shadow-xl ${localDarkMode ? 'bg-gray-800' : 'bg-white'}`} style={{ maxWidth: '42rem', width: 'calc(100% - 2rem)' }}>
+        <div className={`rounded-lg max-w-2xl w-full mx-auto max-h-[85vh] overflow-y-auto shadow-xl ${localDarkMode ? 'bg-gray-700' : 'bg-white'}`} style={{ maxWidth: '42rem', width: 'calc(100% - 2rem)' }}>
         {/* Header */}
-        <div className={`sticky top-0 border-b px-6 py-4 flex items-center justify-between ${localDarkMode ? 'bg-gray-800 border-gray-700' : 'bg-white border-gray-200'}`}>
+        <div className={`sticky top-0 border-b px-6 py-4 flex items-center justify-between ${localDarkMode ? 'bg-gray-700 border-gray-600' : 'bg-white border-gray-200'}`}>
           <div className="flex items-center gap-3">
             <div 
               className="w-10 h-10 rounded-lg flex items-center justify-center"

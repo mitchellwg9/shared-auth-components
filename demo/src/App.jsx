@@ -323,6 +323,7 @@ function App() {
           showToast={showToast}
           authAPI={authAPI}
           primaryColor="#6366f1"
+          darkMode={darkMode}
         />
 
         {/* Settings Modal */}

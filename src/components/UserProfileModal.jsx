@@ -12,7 +12,8 @@ export function UserProfileModal({
   onUserUpdate,
   showToast,
   authAPI,
-  primaryColor = "#6366f1"
+  primaryColor = "#6366f1",
+  darkMode = false
 }) {
   const [formData, setFormData] = useState({
     name: '',
@@ -391,9 +392,9 @@ export function UserProfileModal({
     <>
       {/* Main Profile Modal */}
       <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50 overflow-y-auto">
-        <div className="bg-white rounded-lg max-w-2xl w-full mx-auto my-4 shadow-xl flex flex-col" style={{ maxWidth: '42rem', width: 'calc(100% - 2rem)', maxHeight: '90vh' }}>
+        <div className={`rounded-lg max-w-2xl w-full mx-auto my-4 shadow-xl flex flex-col ${darkMode ? 'bg-gray-700' : 'bg-white'}`} style={{ maxWidth: '42rem', width: 'calc(100% - 2rem)', maxHeight: '90vh' }}>
           {/* Header - Fixed at top */}
-          <div className="flex-shrink-0 bg-white border-b border-gray-200 px-6 py-4 flex items-center justify-between rounded-t-lg">
+          <div className={`flex-shrink-0 border-b px-6 py-4 flex items-center justify-between rounded-t-lg ${darkMode ? 'bg-gray-700 border-gray-600' : 'bg-white border-gray-200'}`}>
             <div className="flex items-center gap-3">
               <div 
                 className="w-10 h-10 rounded-lg flex items-center justify-center"
@@ -402,13 +403,17 @@ export function UserProfileModal({
                 <User className="w-5 h-5" style={{ color: primaryColor }} />
               </div>
               <div>
-                <h3 className="text-base font-semibold text-gray-900">My Profile</h3>
-                <p className="text-xs text-gray-500">Manage your account settings</p>
+                <h3 className={`text-base font-semibold ${darkMode ? 'text-gray-200' : 'text-gray-900'}`}>My Profile</h3>
+                <p className={`text-xs ${darkMode ? 'text-gray-400' : 'text-gray-500'}`}>Manage your account settings</p>
               </div>
             </div>
             <button
               onClick={onClose}
-              className="p-2 text-gray-400 hover:text-gray-600 hover:bg-gray-100 rounded-lg transition-colors"
+              className={`p-2 rounded-lg transition-colors ${
+                darkMode 
+                  ? 'text-gray-400 hover:text-gray-200 hover:bg-gray-600' 
+                  : 'text-gray-400 hover:text-gray-600 hover:bg-gray-100'
+              }`}
             >
               <X className="w-5 h-5" />
             </button>
@@ -419,10 +424,10 @@ export function UserProfileModal({
             <div className="space-y-6">
               {/* Personal Information */}
               <div>
-                <h4 className="text-sm font-semibold text-gray-900 mb-4">Personal Information</h4>
+                <h4 className={`text-sm font-semibold mb-4 ${darkMode ? 'text-gray-200' : 'text-gray-900'}`}>Personal Information</h4>
                 <div className="space-y-4">
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-2">Full Name *</label>
+                    <label className={`block text-sm font-medium mb-2 ${darkMode ? 'text-gray-300' : 'text-gray-700'}`}>Full Name *</label>
                     <input
                       type="text"
                       value={formData.name}
@@ -433,22 +438,22 @@ export function UserProfileModal({
                     />
                   </div>
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-2">Email</label>
+                    <label className={`block text-sm font-medium mb-2 ${darkMode ? 'text-gray-300' : 'text-gray-700'}`}>Email</label>
                     <input
                       type="email"
                       value={formData.email}
                       onChange={(e) => setFormData({ ...formData, email: e.target.value })}
-                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent bg-gray-50"
+                      className={`w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent ${darkMode ? 'bg-gray-600 border-gray-500 text-gray-200' : 'bg-gray-50 border-gray-300'}`}
                       style={{ '--tw-ring-color': primaryColor }}
                       placeholder="Enter your email"
                       disabled
                     />
-                    <p className="text-xs text-gray-500 mt-1">Email cannot be changed</p>
+                    <p className={`text-xs mt-1 ${darkMode ? 'text-gray-400' : 'text-gray-500'}`}>Email cannot be changed</p>
                   </div>
                   
                   {/* Password Change - Inline */}
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-2">New Password</label>
+                    <label className={`block text-sm font-medium mb-2 ${darkMode ? 'text-gray-300' : 'text-gray-700'}`}>New Password</label>
                     <div className="relative">
                       <input
                         type={showNewPassword ? 'text' : 'password'}
@@ -646,7 +651,7 @@ export function UserProfileModal({
           </div>
           
           {/* Footer - Fixed at bottom */}
-          <div className="flex-shrink-0 border-t border-gray-200 px-6 py-4 bg-white">
+          <div className={`flex-shrink-0 border-t px-6 py-4 ${darkMode ? 'bg-gray-700 border-gray-600' : 'bg-white border-gray-200'}`}>
             <div className="flex gap-2">
                 <button
                   onClick={async () => {
