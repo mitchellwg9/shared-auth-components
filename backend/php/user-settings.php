@@ -72,22 +72,32 @@ try {
 
     // Create table if it doesn't exist
     try {
-        $createTableSQL = "CREATE TABLE IF NOT EXISTS user_settings (
-            id INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
-            user_id INT UNSIGNED NOT NULL,
-            theme VARCHAR(50) DEFAULT 'sapphire',
-            date_format VARCHAR(20) DEFAULT 'dd/mm/yyyy',
-            dark_mode TINYINT(1) DEFAULT 0,
-            created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
-            updated_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-            UNIQUE KEY unique_user_settings (user_id),
-            INDEX idx_user_settings_user (user_id)
-        ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci";
-        
-        $conn->query($createTableSQL);
+        // Check if table exists first
+        $checkTable = $conn->query("SHOW TABLES LIKE 'user_settings'");
+        if ($checkTable->num_rows == 0) {
+            $createTableSQL = "CREATE TABLE user_settings (
+                id INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+                user_id INT UNSIGNED NOT NULL,
+                theme VARCHAR(50) DEFAULT 'sapphire',
+                date_format VARCHAR(20) DEFAULT 'dd/mm/yyyy',
+                dark_mode TINYINT(1) DEFAULT 0,
+                created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+                updated_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+                UNIQUE KEY unique_user_settings (user_id),
+                INDEX idx_user_settings_user (user_id)
+            ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci";
+            
+            if (!$conn->query($createTableSQL)) {
+                error_log("Failed to create user_settings table: " . $conn->error);
+            } else {
+                error_log("Successfully created user_settings table");
+            }
+        }
     } catch (Exception $e) {
-        error_log("Failed to create user_settings table: " . $e->getMessage());
+        error_log("Error checking/creating user_settings table: " . $e->getMessage());
         // Continue anyway - table might already exist
+    } catch (Error $e) {
+        error_log("Fatal error checking/creating user_settings table: " . $e->getMessage());
     }
 
     if ($method === 'GET') {
@@ -125,9 +135,12 @@ try {
         // Update user settings
         $data = getRequestData();
         
+        error_log("User Settings PUT - User ID: $userId");
+        error_log("User Settings PUT - Data: " . json_encode($data));
+        
         $theme = isset($data['theme']) ? $data['theme'] : null;
         $dateFormat = isset($data['dateFormat']) ? $data['dateFormat'] : null;
-        $darkMode = isset($data['darkMode']) ? ($data['darkMode'] ? 1 : 0) : null;
+        $darkMode = isset($data['darkMode']) !== null ? ($data['darkMode'] ? 1 : 0) : null;
 
         // Build update query
         $updates = [];
