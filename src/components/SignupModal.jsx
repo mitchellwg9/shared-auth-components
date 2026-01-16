@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { X, User, Mail, Lock, Eye, EyeOff } from 'lucide-react';
 import { createAuthAPI } from '../utils/authAPI';
 
@@ -48,6 +48,22 @@ export function SignupModal({
     }
     return createAuthAPI(apiBaseUrl);
   }, [apiBaseUrl]);
+
+  // Reset form when modal opens
+  useEffect(() => {
+    if (isOpen) {
+      // Reset form when modal opens
+      setFormData({
+        name: '',
+        email: '',
+        password: '',
+        confirmPassword: ''
+      });
+      setErrors({});
+      setShowPassword(false);
+      setShowConfirmPassword(false);
+    }
+  }, [isOpen]);
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -152,6 +168,8 @@ export function SignupModal({
           confirmPassword: ''
         });
         setErrors({});
+        setShowPassword(false);
+        setShowConfirmPassword(false);
         
         // Call onSignup callback if provided
         if (onSignup) {
