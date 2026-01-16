@@ -131,10 +131,9 @@ export function SignupModal({
                          errorMessage.toLowerCase().includes('already exists');
     
     if (isEmailExists) {
-      // Set error on email field
+      // Set error on email field only (no submit error to avoid duplicate)
       setErrors({
-        email: 'This email is already registered. Please use a different email or sign in instead.',
-        submit: 'This email is already registered. Please use a different email or sign in instead.'
+        email: 'This email is already registered. Please use a different email or sign in instead.'
       });
       // Show toast message
       if (showToast) {
