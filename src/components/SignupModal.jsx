@@ -124,6 +124,31 @@ export function SignupModal({
     return Object.keys(newErrors).length === 0;
   };
 
+  // Helper function to handle registration errors
+  const handleRegistrationError = (errorMessage) => {
+    const isEmailExists = errorMessage.toLowerCase().includes('email already exists') || 
+                         errorMessage.toLowerCase().includes('already registered') ||
+                         errorMessage.toLowerCase().includes('already exists');
+    
+    if (isEmailExists) {
+      // Set error on email field
+      setErrors({
+        email: 'This email is already registered. Please use a different email or sign in instead.',
+        submit: 'This email is already registered. Please use a different email or sign in instead.'
+      });
+      // Show toast message
+      if (showToast) {
+        showToast('This email is already registered. Please use a different email or sign in instead.', 'error');
+      }
+    } else {
+      // Other errors
+      setErrors({ submit: errorMessage });
+      if (showToast) {
+        showToast(errorMessage, 'error');
+      }
+    }
+  };
+
   const handleSubmit = async (e) => {
     e.preventDefault();
     
@@ -182,17 +207,11 @@ export function SignupModal({
         }
       } else {
         const errorMsg = response.error || 'Failed to create account. Please try again.';
-        setErrors({ submit: errorMsg });
-        if (showToast) {
-          showToast(errorMsg, 'error');
-        }
+        handleRegistrationError(errorMsg);
       }
     } catch (error) {
       const errorMsg = error.message || error.details?.error || 'Failed to create account. Please try again.';
-      setErrors({ submit: errorMsg });
-      if (showToast) {
-        showToast(errorMsg, 'error');
-      }
+      handleRegistrationError(errorMsg);
     } finally {
       setIsLoading(false);
     }
