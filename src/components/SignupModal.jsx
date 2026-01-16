@@ -67,8 +67,15 @@ export function SignupModal({
   const validate = () => {
     const newErrors = {};
 
-    if (!formData.name.trim()) {
+    const trimmedName = formData.name.trim();
+    if (!trimmedName) {
       newErrors.name = 'Name is required';
+    } else {
+      // Validate full name: at least 2 characters, a space, then at least 2 more characters
+      const fullNamePattern = /^.{2,}\s.{2,}$/;
+      if (!fullNamePattern.test(trimmedName)) {
+        newErrors.name = 'Please enter your full name (first name and last name)';
+      }
     }
 
     if (!formData.email.trim()) {
@@ -354,4 +361,5 @@ export function SignupModal({
     </div>
   );
 }
+
 
